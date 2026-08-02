@@ -1,13 +1,13 @@
 {
   "name": "bingo-studio",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Régie de bingo télé — saisie du boulier, habillage antenne, vérification des cartes",
   "main": "main.js",
   "private": true,
   "scripts": {
     "start": "electron .",
     "test": "node --test tests/*.test.mjs",
-    "dist:mac": "electron-builder --mac",
+    "dist:mac": "electron-builder --mac --universal",
     "dist:win": "electron-builder --win",
     "cartes": "node scripts/generer-cartes.mjs",
     "feuilles": "node scripts/feuilles-cartes.mjs",
@@ -21,6 +21,11 @@
   "build": {
     "appId": "ca.bingostudio.app",
     "productName": "Bingo Studio",
+    "copyright": "Bingo Studio — offert aux télévisions communautaires autonomes",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets/icone"
+    },
     "files": [
       "main.js",
       "preload.js",
@@ -28,12 +33,63 @@
       "data/**/*",
       "assets/**/*"
     ],
+    "asarUnpack": [
+      "assets/musiques/**",
+      "assets/sons/**",
+      "data/**"
+    ],
     "mac": {
-      "target": "dmg",
-      "category": "public.app-category.video"
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "category": "public.app-category.video",
+      "icon": "assets/icone/icone.icns",
+      "identity": null,
+      "darkModeSupport": true
+    },
+    "dmg": {
+      "title": "Bingo Studio",
+      "contents": [
+        {
+          "x": 140,
+          "y": 190,
+          "type": "file"
+        },
+        {
+          "x": 400,
+          "y": 190,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
     },
     "win": {
-      "target": "nsis"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icone/icone.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Bingo Studio",
+      "installerLanguages": [
+        "fr_FR"
+      ],
+      "language": "1036"
     }
   }
 }

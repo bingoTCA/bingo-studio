@@ -236,12 +236,14 @@
           </label>
         </div>
 
-        <!-- ⚠️ name="OPT_IN" est INDISPENSABLE. Le compte Brevo déclare cet
-             attribut comme OBLIGATOIRE. Sans lui, Brevo accepte la requête et
-             répond {"success":true} — mais ne crée aucun contact, en silence.
-             Le formulaire a l'air de marcher et personne ne s'inscrit. -->
+        <!-- Cette case n'a VOLONTAIREMENT pas de « name ». Le formulaire
+             officiel de Brevo, récupéré depuis leur serveur, n'envoie que
+             cinq champs : EMAIL, NOM, ORGANISME, email_address_check et
+             locale. Envoyer un attribut qu'ils ne déclarent pas risque de
+             faire rejeter toute l'inscription. La case reste un garde-fou
+             d'interface : sans elle cochée, le navigateur bloque l'envoi. -->
         <label class="consentement">
-          <input type="checkbox" name="OPT_IN" value="1" required>
+          <input type="checkbox" required>
           <span>J'accepte de recevoir le lien de téléchargement, les avis de
                 mise à jour et un rappel annuel. Je peux me désabonner à tout
                 moment.</span>

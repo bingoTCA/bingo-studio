@@ -204,11 +204,16 @@
         revente, et tu te désabonnes en un clic.
       </p>
 
-      <!-- Formulaire Brevo — envoi direct, sans iframe, pour garder l'habillage
-           du site. Les noms de champs (NOM, ORGANISME, EMAIL) doivent
+      <!-- Formulaire Brevo. Les noms de champs (NOM, ORGANISME, EMAIL) doivent
            correspondre EXACTEMENT aux attributs du compte Brevo : un nom qui
-           ne correspond pas est jeté en silence, sans message d'erreur. -->
-      <form class="inscription" method="POST"
+           ne correspond pas est jeté en silence, sans message d'erreur.
+
+           target = un cadre invisible : Brevo répond par du JSON brut
+           ({"success":true}), et sans ce cadre la personne atterrissait sur
+           une page noire couverte de code après s'être inscrite. La réponse
+           tombe maintenant dans le cadre, et on affiche un vrai remerciement.
+           Sans JavaScript, le formulaire part quand même — c'est le repli. -->
+      <form id="form-inscription" class="inscription" method="POST" target="cadre-brevo"
             action="https://d37cf71c.sibforms.com/serve/MUIFABNqFg0la_YHhXG9PD7spLY72e7-uTZy6el7Qg2yYerzy16LuA8-oeFUVbsVhrVx-rcXVcuuYe0FDbn1OtxzhWJf0qtB20dLN8ZeYsa2idNfVeqeg-wSgDshgeVtAufVJ0WfGIJxJ3kt7H8gXwKc7WfciyRFOd1CCJom1XeXq57_ki9Cj68DDIV_DLO-U2eH8Ij_NiayIjfWNw==">
         <div class="inscription-grille">
           <label>Ton nom
@@ -234,8 +239,36 @@
         <input type="text" name="email_address_check" value="" class="piege" tabindex="-1" autocomplete="off" aria-hidden="true">
         <input type="hidden" name="locale" value="fr">
 
-        <button type="submit" class="bouton bouton-fort">Recevoir le lien</button>
+        <button id="btn-inscription" type="submit" class="bouton bouton-fort">Recevoir le lien</button>
       </form>
+
+      <!-- Le cadre où atterrit la réponse de Brevo. Invisible, mais présent
+           dans le document : un iframe en display:none n'est pas chargé
+           partout de la même façon. -->
+      <iframe name="cadre-brevo" id="cadre-brevo" title="Réponse du service d'envoi" class="cadre-cache"></iframe>
+
+      <p id="inscription-souci" class="souci" hidden>
+        L'envoi n'a pas abouti — un bloqueur de pisteurs ou une coupure de
+        réseau, souvent. Réessaie, ou écris-moi directement à
+        <a href="mailto:marcbert@mailo.com">marcbert@mailo.com</a> et je
+        t'envoie le lien à la main. Tu peux aussi
+        <a href="telecharger/">aller directement au téléchargement</a>.
+      </p>
+
+      <div id="inscription-merci" class="merci" hidden>
+        <h3>C'est fait. Merci&nbsp;!</h3>
+        <p>
+          Le lien de téléchargement part vers ta boîte de courriel — regarde
+          dans les indésirables si tu ne le vois pas d'ici quelques minutes.
+        </p>
+        <p>
+          Pas envie d'attendre&nbsp;? La page de téléchargement est juste ici.
+        </p>
+        <div class="boutons">
+          <a class="bouton bouton-fort" href="telecharger/">Aller au téléchargement</a>
+          <button id="btn-reinscrire" type="button" class="bouton">Inscrire quelqu'un d'autre</button>
+        </div>
+      </div>
 
       <p class="petit">
         Mac et Windows · français · aucun compte à créer dans le logiciel ·
@@ -569,8 +602,61 @@
 <script>
   document.getElementById("annee").textContent = new Date().getFullYear();
 
-  // Tant que les fichiers ne sont pas en ligne, les tuiles de téléchargement
-  // ne doivent pas donner l'illusion d'un lien mort.
+  // ---------------------------------------------------------------------
+  //  Inscription — garder la personne sur le site
+  //
+  //  Brevo répond par du JSON brut. Le formulaire vise donc un cadre
+  //  invisible, et c'est nous qui affichons le remerciement. On ne peut pas
+  //  LIRE la réponse (autre domaine), seulement savoir qu'elle est arrivée :
+  //  d'où l'écoute de « load » sur le cadre plutôt qu'une lecture du contenu.
+  // ---------------------------------------------------------------------
+  (function () {
+    const form = document.getElementById("form-inscription");
+    const cadre = document.getElementById("cadre-brevo");
+    const merci = document.getElementById("inscription-merci");
+    const bouton = document.getElementById("btn-inscription");
+    const recommencer = document.getElementById("btn-reinscrire");
+    if (!form || !cadre || !merci) return;
+
+    let envoiEnCours = false;
+    let filet = null;
+    const etiquette = bouton.textContent;
+
+    function reussi() {
+      if (!envoiEnCours) return;          // le « load » initial du cadre vide
+      envoiEnCours = false;
+      clearTimeout(filet);
+      form.hidden = true;
+      merci.hidden = false;
+      merci.scrollIntoView({ block: "center" });
+    }
+
+    form.addEventListener("submit", function () {
+      envoiEnCours = true;
+      bouton.disabled = true;
+      bouton.textContent = "Envoi en cours…";
+      // Filet : si le cadre ne signale jamais rien — réseau coupé, bloqueur de
+      // pisteurs —, on ne laisse pas le bouton figé pour toujours.
+      filet = setTimeout(function () {
+        if (!envoiEnCours) return;
+        envoiEnCours = false;
+        bouton.disabled = false;
+        bouton.textContent = etiquette;
+        document.getElementById("inscription-souci").hidden = false;
+      }, 12000);
+    });
+
+    cadre.addEventListener("load", reussi);
+
+    recommencer.addEventListener("click", function () {
+      form.reset();
+      form.hidden = false;
+      merci.hidden = true;
+      bouton.disabled = false;
+      bouton.textContent = etiquette;
+      form.scrollIntoView({ block: "center" });
+    });
+  })();
 </script>
 </body>
 </html>

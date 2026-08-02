@@ -76,11 +76,15 @@ em { color: var(--jaune); font-style: normal; }
 .accroche { font-size: 20px; max-width: 60ch; color: var(--texte); margin-bottom: 30px; }
 
 .boutons { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+/* Vaut pour un <a> comme pour un <button>. Sans « background » ni « font »,
+   le navigateur donne au <button> son gris système et sa police par défaut :
+   le texte, réglé sur --texte (presque blanc), devenait illisible. */
 .bouton {
   display: inline-block; text-decoration: none;
   padding: 13px 26px; border-radius: 10px;
   border: 1px solid var(--bord); color: var(--texte);
-  font-size: 16px;
+  font-size: 16px; font-family: inherit; line-height: normal;
+  background: transparent; cursor: pointer;
 }
 .bouton:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.3); }
 .bouton-fort { background: var(--jaune); border-color: var(--jaune); color: #2a1456; font-weight: 700; }
@@ -280,6 +284,33 @@ code {
   background: rgba(255,255,255,.08);
   border-radius: 5px;
   padding: 1px 6px;
+}
+
+/* ---------- Inscription : après l'envoi ---------- */
+
+/* Le cadre qui reçoit la réponse de Brevo. Pas display:none — un iframe
+   masqué ainsi n'est pas chargé de la même façon partout, et on a besoin
+   de son événement « load » pour savoir que l'envoi est passé. */
+.cadre-cache {
+  position: absolute; width: 0; height: 0; border: 0;
+  visibility: hidden; pointer-events: none;
+}
+
+.merci {
+  border-left: 4px solid var(--jaune);
+  border-radius: 0 14px 14px 0;
+  background: linear-gradient(90deg, rgba(255,215,0,.10) 0%, rgba(26,18,38,.25) 100%);
+  padding: 26px 28px; max-width: 62ch;
+}
+.merci h3 { margin-bottom: 10px; }
+.merci p + p { margin-top: 12px; }
+.merci .boutons { margin-top: 20px; margin-bottom: 0; }
+
+.souci {
+  border-left: 4px solid var(--rouge);
+  border-radius: 0 10px 10px 0;
+  background: rgba(200,16,46,.10);
+  padding: 14px 16px; margin-top: 16px; max-width: 62ch;
 }
 
 /* ---------- Avis légal ---------- */

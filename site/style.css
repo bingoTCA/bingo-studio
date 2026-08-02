@@ -261,6 +261,27 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
 .etapes-contribution h3 { font-size: 19px; margin-bottom: 8px; }
 .etapes-contribution p { font-size: 15.5px; color: var(--texte-doux); line-height: 1.6; }
 
+/* Sous-titre de section : un h3 qui ouvre un bloc, pas une carte. Il lui faut
+   de l'air au-dessus, qu'un h3 de carte n'a pas besoin d'avoir. */
+.sous-titre { margin-top: 44px; }
+
+/* Mise en garde à l'intérieur d'une carte. .avis existe déjà mais c'est un
+   grand encadré de section : posé dans une carte, il l'écraserait. */
+.mise-en-garde {
+  border-left: 3px solid var(--rouge);
+  background: rgba(200,16,46,.10);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 14px;
+}
+
+code {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: .92em;
+  background: rgba(255,255,255,.08);
+  border-radius: 5px;
+  padding: 1px 6px;
+}
+
 /* ---------- Avis légal ---------- */
 .avis {
   border-left: 4px solid var(--rouge);

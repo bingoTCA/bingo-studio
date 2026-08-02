@@ -635,16 +635,47 @@ function optionsImpression() {
   };
 }
 
+// Mesuré sur une machine ordinaire : le rendu PDF coûte environ 7,6 ms et
+// 24 Ko par feuille, à peu près linéairement. On arrondit vers le haut : mieux
+// vaut annoncer plus long que laisser croire à un plantage.
+const MS_PAR_FEUILLE = 8;
+const OCTETS_PAR_FEUILLE = 24 * 1024;
+// Seuil réglé sur la demi-minute : en dessous, l'attente reste normale et une
+// alerte ne ferait qu'inquiéter pour rien.
+const FEUILLES_QUI_INQUIETENT = 4000;
+
 function majResumeImpression() {
-  if (!Object.keys(catalogue).length) { $("imp-resume").textContent = "Catalogue non chargé."; return; }
+  const ligne = $("imp-resume");
+  ligne.classList.remove("aide-alerte");
+  if (!Object.keys(catalogue).length) { ligne.textContent = "Catalogue non chargé."; return; }
   try {
     const o = optionsImpression();
     const m = monterHtml(catalogue, o);
-    $("imp-resume").textContent =
-      `${m.grilles.toLocaleString("fr-CA")} grilles · ${m.feuilles.toLocaleString("fr-CA")} feuilles`
+
+    // Plage vide : le dire ici plutôt que de laisser cliquer pour rien.
+    if (!m.grilles) {
+      ligne.textContent = o.de > o.a
+        ? `Rien à imprimer : « de la carte » (${o.de}) est plus grand que « à la carte » (${o.a}).`
+        : "Aucune carte dans cette tranche.";
+      ligne.classList.add("aide-alerte");
+      return;
+    }
+
+    let texte = `${m.grilles.toLocaleString("fr-CA")} grilles · ${m.feuilles.toLocaleString("fr-CA")} feuilles`
       + (m.derniereIncomplete ? ` · la dernière n'en porte que ${m.derniereIncomplete}` : "");
+
+    // Un gros lot n'est pas une erreur — mais partir sans savoir que ça prendra
+    // deux minutes et pèsera 400 Mo, ça ressemble à un plantage.
+    if (m.feuilles >= FEUILLES_QUI_INQUIETENT) {
+      const secondes = Math.round(m.feuilles * MS_PAR_FEUILLE / 1000);
+      const duree = secondes >= 90 ? `${Math.round(secondes / 60)} minutes` : `${secondes} secondes`;
+      texte += ` — environ ${duree} de rendu et ${medias.formaterTaille(m.feuilles * OCTETS_PAR_FEUILLE)}.`
+             + ` Resserre « de la carte » et « à la carte » pour n'imprimer que le lot dont tu as besoin.`;
+      ligne.classList.add("aide-alerte");
+    }
+    ligne.textContent = texte;
   } catch (err) {
-    $("imp-resume").textContent = err.message;
+    ligne.textContent = err.message;
   }
 }
 
@@ -1583,6 +1614,14 @@ async function demarrer() {
     $("imp-de").value = nums[0];
     $("imp-a").value = nums.at(-1);
     $("imp-de").min = nums[0]; $("imp-a").max = nums.at(-1);
+
+    // Le champ de vérification se règle sur la base RÉELLEMENT chargée. En dur
+    // à 4 chiffres, il aurait avalé le « 4 » de la carte 12345 sans un bruit :
+    // l'opératrice aurait lu « introuvable » en ondes, avec la bonne carte en
+    // main. Une station qui génère sa propre base est couverte aussi.
+    const chiffres = String(nums.at(-1)).length;
+    $("verif-num").maxLength = chiffres;
+    $("verif-num").placeholder = "0".repeat(chiffres);
     try {
       const m = await fetch("/data/cartes.manifeste.json");
       if (m.ok) manifesteCartes = await m.json();

@@ -4,7 +4,7 @@ Régie de bingo télé. Le boulier reste devant la caméra — le logiciel ne ti
 rien. Il fait les deux choses qui font mal en direct : **l'habillage à
 l'antenne** et **la vérification d'une carte au téléphone**.
 
-Catalogue de **10 000 cartes originales**, vérification instantanée contre les
+Catalogue de **50 000 cartes libres de droits**, vérification instantanée contre les
 numéros déjà sortis.
 
 Offert gratuitement aux organismes communautaires. Un projet personnel de
@@ -189,7 +189,7 @@ retrouves ta formule telle quelle à la prochaine ouverture.
 
 ## Vérifier une carte
 
-Tape le numéro de carte (1 à 10 000). Verdict immédiat : **gagnante**, ou
+Tape le numéro de carte (1 à 50 000). Verdict immédiat : **gagnante**, ou
 **il reste N cases**. La grille montre les cases marquées et surligne la figure
 retenue en jaune.
 
@@ -230,7 +230,7 @@ des gagnants à perdre.
 
 ## La base de cartes — scellée
 
-`data/cartes.json` porte **10 000 cartes, numérotées de 1 à 10 000**, générées
+`data/cartes.json` porte **50 000 cartes, numérotées de 1 à 50 000**, générées
 avec la graine `bingo-studio 2026`. Elle est **libre de droits pour les
 télévisions communautaires autonomes**.
 
@@ -246,8 +246,31 @@ vérification en ondes donnerait de mauvais verdicts. Trois garde-fous :
    *rigoureusement* à l'identique — vérifié : régénérer avec
    `bingo-studio 2026` redonne un fichier identique octet pour octet. La base
    est donc reconstructible même si le fichier était perdu.
-3. **La numérotation.** De 1 à 10 000, sans trou. (Il n'y a pas de carte n° 0 :
+3. **La numérotation.** De 1 à 50 000, sans trou. (Il n'y a pas de carte n° 0 :
    une série commence à 1.)
+
+### D'où viennent ces numéros
+
+Ils ne sont **repris à personne** : ni à Bingo Vézina, ni à aucun autre
+fournisseur. Ils sortent de `scripts/generer-cartes.mjs`.
+
+La graine (`bingo-studio 2026`) est hachée en FNV-1a pour donner un entier de
+départ, qui alimente un générateur **mulberry32** — un PRNG de 32 bits en
+quelques lignes, déterministe et sans dépendance. Pour chaque carte on y puise
+5 numéros dans 1-15 (colonne B), 5 dans 16-30 (I), 4 dans 31-45 (N, centre
+libre), 5 dans 46-60 (G), 5 dans 61-75 (O). Chaque carte est validée puis
+comparée aux précédentes par signature, pour qu'aucune ne se répète.
+
+Conséquence pratique : **ces numéros de série ne valent que pour ce logiciel**.
+La carte n° 4321 d'ici et celle d'un autre fournisseur portent le même chiffre
+et deux grilles sans rapport. Vérifier une carte achetée ailleurs afficherait
+la mauvaise grille et donnerait un mauvais verdict en ondes.
+
+**Étendre une base ne casse rien.** Vérifié : régénérer de 1 à 50 000 avec la
+même graine redonne les 10 000 premières cartes *à l'identique* — le générateur
+avance séquentiellement, donc une base plus courte est un préfixe exact de la
+plus longue. Une station peut donc passer à une base plus grande sans invalider
+les cartes déjà imprimées.
 
 Tu n'as donc **rien à régénérer**. Après un changement volontaire, resceller :
 
@@ -286,7 +309,7 @@ des lettres blanches illisibles.
 
 La mention de droits du manifeste est imprimée au bas de chaque feuille.
 
-### Plus de 10 000 numéros de série
+### Plus de 50 000 numéros de série
 
 Une station qui écoule beaucoup de cartes peut en vouloir davantage. Générer
 une base plus grande ne pose aucun problème de fond : il existe environ
@@ -316,7 +339,7 @@ catalogue entier est chargé pour la vérification en ondes. Jusqu'à 50 000, ri
 Pour ne plus dépendre du fichier acheté — et posséder tes numéros.
 
 ```bash
-npm run cartes -- --graine="ma graine" --debut=1 --fin=10000
+npm run cartes -- --graine="ma graine" --debut=1 --fin=50000
 ```
 
 Ça produit deux fichiers dans `data/` :
@@ -340,7 +363,7 @@ gagnants en même temps.
 Pour basculer sur une nouvelle base :
 
 ```bash
-npm run cartes -- --graine="AUTRE GRAINE" --fin=10000 --installer
+npm run cartes -- --graine="AUTRE GRAINE" --fin=50000 --installer
 npm run sceller -- --graine="AUTRE GRAINE"
 ```
 
@@ -381,7 +404,7 @@ npm test
 ```
 
 Vérifie les figures, la case libre, la détection de gagnant, l'intégrité des
-Les 10 000 cartes et les refus de saisie. Une erreur de détection de gagnant est une
+Les 50 000 cartes et les refus de saisie. Une erreur de détection de gagnant est une
 erreur devant public : lance-les avant chaque diffusion.
 
 ## Empaqueter

@@ -3,9 +3,9 @@
   "droits": "Cartes libres de droits pour les télévisions communautaires autonomes · Bingo Studio",
   "graine": "bingo-studio 2026",
   "premier": 1,
-  "dernier": 10000,
-  "nombre": 10000,
-  "empreinte": "sha256:70472f9f2919e86959b6c48be7a9b3e1a6ea15d60a1b50453fd66195d5fb32c3",
+  "dernier": 50000,
+  "nombre": 50000,
+  "empreinte": "sha256:a606efb66267278bbacae13c75646f08d799ce2bd6a2f368b9f00baaa7d3bd46",
   "scelleLe": "2026-08-02",
   "note": "Ne pas modifier data/cartes.json. Toute retouche invalide l'empreinte et fait échouer npm test. Pour changer de base : régénérer avec la graine, puis resceller."
 }

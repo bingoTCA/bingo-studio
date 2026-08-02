@@ -6,10 +6,11 @@
 //  correspond plus — une modification accidentelle est attrapée avant
 //  la diffusion, pas devant public.
 //
-//    node scripts/sceller-base.mjs --graine="ma graine" --detenteur="Marc Bert"
+//    node scripts/sceller-base.mjs --graine="ma graine"
+//    node scripts/sceller-base.mjs --graine="ma graine" --droits="© 2026 Ma Télé"
 // =====================================================================
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -29,9 +30,21 @@ const brut = readFileSync(BASE, "utf8");
 const catalogue = JSON.parse(brut);
 const numeros = Object.keys(catalogue).map(Number).sort((a, b) => a - b);
 
+// La mention de droits s'IMPRIME au bas de chaque feuille de cartes. Elle est
+// reprise du manifeste existant si on rescelle : sans ça, un simple
+// « npm run sceller » réécrirait la mention en silence, et le prochain lot
+// partirait chez l'imprimeur avec les mauvais droits.
+const ancien = existsSync(MANIFESTE)
+  ? JSON.parse(readFileSync(MANIFESTE, "utf8"))
+  : {};
+
+const DROITS_PAR_DEFAUT =
+  "Cartes libres de droits pour les télévisions communautaires autonomes · Bingo Studio";
+
 const manifeste = {
-  detenteur: String(args.detenteur ?? "Marc Bert"),
-  droits: `© ${args.annee ?? new Date().getFullYear()} ${args.detenteur ?? "Marc Bert"}. Base de cartes originale, tous droits réservés.`,
+  detenteur: String(args.detenteur ?? ancien.detenteur
+    ?? "Bingo Studio — base offerte aux télévisions communautaires autonomes"),
+  droits: String(args.droits ?? ancien.droits ?? DROITS_PAR_DEFAUT),
   graine: args.graine ? String(args.graine) : null,
   premier: numeros[0],
   dernier: numeros.at(-1),

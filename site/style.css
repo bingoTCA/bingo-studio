@@ -207,6 +207,17 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
 .consentement input { width: 18px; height: 18px; margin-top: 3px; flex-shrink: 0; accent-color: var(--jaune); }
 
 .inscription button { border: none; cursor: pointer; font-family: inherit; }
+.pleine-largeur { grid-column: 1 / -1; }
+
+/* Piège à robots : invisible et hors du parcours au clavier, mais bien
+   présent dans le document. Pas de display:none — certains robots le
+   détectent et sautent le champ, ce qui annule le piège. */
+.piege {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px; height: 1px; opacity: 0;
+  pointer-events: none;
+}
 
 /* ---------- Liste simple ---------- */
 .liste-simple { list-style: none; max-width: 74ch; display: grid; gap: 10px; }

@@ -81,7 +81,7 @@ Pense à inscrire le projet retenu dans `.firebaserc`.
 
 Quatre repères `REMPLACER` dans les fichiers. Cherche-les, ils sont commentés.
 
-### 1. Le formulaire Brevo — `index.html`, attribut `action`
+### 1. ~~Le formulaire Brevo~~ ✅ branché
 
 Dans Brevo (gratuit : contacts illimités, 300 courriels par jour) :
 
@@ -100,13 +100,19 @@ Dans Brevo (gratuit : contacts illimités, 300 courriels par jour) :
 
 Pour le rappel annuel : une campagne ordinaire, une fois l'an, à cette liste.
 
-### 2. Le lien Ko-fi — `index.html`, ancre `#lien-don`
+⚠️ **Les noms de champs sont en espagnol** — ce sont des attributs Brevo
+existants réutilisés : `NOMBRE` porte le nom de la personne, `APELLIDOS` le nom
+de la télévision communautaire. Ne pas les « corriger » dans le HTML : ils
+doivent correspondre exactement aux attributs du compte, sinon Brevo jette la
+donnée en silence, sans message d'erreur.
 
-Crée ta page sur [ko-fi.com](https://ko-fi.com) et remplace `https://ko-fi.com`.
+Pour repartir sur des noms clairs, il faut créer de nouveaux attributs dans
+Brevo (Contacts → Paramètres → Attributs), refaire le formulaire et migrer les
+contacts déjà enregistrés. À faire tôt, ou jamais.
 
-### 3. L'adresse de contact — `index.html`, ancre `#lien-affaires`
+### 2. ~~Le lien Ko-fi~~ ✅ branché — `https://ko-fi.com/marcoso77`
 
-Remplace `REMPLACER@EXEMPLE.COM` dans le `mailto:` de la section « Sur mesure ».
+### 3. ~~L'adresse de contact~~ ✅ branchée — `marcbert@mailo.com`
 
 ### 4. Les fichiers à télécharger — `telecharger/index.html`
 

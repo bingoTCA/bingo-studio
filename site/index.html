@@ -145,31 +145,39 @@
         revente, et tu te désabonnes en un clic.
       </p>
 
-      <!-- ⚠️ À BRANCHER : remplacer l'action par l'adresse du formulaire Brevo.
-           Brevo → Contacts → Formulaires → créer → « Partager » → URL de partage.
-           Les champs doivent porter exactement les noms des attributs Brevo. -->
-      <form class="inscription" action="https://sibforms.com/serve/REMPLACER-PAR-TON-ID"
-            method="POST" target="_blank">
+      <!-- Formulaire Brevo — envoi direct, sans iframe, pour garder l'habillage
+           du site. Les noms de champs viennent d'attributs Brevo existants,
+           nommés en espagnol :
+               NOMBRE    = le nom de la personne
+               APELLIDOS = le nom de la télévision communautaire
+           Ne pas les « corriger » ici : ils doivent correspondre exactement
+           aux attributs du compte Brevo, sinon la donnée est jetée en silence. -->
+      <form class="inscription" method="POST"
+            action="https://d37cf71c.sibforms.com/serve/MUIFABNqFg0la_YHhXG9PD7spLY72e7-uTZy6el7Qg2yYerzy16LuA8-oeFUVbsVhrVx-rcXVcuuYe0FDbn1OtxzhWJf0qtB20dLN8ZeYsa2idNfVeqeg-wSgDshgeVtAufVJ0WfGIJxJ3kt7H8gXwKc7WfciyRFOd1CCJom1XeXq57_ki9Cj68DDIV_DLO-U2eH8Ij_NiayIjfWNw==">
         <div class="inscription-grille">
           <label>Ton nom
-            <input type="text" name="NOM" autocomplete="name" required>
+            <input type="text" name="NOMBRE" maxlength="200" autocomplete="name" required>
           </label>
-          <label>Ta télé ou ton organisme
-            <input type="text" name="ORGANISME" autocomplete="organization" required>
+          <label>Ta télévision communautaire
+            <input type="text" name="APELLIDOS" maxlength="200" autocomplete="organization" required>
           </label>
-          <label>Courriel
+          <label class="pleine-largeur">Courriel
             <input type="email" name="EMAIL" autocomplete="email" required>
           </label>
-          <label>Ville ou région <span class="facultatif">facultatif</span>
-            <input type="text" name="REGION" autocomplete="address-level2">
-          </label>
         </div>
+
         <label class="consentement">
-          <input type="checkbox" name="OPT_IN" value="1" required>
+          <input type="checkbox" required>
           <span>J'accepte de recevoir le lien de téléchargement, les avis de
                 mise à jour et un rappel annuel. Je peux me désabonner à tout
                 moment.</span>
         </label>
+
+        <!-- Piège à robots : doit rester vide. Un robot qui remplit tous les
+             champs se trahit ici, et Brevo rejette l'envoi. -->
+        <input type="text" name="email_address_check" value="" class="piege" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="hidden" name="locale" value="fr">
+
         <button type="submit" class="bouton bouton-fort">Recevoir le lien</button>
       </form>
 

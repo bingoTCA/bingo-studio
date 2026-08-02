@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+  <meta charset="utf-8">
+  <title>Bingo Studio — Antenne</title>
+  <link rel="stylesheet" href="/src/antenne/antenne.css">
+</head>
+<body>
+<main id="scene" class="scene">
+
+  <!-- ============== Bandeau : logo · titre · date/heure · téléphone ============== -->
+  <header class="bandeau">
+    <div class="bandeau-gauche">
+      <img id="logo" class="logo" alt="" hidden>
+      <div>
+        <h1 id="titre">Bingo communautaire</h1>
+        <p id="partie-nom" class="bandeau-partie">Partie 1</p>
+      </div>
+    </div>
+
+    <div id="horloge" class="horloge">—</div>
+
+    <div id="telephone" class="telephone" hidden>
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57a1 1 0 0 0-1.02.24l-2.2 2.2a15.05 15.05 0 0 1-6.59-6.58l2.2-2.21a1 1 0 0 0 .25-1.02A11.36 11.36 0 0 1 8.5 4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1c0 9.39 7.61 17 17 17a1 1 0 0 0 1-1v-3.5a1 1 0 0 0-1-1z"/>
+      </svg>
+      <span id="telephone-num"></span>
+    </div>
+  </header>
+
+  <!-- ============== Haut : gagnants/carte · caméra · dernier numéro ============== -->
+  <section class="haut">
+
+    <div class="bloc-gauche">
+      <!-- Par défaut : les gagnants de la session -->
+      <div id="bloc-gagnants" class="bloc-cadre">
+        <div class="bloc-titre">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M19 5h-2V3H7v2H5a2 2 0 0 0-2 2v2c0 2.4 1.7 4.4 4 4.9V14a5 5 0 0 0 4 4.9V20H8v2h8v-2h-3v-1.1A5 5 0 0 0 17 14v-.1c2.3-.5 4-2.5 4-4.9V7a2 2 0 0 0-2-2zM5 9V7h2v3.8C5.8 10.4 5 9.3 5 9zm14 0c0 .3-.8 1.4-2 1.8V7h2v2z"/>
+          </svg>
+          <span>Gagnants</span>
+        </div>
+        <ol id="liste-gagnants" class="liste-gagnants">
+          <li class="liste-vide">— en attente —</li>
+        </ol>
+      </div>
+
+      <!-- Recouvre le bloc gagnants quand l'opératrice montre une carte -->
+      <div id="bloc-carte" class="bloc-cadre bloc-carte" hidden>
+        <div class="bloc-titre">
+          <span>Carte <span id="carte-num">0000</span></span>
+        </div>
+        <div class="carte-zone">
+          <div id="carte-grille" class="carte-grille"></div>
+        </div>
+        <p id="carte-verdict" class="carte-verdict"></p>
+      </div>
+    </div>
+
+    <!-- Zone d'incrustation : animateur + caméra du boulier,
+         ou publicités si l'opératrice bascule dessus. -->
+    <div class="zone-camera">
+      <div id="camera" class="camera"></div>
+      <div id="pubs" class="pubs" hidden>
+        <img id="pub-a" class="pub-image" alt="">
+        <img id="pub-b" class="pub-image" alt="">
+      </div>
+    </div>
+
+    <div class="bloc-droite">
+      <div class="dernier-num">
+        <div class="dn-titre">Dernier numéro</div>
+        <div class="dn-affichage">
+          <span id="dn-lettre" class="dn-lettre">—</span>
+          <span id="dn-numero" class="dn-numero">—</span>
+        </div>
+        <div class="dn-compteur">
+          <span class="dn-cpt-lib">Boules sorties</span>
+          <span id="dn-compte" class="dn-cpt-val">0</span>
+        </div>
+      </div>
+      <div class="restants"><span id="dn-restants">75</span> encore dans le boulier</div>
+    </div>
+  </section>
+
+  <!-- ============== Bandeau de messages qui défile ============== -->
+  <div id="defilant" class="defilant" hidden>
+    <div id="defilant-piste" class="defilant-piste"></div>
+  </div>
+
+  <!-- ============== Centre : formes à gagner · tableau 1 à 75 ============== -->
+  <section class="centre">
+    <aside class="bloc-formes">
+      <div class="bloc-titre">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/>
+        </svg>
+        <span>Prix à gagner</span>
+      </div>
+      <ol id="liste-formes" class="liste-formes"></ol>
+      <div class="formes-total">
+        <span>Total des prix</span>
+        <span id="formes-total-val">—</span>
+      </div>
+    </aside>
+
+    <div class="tableau-wrap">
+      <div id="tableau" class="tableau"></div>
+    </div>
+  </section>
+
+  <footer class="pied">
+    <p id="figure-aide" class="figure-aide"></p>
+    <p id="commanditaire" class="commanditaire"></p>
+  </footer>
+
+  <!-- ============== Superpositions ============== -->
+  <div id="pause" class="voile" hidden>
+    <p class="voile-titre">Nous revenons dans un instant</p>
+    <p id="pause-titre" class="voile-sous">Bingo communautaire</p>
+  </div>
+
+  <div id="annonce" class="voile voile-annonce" hidden>
+    <p id="annonce-texte" class="voile-titre"></p>
+  </div>
+
+  <!-- Générique de début ou de fin — plein écran, texte qui défile -->
+  <div id="generique" class="generique" hidden>
+    <div class="gen-bandeau">
+      <img id="gen-logo" class="gen-logo" alt="" hidden>
+      <p id="gen-titre" class="gen-titre">Bingo communautaire</p>
+    </div>
+    <div class="gen-defile">
+      <div id="gen-piste" class="gen-piste"></div>
+    </div>
+  </div>
+
+</main>
+
+<script type="module" src="/src/antenne/antenne.js"></script>
+</body>
+</html>

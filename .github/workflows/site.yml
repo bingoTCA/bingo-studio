@@ -1,0 +1,47 @@
+# =====================================================================
+#  Publie le dossier site/ sur GitHub Pages à chaque poussée sur main.
+#
+#  Rien à installer : le site est fait de fichiers statiques, il n'y a
+#  aucune étape de construction. On téléverse le dossier tel quel.
+#
+#  À activer une seule fois : dépôt → Settings → Pages → Source =
+#  « GitHub Actions ».
+# =====================================================================
+
+name: Publier le site
+
+on:
+  push:
+    branches: [main]
+    paths: ["site/**", ".github/workflows/site.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Une seule publication à la fois ; on n'annule pas celle en cours.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publier:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/configure-pages@v5
+
+      - name: Téléverser le dossier site/
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Mettre en ligne
+        id: deploiement
+        uses: actions/deploy-pages@v4

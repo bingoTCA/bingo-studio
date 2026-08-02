@@ -1,0 +1,173 @@
+/* =====================================================================
+   Site de Bingo Studio.
+
+   Même langage visuel que le logiciel — violet profond, jaune, Impact
+   pour les titres — pour que le site et l'application se lisent comme
+   un seul produit. Le corps de texte reste en sans-sérif ordinaire :
+   Impact est illisible en paragraphe.
+   ===================================================================== */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --violet:        #4a1f7a;
+  --violet-fonce:  #1a1226;
+  --violet-nuit:   #0e0618;
+  --jaune:         #ffd700;
+  --rouge:         #c8102e;
+  --texte:         #efeef0;
+  --texte-doux:    #b3aebd;
+  --bord:          rgba(255,255,255,.14);
+}
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  background: var(--violet-nuit);
+  color: var(--texte);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.dedans { width: 100%; max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+h1, h2, h3, .marque {
+  font-family: Impact, "Arial Narrow", Arial, sans-serif;
+  font-weight: 400; letter-spacing: .5px; line-height: 1.1;
+}
+h1 { font-size: clamp(34px, 6vw, 60px); }
+h2 { font-size: clamp(26px, 4vw, 38px); margin-bottom: 18px; }
+h3 { font-size: 22px; margin-bottom: 10px; color: var(--jaune); }
+
+a { color: var(--jaune); }
+strong { color: #fff; }
+em { color: var(--jaune); font-style: normal; }
+
+.petit { font-size: 14px; color: var(--texte-doux); }
+.intro { max-width: 62ch; margin-bottom: 22px; }
+
+/* ---------- En-tête ---------- */
+.entete {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(14, 6, 24, .92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--bord);
+}
+.entete-dedans { display: flex; align-items: center; justify-content: space-between; gap: 20px; height: 62px; }
+.marque { font-size: 24px; color: #fff; text-decoration: none; }
+.entete nav { display: flex; gap: 20px; flex-wrap: wrap; }
+.entete nav a { color: var(--texte-doux); text-decoration: none; font-size: 15px; }
+.entete nav a:hover { color: #fff; }
+.entete nav .lien-don { color: var(--jaune); }
+
+/* ---------- Accroche ---------- */
+.heros {
+  padding: 88px 0 76px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,215,0,.09) 0, transparent 55%),
+    linear-gradient(160deg, #0e0618 0%, #1c0f36 55%, #2a1456 100%);
+  border-bottom: 1px solid var(--bord);
+}
+.surtitre { color: var(--jaune); font-size: 15px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+.heros h1 { margin-bottom: 22px; }
+.accroche { font-size: 20px; max-width: 60ch; color: var(--texte); margin-bottom: 30px; }
+
+.boutons { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.bouton {
+  display: inline-block; text-decoration: none;
+  padding: 13px 26px; border-radius: 10px;
+  border: 1px solid var(--bord); color: var(--texte);
+  font-size: 16px;
+}
+.bouton:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.3); }
+.bouton-fort { background: var(--jaune); border-color: var(--jaune); color: #2a1456; font-weight: 700; }
+.bouton-fort:hover { background: #ffe34d; border-color: #ffe34d; }
+
+/* ---------- Bandes ---------- */
+.bande { padding: 72px 0; border-bottom: 1px solid var(--bord); }
+.bande-sombre { background: #0a0413; }
+.bande-don {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,215,0,.10) 0, transparent 60%),
+    linear-gradient(180deg, #1a1226 0%, #0e0618 100%);
+}
+
+.grille-deux { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+
+.carte {
+  background: linear-gradient(180deg, rgba(74,31,122,.42) 0%, rgba(26,18,38,.42) 100%);
+  border: 1px solid var(--bord); border-radius: 14px;
+  padding: 26px 26px 28px;
+}
+.carte p + p { margin-top: 12px; }
+
+/* ---------- Captures d'écran ---------- */
+.apercu { margin-bottom: 34px; }
+.apercu:last-child { margin-bottom: 0; }
+.apercu img {
+  display: block; width: 100%; height: auto;
+  border-radius: 12px; border: 1px solid var(--bord);
+  background: #0e0618;
+}
+.apercu figcaption {
+  margin-top: 14px; max-width: 74ch;
+  color: var(--texte-doux); font-size: 16px;
+}
+.apercu figcaption strong { color: var(--jaune); }
+
+/* ---------- Téléchargement ---------- */
+.telechargement {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 26px; border-radius: 14px; text-decoration: none;
+  background: linear-gradient(180deg, rgba(74,31,122,.42) 0%, rgba(26,18,38,.42) 100%);
+  border: 1px solid var(--bord); color: var(--texte);
+}
+.telechargement:hover { border-color: rgba(255,215,0,.5); }
+.tele-titre { font-family: Impact, "Arial Narrow", Arial, sans-serif; font-size: 28px; color: #fff; }
+.tele-detail { font-size: 15px; color: var(--texte-doux); }
+.tele-etat {
+  align-self: flex-start; margin-top: 10px;
+  font-size: 13px; padding: 5px 12px; border-radius: 20px;
+  background: rgba(255,215,0,.14); color: var(--jaune);
+}
+.telechargement[aria-disabled="true"] { cursor: default; opacity: .82; }
+
+/* ---------- Étapes ---------- */
+.etapes { list-style: none; counter-reset: etape; display: grid; gap: 22px; max-width: 78ch; }
+.etapes li { counter-increment: etape; padding-left: 62px; position: relative; }
+.etapes li::before {
+  content: counter(etape);
+  position: absolute; left: 0; top: 0;
+  width: 42px; height: 42px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--jaune); color: #2a1456;
+  font-family: Impact, "Arial Narrow", Arial, sans-serif; font-size: 22px;
+}
+.etapes h3 { margin-bottom: 4px; }
+
+/* ---------- Avis légal ---------- */
+.avis {
+  border-left: 4px solid var(--rouge);
+  border-radius: 0 14px 14px 0;
+  background: linear-gradient(90deg, rgba(200,16,46,.13) 0%, rgba(26,18,38,.25) 100%);
+  padding: 28px 30px;
+  max-width: 78ch;
+}
+.avis h2 { color: #fff; }
+.avis p + p { margin-top: 14px; }
+
+/* ---------- Pied ---------- */
+.pied { padding: 44px 0 60px; }
+.pied p + p { margin-top: 8px; }
+
+@media (max-width: 620px) {
+  body { font-size: 16px; }
+  .bande { padding: 54px 0; }
+  .heros { padding: 60px 0 52px; }
+  .entete-dedans { height: auto; padding: 12px 0; flex-direction: column; align-items: flex-start; }
+  .etapes li { padding-left: 52px; }
+  .etapes li::before { width: 36px; height: 36px; font-size: 19px; }
+}

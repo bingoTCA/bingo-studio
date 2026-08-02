@@ -1,0 +1,13 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": ["firebase.json", ".firebaserc", "**/.*", "README.md", "**/*.@(dmg|exe|zip)"],
+    "cleanUrls": true,
+    "headers": [
+      {
+        "source": "**/*.@(css|js|png|jpg|svg|webp|woff2)",
+        "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }]
+      }
+    ]
+  }
+}

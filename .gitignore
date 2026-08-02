@@ -1,0 +1,17 @@
+# Dépendances et paquets construits
+node_modules/
+dist/
+
+# Fichiers produits par les scripts — régénérables à partir de la graine,
+# et parfois volumineux. Ils n'ont rien à faire dans le dépôt.
+data/cartes-nouvelles.*
+data/cartes-precedentes.json
+data/feuilles-*.html
+data/feuilles-*.pdf
+data/apercu-*.html
+
+# macOS
+.DS_Store
+
+# NOTE : data/cartes.json et data/cartes.manifeste.json SONT versionnés.
+# C'est la base scellée en service ; le logiciel ne fonctionne pas sans elle.

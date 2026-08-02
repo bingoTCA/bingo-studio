@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+  <meta charset="utf-8">
+  <title>Bingo Studio — Régie</title>
+  <link rel="stylesheet" href="/src/regie/regie.css">
+</head>
+<body>
+
+<header class="entete">
+  <div class="entete-titre">
+    <strong>Bingo Studio</strong>
+    <span class="entete-session" id="entete-session">Bingo communautaire</span>
+  </div>
+  <div class="entete-actions">
+    <span id="pastille-onde" class="pastille pastille-onde">En ondes</span>
+    <button id="btn-pause" class="bouton">Couper l'antenne</button>
+    <button id="btn-ecrans" class="bouton">Envoyer l'antenne…</button>
+    <button id="btn-reglages" class="bouton">Paramètres</button>
+  </div>
+</header>
+
+<!-- ============ LE TABLEAU — le même qu'à l'antenne ============ -->
+<section class="bloc bloc-tableau">
+  <div id="tableau" class="tableau"></div>
+  <div class="tableau-pied">
+    <input id="saisie" type="text" inputmode="numeric" autocomplete="off"
+           maxlength="2" placeholder="––" aria-label="Numéro sorti du boulier"
+           title="Tape le numéro puis Entrée, ou clique-le directement dans le tableau">
+    <span id="apercu-lettre" class="apercu-lettre">–</span>
+    <button id="btn-annuler" class="bouton bouton-danger">Annuler le dernier</button>
+    <span class="compteur"><strong id="compte-tires">0</strong> tirés · <strong id="compte-restants">75</strong> dans le boulier</span>
+    <div id="journal" class="journal"></div>
+  </div>
+</section>
+
+<p id="message" class="message" role="status" aria-live="polite"></p>
+
+<div class="colonnes">
+
+  <!-- ============ GAUCHE : VÉRIFICATION ============ -->
+  <section class="bloc">
+    <h2>Vérifier une carte</h2>
+    <div class="verif-zone">
+      <input id="verif-num" type="text" inputmode="numeric" autocomplete="off"
+             maxlength="4" placeholder="0000" aria-label="Numéro de carte">
+      <span id="verif-verdict" class="verdict">Catalogue…</span>
+    </div>
+    <div id="verif-grille" class="carte-grille"></div>
+    <div class="verif-actions">
+      <button id="btn-montrer" class="bouton">Montrer à l'antenne</button>
+      <button id="btn-cacher" class="bouton">Retirer de l'antenne</button>
+      <button id="btn-annoncer" class="bouton bouton-primaire">Annoncer le gagnant</button>
+    </div>
+  </section>
+
+  <!-- ============ DROITE : CONTRÔLES + PARTIE ============ -->
+  <div class="colonne-droite">
+
+    <section class="bloc">
+      <h2>Contrôles antenne</h2>
+      <div class="controles">
+        <button id="btn-gen-debut" class="bouton">Générique de début</button>
+        <button id="btn-gen-fin" class="bouton">Générique de fin</button>
+        <button id="btn-gen-stop" class="bouton bouton-primaire">Retour au jeu</button>
+      </div>
+      <div class="controles">
+        <button id="btn-pubs" class="bouton">Passer aux pubs</button>
+        <button id="btn-musique" class="bouton">Musique</button>
+        <button id="btn-son-regie" class="bouton">Son régie</button>
+      </div>
+      <p id="etat-antenne" class="aide">Le jeu est à l'antenne.</p>
+    </section>
+
+    <section class="bloc">
+      <h2>Partie en cours</h2>
+      <div class="partie-barre" id="partie-barre"></div>
+      <p class="aide">Ajouter ou réordonner les parties&nbsp;: <button id="btn-vers-parties" class="lien">dans les Paramètres</button>.</p>
+      <div class="partie-detail">
+        <div>
+          <label for="partie-figure">Figure à compléter</label>
+          <select id="partie-figure"></select>
+        </div>
+        <div>
+          <label for="partie-lot">Lot</label>
+          <input id="partie-lot" type="number" min="0" step="5">
+        </div>
+      </div>
+      <div class="partie-actions">
+        <button id="btn-partie-precedente" class="bouton">Partie précédente</button>
+        <button id="btn-partie-suivante" class="bouton bouton-primaire">Partie suivante</button>
+        <button id="btn-vider-tirage" class="bouton bouton-danger">Vider le tableau</button>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div id="bloc-reglages" class="page-parametres" hidden>
+  <header class="param-entete">
+    <div class="param-titre">
+      <strong>Paramètres</strong>
+      <span class="aide">Chaque changement part à l'antenne tout de suite. « Enregistrer » confirme et te ramène.</span>
+    </div>
+    <div class="param-actions">
+      <button id="btn-param-retour" class="bouton">← Revenir à la régie</button>
+      <button id="btn-param-enregistrer" class="bouton bouton-primaire">Enregistrer et revenir</button>
+    </div>
+  </header>
+
+  <div class="param-corps">
+
+      <h3 id="titre-parties">Les parties</h3>
+      <p class="aide">Ajoute, renomme, choisis la figure, fixe le lot, réordonne avec ↑ ↓.
+         Les parties sont conservées d'une session à l'autre.</p>
+      <div id="reg-parties" class="reg-parties"></div>
+      <button id="btn-ajouter-partie" class="bouton">+ Ajouter une partie</button>
+
+      <h3>Textes à l'antenne</h3>
+      <label for="reg-titre">Titre</label>
+      <input id="reg-titre" type="text">
+      <label for="reg-telephone">Téléphone à afficher</label>
+      <input id="reg-telephone" type="text" placeholder="418 555-0143">
+      <label for="reg-commanditaire">Mention de commandite</label>
+      <input id="reg-commanditaire" type="text" placeholder="Présenté par…">
+      <label class="case-a-cocher">
+        <input id="reg-dateheure" type="checkbox"> Afficher la date et l'heure du moment
+      </label>
+
+      <h3>Logo</h3>
+      <div class="reg-logo">
+        <div class="reg-logo-apercu">
+          <img id="reg-logo-img" alt="" hidden>
+          <span id="reg-logo-vide" class="aide">Aucun logo</span>
+        </div>
+        <div class="reg-logo-actions">
+          <label class="bouton bouton-fichier">
+            Téléverser un logo…
+            <input id="reg-logo-fichier" type="file" accept="image/*" hidden>
+          </label>
+          <button id="btn-logo-retirer" class="bouton bouton-danger">Retirer</button>
+        </div>
+      </div>
+
+      <h3>Couleur de fond</h3>
+      <div class="reg-couleurs">
+        <label>Haut<input id="reg-fond-haut" type="color"></label>
+        <label>Milieu<input id="reg-fond-milieu" type="color"></label>
+        <label>Bas<input id="reg-fond-bas" type="color"></label>
+        <label class="reg-angle"><span>Angle : <span id="reg-angle-val">135</span>°</span>
+          <input id="reg-fond-angle" type="range" min="0" max="360" step="5">
+        </label>
+      </div>
+      <div class="reg-apercu-ligne">
+        <span class="aide">Aperçu</span>
+        <div id="reg-fond-apercu" class="reg-fond-apercu"></div>
+        <button id="btn-fond-defaut" class="bouton">Défaut</button>
+      </div>
+      <label class="case-a-cocher"><input id="reg-halo" type="checkbox"> Halo de projecteur</label>
+      <label class="case-a-cocher"><input id="reg-texture" type="checkbox"> Texture pointillée</label>
+
+      <h3>Zone caméra (chroma)</h3>
+      <p class="aide">Le rectangle bleu où la régie incruste l'animateur et la caméra du boulier.</p>
+      <div class="reg-couleurs">
+        <label>Bleu d'incrustation<input id="reg-chroma" type="color"></label>
+        <button id="btn-chroma-defaut" class="bouton">Bleu pur</button>
+      </div>
+      <label class="case-a-cocher"><input id="reg-chroma-visible" type="checkbox"> Afficher la zone caméra</label>
+
+      <h3>Bandeau défilant</h3>
+      <label class="case-a-cocher"><input id="reg-bandeau-actif" type="checkbox"> Afficher le bandeau</label>
+      <label for="reg-bandeau-messages">Messages — un par ligne</label>
+      <textarea id="reg-bandeau-messages" rows="4" placeholder="Merci à nos commanditaires&#10;Prochain bingo dimanche 12 h 30"></textarea>
+      <label for="reg-bandeau-rss">Flux RSS (facultatif)</label>
+      <div class="reg-ligne-bouton">
+        <input id="reg-bandeau-rss" type="text" placeholder="https://www.radiogaspesie.ca/feed/">
+        <button id="btn-rss-tester" class="bouton">Charger</button>
+      </div>
+      <p id="reg-rss-etat" class="aide">Aucun flux chargé.</p>
+      <label class="reg-angle">Durée d'un passage : <span id="reg-bandeau-vitesse-val">90</span> s
+        <input id="reg-bandeau-vitesse" type="range" min="20" max="240" step="5">
+      </label>
+
+      <h3 id="titre-pubs">Publicités</h3>
+      <p class="aide">Elles remplacent le carré d'incrustation. Bascule en direct avec « Passer aux pubs ».</p>
+      <div class="reg-logo-actions">
+        <label class="bouton bouton-fichier">
+          Ajouter des images…
+          <input id="reg-pubs-fichiers" type="file" accept="image/*" multiple hidden>
+        </label>
+      </div>
+      <div id="reg-pubs-liste" class="reg-pubs-liste"></div>
+      <label class="reg-angle">Changement toutes les <span id="reg-pubs-secondes-val">8</span> s
+        <input id="reg-pubs-secondes" type="range" min="2" max="60" step="1">
+      </label>
+
+      <h3>Sons</h3>
+      <label class="case-a-cocher"><input id="reg-son-ding" type="checkbox"> Clochette à chaque boule</label>
+      <label class="case-a-cocher"><input id="reg-son-fanfare" type="checkbox"> Fanfare à l'annonce d'un gagnant</label>
+      <label class="case-a-cocher"><input id="reg-son-musique" type="checkbox"> Musique de fond pendant le jeu</label>
+      <label class="reg-angle">Volume de la musique : <span id="reg-vol-musique-val">15</span> %
+        <input id="reg-vol-musique" type="range" min="0" max="100" step="5">
+      </label>
+      <label class="reg-angle">Volume des effets : <span id="reg-vol-effets-val">55</span> %
+        <input id="reg-vol-effets" type="range" min="0" max="100" step="5">
+      </label>
+
+      <h3>Génériques</h3>
+      <label for="reg-gen-debut">Texte du générique de début</label>
+      <textarea id="reg-gen-debut" rows="3"></textarea>
+      <label for="reg-gen-fin">Texte du générique de fin</label>
+      <textarea id="reg-gen-fin" rows="3"></textarea>
+      <label class="reg-angle">Durée d'un défilement : <span id="reg-gen-vitesse-val">60</span> s
+        <input id="reg-gen-vitesse" type="range" min="15" max="240" step="5">
+      </label>
+
+      <h3>Diffusion</h3>
+      <p class="aide" id="adresse-antenne">Source navigateur pour OBS ou Tricaster : http://127.0.0.1:7777/antenne</p>
+      <div class="verif-actions">
+        <button id="btn-rapport" class="bouton">Rapport de session</button>
+        <button id="btn-nouvelle" class="bouton bouton-danger">Nouvelle session</button>
+      </div>
+
+  </div>
+</div>
+
+<div id="choix-ecran" class="modale" hidden>
+  <div class="modale-boite">
+    <h2>Où envoyer l'antenne ?</h2>
+    <div id="liste-ecrans" class="liste-ecrans"></div>
+    <div class="verif-actions">
+      <button id="btn-antenne-fenetre" class="bouton">Remettre en fenêtre</button>
+      <button id="btn-fermer-ecrans" class="bouton">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/src/regie/regie.js"></script>
+</body>
+</html>

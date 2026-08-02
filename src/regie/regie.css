@@ -1,0 +1,289 @@
+/* =====================================================================
+   Régie — l'écran de l'opérateur.
+   Sombre (on travaille souvent dans un studio peu éclairé), gros
+   caractères sur la saisie, et rien qui bouge tout seul.
+   ===================================================================== */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* `hidden` doit gagner contre tout `display:` posé plus bas — sinon une
+   modale en display:flex reste visible malgré l'attribut. */
+[hidden] { display: none !important; }
+
+body {
+  background: #14140f;
+  color: #e4e3dc;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 10px 14px 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+h2 { font-size: 15px; font-weight: 600; margin-bottom: 10px; color: #f0b429; }
+h3 { font-size: 13px; font-weight: 600; margin: 16px 0 6px; color: #9a9992; text-transform: uppercase; letter-spacing: 0.08em; }
+label { display: block; font-size: 13px; color: #9a9992; margin: 8px 0 4px; }
+.aide { font-size: 13px; color: #7c7b74; margin-bottom: 6px; }
+
+/* ---------- En-tête ---------- */
+.entete {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-bottom: 9px; margin-bottom: 10px;
+  border-bottom: 1px solid #2c2c26;
+}
+.entete-titre strong { font-size: 16px; }
+.entete-session { color: #7c7b74; margin-left: 10px; font-size: 14px; }
+.entete-actions { display: flex; gap: 8px; align-items: center; }
+
+.pastille { font-size: 12px; padding: 4px 11px; border-radius: 20px; font-weight: 600; }
+.pastille-onde { background: #2f6b2a; color: #d7f0d2; }
+.pastille-coupe { background: #7a2020; color: #f4c9c9; }
+
+/* ---------- Boutons et champs ---------- */
+.bouton {
+  font: inherit; font-size: 13px;
+  padding: 7px 13px; border-radius: 7px;
+  background: transparent; color: #e4e3dc;
+  border: 1px solid #3a3a32; cursor: pointer;
+}
+.bouton:hover { background: #22221c; border-color: #55554a; }
+.bouton:active { transform: scale(0.98); }
+.bouton-primaire { background: #f0b429; color: #1a1200; border-color: #f0b429; font-weight: 600; }
+.bouton-primaire:hover { background: #d79f20; border-color: #d79f20; }
+.bouton-danger { border-color: #6b2a2a; color: #e79a9a; }
+.bouton-danger:hover { background: #2a1414; border-color: #8a3535; }
+
+input, select, textarea {
+  font: inherit;
+  background: #0d0d09; color: #e4e3dc;
+  border: 1px solid #3a3a32; border-radius: 7px;
+  padding: 8px 10px; width: 100%;
+}
+textarea { resize: vertical; line-height: 1.45; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: #f0b429; box-shadow: 0 0 0 3px rgba(240,180,41,0.15); }
+
+/* ---------- Contrôles antenne ---------- */
+.controles { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.controles .bouton { flex: 1; min-width: 120px; }
+.bouton.actif { background: #f0b429; color: #1a1200; border-color: #f0b429; font-weight: 600; }
+
+.reg-ligne-bouton { display: flex; gap: 8px; align-items: stretch; }
+.reg-ligne-bouton .bouton { flex-shrink: 0; }
+
+.reg-pubs-liste { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.reg-pub { position: relative; width: 92px; height: 52px; border-radius: 6px; overflow: hidden; border: 1px solid #33332c; background: #0d0d09; }
+.reg-pub img { width: 100%; height: 100%; object-fit: contain; }
+.reg-pub button {
+  position: absolute; top: 2px; right: 2px;
+  width: 20px; height: 20px; padding: 0; line-height: 1;
+  border-radius: 4px; cursor: pointer;
+  background: rgba(20,8,8,.85); color: #e79a9a; border: 1px solid #6b2a2a;
+}
+.reg-pub button:hover { background: #7a2020; color: #fff; }
+.reg-pubs-vide { font-size: 13px; color: #55554f; }
+
+/* ---------- Disposition ----------
+   Tout doit tenir à l'écran sans défiler : marges serrées, cases du
+   tableau basses et larges, carte de vérification compacte. */
+.bloc { background: #1b1b15; border: 1px solid #2c2c26; border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; }
+.colonnes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: start; }
+.colonnes > * { min-width: 0; }
+.colonne-droite { display: flex; flex-direction: column; }
+.colonne-droite .bloc:last-child { margin-bottom: 0; }
+
+/* ---------- Saisie, sous le tableau ---------- */
+#saisie {
+  width: 70px; flex-shrink: 0;
+  font-size: 24px; font-weight: 700; text-align: center;
+  padding: 3px 0; height: 38px;
+}
+#saisie::placeholder { color: #33332c; }
+.apercu-lettre {
+  font-size: 22px; font-weight: 700; color: #f0b429;
+  min-width: 72px; flex-shrink: 0; white-space: nowrap;
+}
+.compteur { font-size: 13px; color: #7c7b74; white-space: nowrap; flex-shrink: 0; }
+.compteur strong { color: #e4e3dc; }
+
+/* Les messages suivent l'opératrice : la page est longue, et un message
+   affiché en haut serait invisible quand elle travaille dans les réglages. */
+.message {
+  position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%);
+  z-index: 20; max-width: 70vw;
+  padding: 11px 22px; border-radius: 24px;
+  font-size: 14px; font-weight: 600; text-align: center;
+  border: 1px solid #3a3a32; background: #22221c; color: #e4e3dc;
+  box-shadow: 0 6px 22px rgba(0,0,0,.55);
+}
+.message:empty { display: none; }
+.message.erreur { background: #3a1414; border-color: #8a3535; color: #f4c9c9; }
+.message.ok { background: #162c14; border-color: #2f6b2a; color: #d7f0d2; }
+
+/* ---------- Le tableau, identique à celui de l'antenne ----------
+   Cases basses et larges : on récupère beaucoup de hauteur, et les
+   numéros gagnent en taille au passage. */
+.bloc-tableau { padding: 10px 12px; }
+.tableau { display: grid; grid-template-columns: 36px repeat(15, minmax(0, 1fr)); gap: 3px; }
+.tableau-lettre {
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(180deg, #555 0%, #2a2a2a 100%);
+  color: #fff; border-radius: 5px;
+  font-size: 22px; font-weight: 900;
+}
+.tableau-case {
+  display: flex; align-items: center; justify-content: center;
+  height: 44px;
+  background: #000; color: #5a5a5a;
+  border: 1px solid #1a1a1a; border-radius: 5px;
+  font-size: 22px; font-weight: 900;
+  cursor: pointer; user-select: none;
+  transition: background .12s, color .12s;
+}
+/* Survol : jaune = ce clic va l'allumer, rouge sombre = ce clic va l'éteindre. */
+.tableau-case:hover { background: #2a2416; border-color: #f0b429; color: #f0b429; }
+.tableau-case.sorti { background: #c8102e; color: #fff; border-color: #c8102e; }
+.tableau-case.sorti:hover { background: #7a0a1c; border-color: #f08a8a; color: #f4c9c9; }
+.tableau-case.dernier { background: #f0b429; color: #2a1456; border-color: #fff; }
+.tableau-case.prepare { outline: 2px solid #f0b429; outline-offset: -2px; color: #f0b429; }
+
+.tableau-pied { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+
+/* ---------- Journal ---------- */
+.journal { display: flex; gap: 5px; flex: 1; min-width: 0; overflow-x: auto; padding-bottom: 2px; }
+.journal-item {
+  font: inherit; font-size: 13px; font-weight: 600;
+  padding: 5px 9px; border-radius: 6px; flex-shrink: 0;
+  background: #22221c; color: #c9c8c1; border: 1px solid #33332c; cursor: pointer;
+}
+.journal-item:hover { background: #3a1e1e; border-color: #7a3535; color: #f0b0b0; }
+.journal-item.dernier { background: #f0b429; color: #1a1200; border-color: #f0b429; }
+.journal-vide { font-size: 13px; color: #55554f; }
+
+/* ---------- Parties ---------- */
+.partie-barre { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.partie-puce {
+  font: inherit; font-size: 13px; padding: 6px 11px; border-radius: 7px;
+  background: #22221c; color: #9a9992; border: 1px solid #33332c; cursor: pointer;
+}
+.partie-puce.active { background: #f0b429; color: #1a1200; border-color: #f0b429; font-weight: 600; }
+.partie-detail { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 12px; }
+.partie-actions, .verif-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+.lien {
+  font: inherit; font-size: 13px; padding: 0; border: none; background: none;
+  color: #f0b429; text-decoration: underline; cursor: pointer;
+}
+
+/* ---------- Vérification ---------- */
+.verif-zone { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+#verif-num { width: 92px; flex-shrink: 0; font-size: 20px; font-weight: 700; text-align: center; }
+.verdict { font-size: 14px; font-weight: 600; padding: 6px 12px; border-radius: 7px; color: #7c7b74; }
+.verdict.gagnante { background: #2f6b2a; color: #d7f0d2; }
+.verdict.pas-encore { background: #22221c; color: #e4e3dc; }
+.verdict.introuvable { background: #6b2a2a; color: #f4c9c9; }
+
+/* La carte n'a pas besoin d'être grosse : l'opératrice lit un verdict,
+   elle ne joue pas dessus. */
+.carte-grille { display: grid; grid-template-columns: repeat(5, 34px); gap: 3px; }
+.carte-case {
+  height: 34px; border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  background: #22221c; color: #6b6a63;
+}
+.carte-case.marquee { background: #2f6b2a; color: #d7f0d2; }
+.carte-case.libre { background: #3a3a32; color: #a5a49c; }
+.carte-case.retenue { outline: 2px solid #f0b429; outline-offset: -2px; }
+.carte-case.vide { background: transparent; }
+
+/* ---------- Paramètres : une page à part entière ----------
+   Un vrai second document ferait deux écrivains sur le même état pendant
+   qu'on tire des numéros — ici le panneau couvre la régie, mais l'état
+   reste géré par une seule page. */
+.page-parametres {
+  position: fixed; inset: 0; z-index: 30;
+  background: #14140f;
+  display: flex; flex-direction: column;
+}
+.param-entete {
+  flex-shrink: 0;
+  display: flex; justify-content: space-between; align-items: center; gap: 24px;
+  padding: 14px 22px;
+  border-bottom: 1px solid #2c2c26;
+  background: #1b1b15;
+}
+.param-titre { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param-titre strong { font-size: 17px; color: #f0b429; }
+.param-titre .aide { margin: 0; }
+.param-actions { display: flex; gap: 10px; flex-shrink: 0; }
+
+.param-corps {
+  flex: 1; overflow-y: auto;
+  padding: 8px 22px 40px;
+  max-width: 860px; width: 100%; margin: 0 auto;
+}
+.param-corps h3:first-child { margin-top: 12px; }
+
+/* ---------- Réglages ---------- */
+.case-a-cocher { display: flex; align-items: center; gap: 8px; margin: 10px 0 0; color: #c9c8c1; font-size: 13px; cursor: pointer; }
+.case-a-cocher input { width: auto; accent-color: #f0b429; }
+
+.reg-logo { display: flex; gap: 14px; align-items: center; }
+.reg-logo-apercu {
+  width: 150px; height: 78px; flex-shrink: 0;
+  background: #0d0d09; border: 1px solid #33332c; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.reg-logo-apercu img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.reg-logo-actions { display: flex; flex-direction: column; gap: 8px; }
+.bouton-fichier { text-align: center; }
+
+.reg-couleurs { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; }
+/* Attention : en flex-column, chaque morceau de texte devient une ligne.
+   Le libellé doit donc être enveloppé dans un seul <span>. */
+.reg-couleurs label { display: flex; flex-direction: column; gap: 5px; margin: 0; font-size: 13px; }
+.reg-couleurs label > span { white-space: nowrap; }
+.reg-couleurs input[type="color"] { width: 58px; height: 36px; padding: 2px; cursor: pointer; }
+.reg-angle { flex: 1; min-width: 160px; white-space: nowrap; }
+.reg-angle input[type="range"] { accent-color: #f0b429; }
+
+.reg-apercu-ligne { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.reg-apercu-ligne .aide { margin: 0; flex-shrink: 0; }
+.reg-fond-apercu { flex: 1; height: 40px; border-radius: 8px; border: 1px solid #33332c; }
+
+/* ---------- Parties ---------- */
+.reg-parties { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.reg-partie {
+  display: grid;
+  grid-template-columns: minmax(0,1.3fr) minmax(0,1.6fr) 78px auto auto auto;
+  gap: 5px; align-items: center;
+}
+.reg-partie.courante { outline: 1px solid #f0b429; outline-offset: 3px; border-radius: 4px; }
+.reg-partie input, .reg-partie select { padding: 6px 8px; font-size: 13px; }
+.reg-bouton-mini {
+  font: inherit; font-size: 13px; line-height: 1;
+  width: 26px; height: 30px; padding: 0; border-radius: 6px;
+  background: transparent; color: #c9c8c1; border: 1px solid #33332c; cursor: pointer;
+}
+.reg-bouton-mini:hover:not(:disabled) { background: #2f2f27; border-color: #55554a; }
+.reg-bouton-mini:disabled { opacity: 0.25; cursor: not-allowed; }
+.reg-supprimer {
+  font: inherit; font-size: 15px; line-height: 1;
+  width: 26px; height: 30px; padding: 0; border-radius: 6px;
+  background: transparent; color: #e79a9a; border: 1px solid #6b2a2a; cursor: pointer;
+}
+.reg-supprimer:hover { background: #2a1414; }
+
+/* ---------- Modale des écrans ---------- */
+.modale {
+  position: fixed; inset: 0; background: rgba(6,6,6,0.82);
+  display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 10;
+}
+.modale-boite { background: #1b1b15; border: 1px solid #3a3a32; border-radius: 12px; padding: 22px 24px; width: 100%; max-width: 460px; }
+.liste-ecrans { display: flex; flex-direction: column; gap: 8px; }
+.ecran-choix {
+  font: inherit; text-align: left; padding: 12px 14px; border-radius: 8px;
+  background: #22221c; color: #e4e3dc; border: 1px solid #33332c; cursor: pointer;
+}
+.ecran-choix:hover { background: #2f2f27; border-color: #f0b429; }
+.ecran-choix small { display: block; color: #7c7b74; font-size: 12px; margin-top: 2px; }

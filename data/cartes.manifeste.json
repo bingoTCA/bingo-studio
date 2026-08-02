@@ -1,0 +1,11 @@
+{
+  "detenteur": "Marc Bert",
+  "droits": "© 2026 Marc Bert. Base de cartes originale, tous droits réservés.",
+  "graine": "bingo-studio 2026",
+  "premier": 1,
+  "dernier": 10000,
+  "nombre": 10000,
+  "empreinte": "sha256:70472f9f2919e86959b6c48be7a9b3e1a6ea15d60a1b50453fd66195d5fb32c3",
+  "scelleLe": "2026-08-02",
+  "note": "Ne pas modifier data/cartes.json. Toute retouche invalide l'empreinte et fait échouer npm test. Pour changer de base : régénérer avec la graine, puis resceller."
+}

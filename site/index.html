@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bingo Studio — la régie de bingo télé, offerte aux télés communautaires</title>
+<meta name="description" content="Logiciel gratuit de régie pour bingo télé et radio : habillage à l'antenne, vérification des cartes en direct, impression des cartes. Un projet personnel de Marc Bert, offert aux organismes communautaires.">
+<meta property="og:title" content="Bingo Studio — la régie de bingo télé">
+<meta property="og:description" content="Offert gratuitement aux télés et radios communautaires.">
+<meta property="og:locale" content="fr_CA">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="entete">
+  <div class="dedans entete-dedans">
+    <a class="marque" href="/">Bingo&nbsp;Studio</a>
+    <nav>
+      <a href="#telecharger">Télécharger</a>
+      <a href="#emploi">Mode d'emploi</a>
+      <a href="#cartes">Les cartes</a>
+      <a href="#don" class="lien-don">Faire un don</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============================ Accroche ============================ -->
+  <section class="heros">
+    <div class="dedans">
+      <p class="surtitre">Gratuit · un projet de Marc Bert</p>
+      <h1>La régie de bingo<br>pour la télé et la radio</h1>
+      <p class="accroche">
+        Ton boulier reste devant la caméra. Le logiciel fait les deux choses qui
+        font mal en direct : <strong>l'habillage à l'antenne</strong> et
+        <strong>la vérification d'une carte au téléphone</strong>.
+      </p>
+      <div class="boutons">
+        <a class="bouton bouton-fort" href="#telecharger">Télécharger — c'est gratuit</a>
+        <a class="bouton" href="#emploi">Voir comment ça marche</a>
+      </div>
+      <p class="petit">Mac et Windows · français · aucun compte à créer · fonctionne hors ligne</p>
+    </div>
+  </section>
+
+  <!-- ============================ Ce que ça fait ============================ -->
+  <section class="bande">
+    <div class="dedans">
+      <h2>Deux écrans, un seul logiciel</h2>
+
+      <figure class="apercu">
+        <img src="images/antenne.png" alt="L'écran d'antenne : la carte vérifiée, la zone d'incrustation caméra, le dernier numéro, les prix à gagner et le tableau de 1 à 75." width="1600" height="900" loading="lazy">
+        <figcaption>
+          <strong>L'antenne</strong> — la boule, le tableau complet, la figure
+          en cours, les prix, la date et l'heure, ton logo, et une zone
+          d'incrustation en bleu pour l'animateur et la caméra du boulier.
+          Elle part sur un second écran, ou dans OBS et Tricaster comme source
+          navigateur. Générique de début et de fin inclus.
+        </figcaption>
+      </figure>
+
+      <figure class="apercu">
+        <img src="images/regie.png" alt="L'écran de régie : le tableau cliquable de 1 à 75, la vérification d'une carte, les contrôles antenne et la partie en cours." width="1600" height="1000" loading="lazy">
+        <figcaption>
+          <strong>La régie</strong> — le même tableau qu'à l'antenne. Un clic
+          allume le numéro sorti du boulier et l'envoie en ondes ; un second
+          clic le retire. Tu entres un numéro de carte, le verdict tombe :
+          <em>gagnante</em>, ou <em>il reste 7 cases</em>. Fini la vérification
+          à la main, en direct, sous pression.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============================ Téléchargement ============================ -->
+  <section id="telecharger" class="bande bande-sombre">
+    <div class="dedans">
+      <h2>Télécharger</h2>
+      <p class="intro">
+        Gratuit, sans compte, sans limite de temps. Si le logiciel te sert,
+        <a href="#don">un don</a> aide à le faire vivre.
+      </p>
+      <div class="grille-deux">
+        <!-- Les fichiers sont servis par GitHub Releases, pas par ce site :
+             aucune limite de bande passante, alors que l'hébergement du site
+             en a une. -->
+        <a class="telechargement" href="#" data-plateforme="mac" aria-disabled="true">
+          <span class="tele-titre">macOS</span>
+          <span class="tele-detail">Fichier .dmg · Apple Silicon et Intel</span>
+          <span class="tele-etat">Bientôt disponible</span>
+        </a>
+        <a class="telechargement" href="#" data-plateforme="windows" aria-disabled="true">
+          <span class="tele-titre">Windows</span>
+          <span class="tele-detail">Fichier .exe · Windows 10 et 11</span>
+          <span class="tele-etat">Bientôt disponible</span>
+        </a>
+      </div>
+      <p class="petit">
+        À la première ouverture, le système peut prévenir que le développeur
+        n'est pas identifié : c'est normal pour un logiciel offert
+        gratuitement. Sur Mac, clic droit sur l'application puis
+        <em>Ouvrir</em>. Sur Windows, <em>Informations complémentaires</em>
+        puis <em>Exécuter quand même</em>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================ Mode d'emploi ============================ -->
+  <section id="emploi" class="bande">
+    <div class="dedans">
+      <h2>Mode d'emploi</h2>
+      <ol class="etapes">
+        <li>
+          <h3>Installe et ouvre</h3>
+          <p>Deux fenêtres s'ouvrent : la <strong>régie</strong>, pour toi, et
+             l'<strong>antenne</strong>, pour le téléviseur.</p>
+        </li>
+        <li>
+          <h3>Envoie l'antenne à la diffusion</h3>
+          <p>Bouton « Envoyer l'antenne… » pour la placer en plein écran sur
+             l'écran de ton choix. Avec OBS ou Tricaster, utilise plutôt une
+             <strong>source navigateur</strong> sur l'adresse indiquée dans les
+             Paramètres. Un fond transparent est disponible pour incruster
+             par-dessus le plateau.</p>
+        </li>
+        <li>
+          <h3>Règle ton habillage</h3>
+          <p>Logo, couleurs de fond, couleur d'incrustation, téléphone,
+             commanditaire, bandeau défilant, sons, génériques. Tes réglages et
+             tes parties sont conservés d'une semaine à l'autre.</p>
+        </li>
+        <li>
+          <h3>Compose tes parties</h3>
+          <p>Onze figures — ligne, colonne, diagonale, X, quatre coins, T, L, H,
+             le tour, carte pleine… Ajoute, renomme, réordonne : chaque télé
+             communautaire a sa formule.</p>
+        </li>
+        <li>
+          <h3>Anime</h3>
+          <p>Chaque boule sortie du boulier, un clic. Un appel arrive : tu tapes
+             le numéro de carte, le verdict s'affiche, tu peux montrer la carte
+             à l'antenne et annoncer le gagnant.</p>
+        </li>
+        <li>
+          <h3>Produis ton rapport</h3>
+          <p>Parties, figures, lots, gagnants avec l'heure, et tous les numéros
+             tirés dans l'ordre avec leur horodatage — pour ta Régie et ta
+             comptabilité.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============================ Les cartes ============================ -->
+  <section id="cartes" class="bande bande-sombre">
+    <div class="dedans">
+      <h2>Les cartes</h2>
+      <div class="grille-deux">
+        <article class="carte">
+          <h3>Une base à toi</h3>
+          <p>
+            Le logiciel est livré avec une base de <strong>10 000 cartes
+            originales</strong>, une œuvre originale de Marc Bert. Tu peux aussi
+            générer la tienne : elle est produite à partir d'une
+            <strong>graine</strong>, ce qui la rend reproductible à l'identique
+            et vérifiable.
+          </p>
+          <p>
+            Chaque base est validée avant d'être écrite : 24 numéros distincts
+            par carte, chaque colonne dans sa plage, et aucune carte identique à
+            une autre — deux cartes jumelles, ce sont deux gagnants en même
+            temps.
+          </p>
+        </article>
+        <article class="carte">
+          <h3>Imprimer</h3>
+          <p>
+            Le logiciel monte tes feuilles et produit le <strong>PDF à envoyer
+            à l'imprimeur</strong> : de 1 à 18 grilles par feuille, en Letter,
+            Legal ou A4, avec une teinte de papier par série.
+          </p>
+          <p>
+            Les numéros de série sont <strong>éparpillés</strong> sur
+            l'ensemble du tirage : une feuille ne porte jamais 1-2-3. Personne
+            ne peut deviner ce qu'il achète, et les grilles voisines ne se
+            retrouvent pas dans la même main.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ Cadre légal ============================ -->
+  <section class="bande">
+    <div class="dedans">
+      <div class="avis">
+        <h2>Un mot important sur le cadre légal</h2>
+        <p>
+          <strong>Bingo Studio ne tire jamais les numéros.</strong> C'est ton
+          boulier, filmé, qui les tire ; l'opératrice saisit ce qui sort. Le
+          logiciel affiche et vérifie — il ne conduit aucun jeu de hasard.
+        </p>
+        <p>
+          Ce n'est pas un détail technique. Au Canada, le Code criminel
+          (art. 207(4)(c)) exclut les jeux « exploités au moyen d'un
+          ordinateur » des licences accordées aux organismes de charité :
+          seul l'État provincial peut exploiter un bingo joué en ligne. Un
+          bingo télé à cartes papier, lui, relève d'une licence ordinaire —
+          au Québec, le <em>bingo média</em> de la Régie des alcools, des
+          courses et des jeux.
+        </p>
+        <p class="petit">
+          Chaque organisme demeure responsable d'obtenir et de respecter sa
+          propre licence auprès de l'autorité de sa province. Bingo Studio est un
+          outil, pas un avis juridique.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ Don ============================ -->
+  <section id="don" class="bande bande-don">
+    <div class="dedans">
+      <h2>Ce logiciel est donné, pas vendu</h2>
+      <p class="intro">
+        Bingo Studio a été construit par une télévision communautaire, pour les
+        télévisions communautaires. Il ne coûte rien et ne coûtera jamais rien.
+      </p>
+      <p class="intro">
+        S'il t'a évité un achat, une soirée de bricolage ou une erreur en
+        ondes, un don aide à l'entretenir et à l'améliorer. Ça se passe sur
+        <strong>Ko-fi</strong> : quelques secondes, sans créer de compte.
+      </p>
+      <div class="boutons">
+        <!-- Remplacer par l'adresse de la page Ko-fi -->
+        <a class="bouton bouton-fort" id="lien-don" href="https://ko-fi.com" rel="noopener">Offrir un café</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="pied">
+  <div class="dedans">
+    <p><strong>Bingo Studio</strong> — construit en Gaspésie, pour les bingos communautaires.</p>
+    <p class="petit">
+      © <span id="annee">2026</span> Marc Bert. Logiciel offert gratuitement.
+      La base de cartes fournie est une œuvre originale de Marc Bert, tous droits réservés.
+    </p>
+    <p class="petit"><a href="https://github.com/bingoTCA/bingo-studio" rel="noopener">Le code source sur GitHub</a></p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById("annee").textContent = new Date().getFullYear();
+
+  // Tant que les fichiers ne sont pas en ligne, les tuiles de téléchargement
+  // ne doivent pas donner l'illusion d'un lien mort.
+  for (const lien of document.querySelectorAll('.telechargement[aria-disabled="true"]')) {
+    lien.addEventListener("click", (e) => e.preventDefault());
+  }
+</script>
+</body>
+</html>

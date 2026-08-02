@@ -1,0 +1,399 @@
+/* =====================================================================
+   Habillage antenne — modèle visuel repris de BINGO 2.0 (jeu-main).
+   Violet profond, Impact, cases noires qui passent au rouge, colonne de
+   lettres en dégradé gris, carte « dernier numéro » blanche.
+
+   Trois règles de télé respectées :
+     1. Dimensions en vh/vw : identique en 720p, 1080p et 4K.
+     2. Marge de sécurité : les téléviseurs rognent les bords.
+     3. Contraste fort et gros caractères : ça se lit du salon.
+
+   Les couleurs de fond, le chroma et le logo viennent des Paramètres
+   de la Régie — ils sont posés en variables par antenne.js.
+   ===================================================================== */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* `hidden` doit gagner contre tout `display:` posé plus bas — sinon les
+   voiles de pause et d'annonce restent affichés en ondes. */
+[hidden] { display: none !important; }
+
+:root {
+  --violet:       #4a1f7a;
+  --violet-fonce: #1a1226;
+  --jaune:        #ffd700;
+  --rouge:        #c8102e;
+  --fond-haut:    #080313;
+  --fond-milieu:  #140928;
+  --fond-bas:     #2a1456;
+  --fond-angle:   135deg;
+  --chroma:       #0033cc;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--fond-haut);
+  color: #fff;
+  font-family: Impact, "Arial Narrow", Arial, sans-serif;
+  letter-spacing: .5px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Fond transparent pour incrustation OBS : /antenne?fond=transparent */
+body.transparent, body.transparent .scene { background: none !important; }
+body.transparent .scene::before, body.transparent .scene::after { display: none; }
+
+.scene {
+  position: relative;
+  width: 100%; height: 100%;
+  padding: 2.6vh 2.4vw;
+  display: flex; flex-direction: column;
+  gap: 1.4vh;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255,215,0,.04) 0, transparent 50%),
+    radial-gradient(circle at 85% 90%, rgba(255,215,0,.04) 0, transparent 50%),
+    linear-gradient(var(--fond-angle), var(--fond-haut) 0%, var(--fond-milieu) 50%, var(--fond-bas) 100%);
+}
+
+/* Texture pointillée en diagonale */
+.scene::before {
+  content: ""; position: absolute; inset: -50%;
+  pointer-events: none; z-index: 0;
+  background-image: radial-gradient(circle, rgba(12,4,22,.6) 1.4px, transparent 1.9px);
+  background-size: 16px 16px;
+  transform: rotate(45deg);
+}
+.scene.sans-texture::before { display: none; }
+
+/* Halo — réflecteur de scène venant du haut-centre */
+.scene::after {
+  content: ""; position: absolute;
+  top: -18vh; left: 50%; width: 90vw; height: 70vh;
+  transform: translateX(-50%);
+  pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse 50% 55% at center top,
+    rgba(255,255,255,.55) 0%, rgba(255,255,255,.34) 22%,
+    rgba(255,255,255,.16) 45%, rgba(255,255,255,.06) 65%, transparent 80%);
+  mix-blend-mode: screen;
+}
+.scene.sans-halo::after { display: none; }
+
+.scene > * { position: relative; z-index: 1; }
+
+/* ===================== Bandeau ===================== */
+.bandeau {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1.6vw;
+}
+.bandeau-gauche { display: flex; align-items: center; gap: 1.1vw; min-width: 0; }
+.bandeau-gauche > div { min-width: 0; }
+.logo { max-height: 7vh; max-width: 13vw; object-fit: contain; flex-shrink: 0; }
+/* Le titre cède la place à l'horloge plutôt que de passer dessous. */
+#titre {
+  font-size: 3.1vh; font-weight: 400; line-height: 1.1;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.bandeau-partie { font-size: 2vh; color: var(--jaune); white-space: nowrap; }
+
+.horloge {
+  justify-self: center;
+  background: linear-gradient(180deg, var(--violet) 0%, var(--violet-fonce) 100%);
+  border: 0.25vh solid rgba(255,255,255,.35);
+  border-radius: 1vh;
+  padding: 0.7vh 2vw;
+  font-size: 2.4vh; color: #fff; white-space: nowrap;
+}
+
+.telephone {
+  justify-self: end;
+  display: flex; align-items: center; gap: 0.7vw;
+  background: linear-gradient(180deg, var(--violet) 0%, var(--violet-fonce) 100%);
+  border: 0.25vh solid rgba(255,255,255,.35);
+  border-radius: 1vh;
+  padding: 0.7vh 1.4vw;
+  font-size: 2.6vh; color: var(--jaune); white-space: nowrap;
+}
+.telephone svg { width: 2.6vh; height: 2.6vh; flex-shrink: 0; }
+
+/* ===================== Haut : 3 zones ===================== */
+.haut {
+  display: grid;
+  grid-template-columns: 24vw minmax(0, 1fr) 22vw;
+  gap: 1.2vw;
+  align-items: stretch;
+  min-height: 0;
+}
+
+.bloc-gauche { position: relative; min-width: 0; }
+
+.bloc-cadre {
+  height: 100%;
+  background: linear-gradient(180deg, var(--violet) 0%, var(--violet-fonce) 100%);
+  border: 0.28vh solid #fff;
+  border-radius: 1.4vh;
+  padding: 1vh 1.1vw;
+  box-shadow: 0 0.6vh 1.8vh rgba(0,0,0,.45);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.bloc-carte { position: absolute; inset: 0; align-items: center; }
+
+.bloc-titre {
+  display: flex; align-items: center; justify-content: center; gap: 0.6vw;
+  font-size: 2.1vh; letter-spacing: 2px; text-transform: uppercase;
+  padding-bottom: 0.6vh; margin-bottom: 0.8vh;
+  border-bottom: 1px solid rgba(255,255,255,.25);
+  width: 100%; text-align: center;
+}
+.bloc-titre svg { width: 2.4vh; height: 2.4vh; color: var(--jaune); flex-shrink: 0; }
+
+/* --- Gagnants --- */
+.liste-gagnants { list-style: none; display: flex; flex-direction: column; gap: 0.6vh; overflow: hidden; }
+.liste-gagnants li {
+  border: 0.2vh solid rgba(255,255,255,.3); border-radius: 0.8vh;
+  padding: 0.6vh 0.8vw; font-size: 2vh; text-align: center; color: #fff;
+}
+.liste-gagnants li .g-carte { color: var(--jaune); }
+.liste-vide { border-style: dashed !important; color: rgba(255,255,255,.5) !important; }
+
+/* --- Carte vérifiée ---
+   Volontairement simple : 25 cases carrées strictement identiques, aucun
+   contour. Un numéro sorti = fond rouge, chiffre blanc. Rien d'autre.
+   (La classe du bandeau défilant s'appelait aussi « marquee » : chaque case
+   sortie héritait de sa hauteur et de sa bordure, d'où des cases inégales.
+   Le bandeau s'appelle maintenant « defilant ».) */
+/* La grille est un carré qui se cale dans la place restante : le verdict
+   sous la carte n'est jamais rogné, quelle que soit la taille de l'écran. */
+.carte-zone { flex: 1; min-height: 0; width: 100%; display: flex; align-items: center; justify-content: center; }
+.carte-grille {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 0.6vh;
+  aspect-ratio: 1; height: 100%; width: auto; max-width: 100%;
+}
+.carte-case {
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 0.6vh; font-size: 2.8vh;
+  background: #000; color: #5a5a5a; border: 1px solid #1a1a1a;
+}
+.carte-case.marquee { background: var(--rouge); color: #fff; border-color: var(--rouge); }
+.carte-case.libre   { background: #2a2a24; color: #8a8880; }
+
+.carte-verdict { margin-top: 0.8vh; font-size: 2.4vh; text-align: center; }
+.carte-verdict.gagnante   { color: #7ed37a; }
+.carte-verdict.pas-encore { color: #fff; }
+
+/* --- Zone caméra (chroma) : animateur + caméra du boulier --- */
+.zone-camera { display: flex; align-items: center; justify-content: center; min-width: 0; }
+.camera, .pubs {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  border: 0.4vh solid #000;
+  border-radius: 1vh;
+}
+.camera { background: var(--chroma); }
+
+/* --- Pubs : les mêmes dimensions, à la place du chroma --- */
+.pubs { position: relative; overflow: hidden; background: #000; }
+.pub-image {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: contain;
+  opacity: 0; transition: opacity 600ms ease;
+}
+.pub-image.visible { opacity: 1; }
+
+/* --- Dernier numéro --- */
+.bloc-droite { display: flex; flex-direction: column; gap: 1vh; min-width: 0; }
+.dernier-num {
+  flex: 1;
+  background: linear-gradient(180deg, #ffffff 0%, #e0e0e0 100%);
+  border: 0.4vh solid #000; border-radius: 1.4vh;
+  padding: 1vh 1.2vw;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  text-align: center; color: #000;
+  box-shadow: 0 0.6vh 1.8vh rgba(0,0,0,.45);
+}
+.dn-titre { font-size: 1.9vh; letter-spacing: 2px; text-transform: uppercase; opacity: .65; }
+.dn-affichage { display: flex; flex-direction: column; align-items: center; line-height: 1; }
+.dn-lettre { font-size: 5vh; }
+.dn-numero { font-size: 13vh; font-weight: 900; line-height: .92; }
+.dn-compteur {
+  width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.2vh;
+  padding-top: 0.6vh; border-top: 1px solid rgba(0,0,0,.18);
+}
+.dn-cpt-lib { font-size: 1.5vh; letter-spacing: 2px; text-transform: uppercase; opacity: .7; }
+.dn-cpt-val { font-size: 3vh; font-weight: 900; }
+.restants { font-size: 1.8vh; text-align: center; color: rgba(255,255,255,.75); }
+.restants span { color: var(--jaune); }
+
+/* ===================== Bandeau défilant ===================== */
+.defilant {
+  position: relative; overflow: hidden; white-space: nowrap;
+  height: 4.4vh; flex-shrink: 0;
+  background: linear-gradient(180deg, var(--violet) 0%, var(--violet-fonce) 100%);
+  border: 0.2vh solid rgba(255,255,255,.3);
+  border-radius: 0.8vh;
+  /* Fondu aux deux bouts : le texte entre et sort sans couper net. */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 4vw, #000 calc(100% - 4vw), transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 4vw, #000 calc(100% - 4vw), transparent 100%);
+}
+.defilant-piste {
+  display: inline-block; white-space: nowrap;
+  padding-left: 100%;
+  font-size: 2.2vh; letter-spacing: 1.5px; color: #fff;
+  line-height: 4.2vh;
+  animation: defile linear infinite;
+  text-shadow: 0 0.2vh 0.6vh rgba(0,0,0,.5);
+}
+.defilant-item { display: inline-block; margin-right: 6vw; }
+.defilant-item::before { content: "★"; color: var(--jaune); margin-right: 1.2vw; }
+@keyframes defile { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+
+/* ===================== Centre : formes + tableau ===================== */
+.centre {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 17vw minmax(0, 1fr);
+  gap: 1.2vw;
+  align-items: stretch;
+  min-height: 0;
+}
+
+.bloc-formes {
+  background: linear-gradient(180deg, var(--violet) 0%, var(--violet-fonce) 100%);
+  border: 0.28vh solid #fff; border-radius: 1.4vh;
+  padding: 1vh 0.9vw;
+  box-shadow: 0 0.6vh 1.8vh rgba(0,0,0,.45);
+  display: flex; flex-direction: column; gap: 0.5vh;
+  overflow: hidden;
+}
+/* min-height: 0 — sans ça, les lignes refusent de se serrer et c'est le
+   total, placé après, qui se fait rogner hors du bloc. */
+.liste-formes { list-style: none; flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 0.5vh; }
+.liste-formes li {
+  flex: 1 1 0; min-height: 0; overflow: hidden;
+  border: 0.2vh solid rgba(255,255,255,.3); border-radius: 0.8vh;
+  padding: 0.4vh 0.6vw;
+  display: flex; align-items: center; gap: 0.5vw;
+  font-size: 1.9vh; color: #fff;
+}
+/* Nom au-dessus, montant en dessous — jamais de chevauchement. */
+.f-texte { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.05; }
+.f-nom { overflow-wrap: anywhere; }
+.liste-formes .f-picto { flex-shrink: 0; }
+.liste-formes li.en-cours {
+  background: var(--jaune); color: #2a1456; border-color: #fff;
+}
+.liste-formes li.faite { opacity: .45; }
+.liste-formes .f-lot { font-weight: 900; white-space: nowrap; color: var(--jaune); }
+.liste-formes li.en-cours .f-lot { color: #2a1456; }
+
+/* Pictogramme de la figure, dans la ligne en cours */
+.f-picto { display: grid; grid-template-columns: repeat(5, 0.9vh); gap: 0.15vh; flex-shrink: 0; }
+.f-picto i { width: 0.9vh; height: 0.9vh; border-radius: 0.15vh; background: rgba(255,255,255,.28); }
+.en-cours .f-picto i { background: rgba(42,20,86,.25); }
+.f-picto i.on { background: #fff; }
+.en-cours .f-picto i.on { background: #2a1456; }
+
+.formes-total {
+  flex-shrink: 0;          /* le total passe avant les lignes */
+  display: flex; justify-content: space-between; align-items: baseline; gap: 0.5vw;
+  border-top: 1px solid rgba(255,255,255,.25);
+  padding-top: 0.6vh; font-size: 1.8vh; text-transform: uppercase; letter-spacing: 1px;
+}
+.formes-total span:last-child { font-size: 2.6vh; color: var(--jaune); font-weight: 900; }
+
+/* --- Tableau 1 à 75 --- */
+.tableau-wrap {
+  background:
+    linear-gradient(135deg, #5a5a5a 0%, #8a8a8a 60%, #b8b8b8 100%) padding-box,
+    linear-gradient(160deg, var(--violet) 0%, #0b0616 100%) border-box;
+  border: 0.5vh solid transparent;
+  border-radius: 1.4vh;
+  padding: 0.8vh 0.7vw;
+  box-shadow: 0 0.6vh 1.8vh rgba(0,0,0,.45);
+  display: flex;
+}
+.tableau {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 4.4vw repeat(15, minmax(0, 1fr));
+  gap: 0.35vh;
+}
+.tableau-lettre {
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(180deg, #555 0%, #2a2a2a 100%);
+  color: #fff; font-size: 4.2vh; border-radius: 0.5vh;
+}
+.tableau-case {
+  display: flex; align-items: center; justify-content: center;
+  background: #000; color: #5a5a5a;
+  border: 1px solid #1a1a1a; border-radius: 0.5vh;
+  font-size: 3.1vh; line-height: 1;
+  transition: background .12s, color .12s;
+}
+.tableau-case.sorti  { background: var(--rouge); color: #fff; border-color: var(--rouge); }
+.tableau-case.dernier { background: var(--jaune); color: #2a1456; border-color: #fff; }
+
+/* ===================== Pied ===================== */
+.pied {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 2vw; min-height: 3vh;
+}
+.figure-aide { font-size: 2vh; color: var(--jaune); }
+.commanditaire { font-size: 1.9vh; color: rgba(255,255,255,.7); }
+
+/* ===================== Superpositions ===================== */
+.voile {
+  position: absolute; inset: 0; z-index: 5;
+  background: rgba(8, 3, 19, 0.95);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2vh; text-align: center; padding: 0 8vw;
+}
+.voile-titre { font-size: 8vh; line-height: 1.15; white-space: pre-line; }
+.voile-sous { font-size: 3vh; color: var(--jaune); }
+.voile-annonce { background: var(--jaune); }
+.voile-annonce .voile-titre { color: #2a1456; }
+
+/* ===================== Générique début / fin ===================== */
+.generique {
+  position: absolute; inset: 0; z-index: 6;
+  display: flex; flex-direction: column;
+  padding: 3vh 6vw 0;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,215,0,.07) 0, transparent 55%),
+    linear-gradient(var(--fond-angle), var(--fond-haut) 0%, var(--fond-milieu) 50%, var(--fond-bas) 100%);
+}
+.gen-bandeau {
+  flex-shrink: 0; text-align: center;
+  padding-bottom: 2vh; margin-bottom: 1vh;
+  border-bottom: 0.25vh solid rgba(255,255,255,.25);
+}
+.gen-logo { max-height: 12vh; max-width: 30vw; object-fit: contain; }
+.gen-titre { font-size: 3.4vh; color: var(--jaune); margin-top: 1vh; }
+
+/* Le texte remonte de sous l'écran jusqu'au-dessus, puis recommence. */
+.gen-defile {
+  flex: 1; position: relative; overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+          mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+}
+/* La piste commence par une cale de la hauteur de la fenêtre : en la
+   remontant de 100 % de SA propre hauteur (cale + texte), le texte
+   traverse donc l'écran en entier, du bas vers le haut. Sans la cale,
+   il ne monterait que de sa propre hauteur et ne sortirait jamais. */
+.gen-piste {
+  position: absolute; left: 0; right: 0; top: 0;
+  text-align: center; font-size: 3.6vh; line-height: 1.6;
+  white-space: pre-line;
+  animation: remonte linear infinite;
+}
+.gen-cale { height: 100%; }
+.gen-piste .gen-section { margin: 4vh 0 1vh; font-size: 2.6vh; color: var(--jaune); letter-spacing: 3px; text-transform: uppercase; }
+.gen-piste .gen-ligne { margin: 0.6vh 0; }
+.gen-piste .gen-etoiles { color: var(--jaune); font-size: 3vh; margin: 3vh 0; }
+@keyframes remonte { from { transform: translateY(0); } to { transform: translateY(-100%); } }

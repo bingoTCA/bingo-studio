@@ -1,0 +1,39 @@
+{
+  "name": "bingo-studio",
+  "version": "0.1.0",
+  "description": "Régie de bingo télé — saisie du boulier, habillage antenne, vérification des cartes",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/*.test.mjs",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win",
+    "cartes": "node scripts/generer-cartes.mjs",
+    "feuilles": "node scripts/feuilles-cartes.mjs",
+    "sceller": "node scripts/sceller-base.mjs",
+    "captures": "electron scripts/captures.cjs"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "ca.bingostudio.app",
+    "productName": "Bingo Studio",
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "data/**/*",
+      "assets/**/*"
+    ],
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.video"
+    },
+    "win": {
+      "target": "nsis"
+    }
+  }
+}

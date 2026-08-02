@@ -1,0 +1,4 @@
+{
+  "type": "module",
+  "//": "Ce dossier est en modules ES. La racine reste en CommonJS pour Electron."
+}

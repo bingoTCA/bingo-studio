@@ -304,3 +304,22 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: #f0b429
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 #reg-reglement { font-size: 14px; line-height: 1.5; }
+
+/* ---------- Confirmation maison ---------- */
+.modale-alerte { max-width: 500px; border-color: #6b2a2a; }
+.modale-alerte h2 { color: #f08a8a; font-size: 19px; margin-bottom: 12px; }
+.confirm-texte { font-size: 15px; line-height: 1.6; margin-bottom: 10px; }
+.confirm-texte strong { color: #f0b429; }
+.confirm-boutons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+.bouton-danger-plein {
+  background: #8a2020; border-color: #8a2020; color: #fff; font-weight: 600;
+}
+.bouton-danger-plein:hover { background: #a52828; border-color: #a52828; }
+
+/* ---------- Impression des cartes ---------- */
+.reg-impression {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px; margin-bottom: 10px;
+}
+.reg-impression label { margin: 0; display: flex; flex-direction: column; gap: 5px; }
+.reg-impression input[type="color"] { height: 36px; padding: 2px; cursor: pointer; }

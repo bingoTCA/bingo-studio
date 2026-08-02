@@ -29,6 +29,16 @@ const DEMO = {
     { nom: "Partie 3", figure: "TOUR", lot: 300 },
     { nom: "Jackpot", figure: "PLEINE", lot: 1000 }
   ],
+  // Ambiance volontairement différente du violet livré : les captures du
+  // site montrent ainsi que les couleurs se règlent.
+  theme: {
+    ambiance: "#0f4c47",
+    accent: "#ffcf4d",
+    marquage: "#d1332e",
+    fondHaut: "#020a09", fondMilieu: "#06201d", fondBas: "#0d4741", fondAngle: 135,
+    bandeau: { actif: true, source: "messages", vitesse: 90,
+      messages: ["Merci à nos commanditaires", "Prochain bingo dimanche 12 h 30"] }
+  },
   partieIndex: 1,
   tirage: [12, 27, 44, 51, 68, 3, 33, 59, 17, 40, 71, 25, 8, 55, 62],
   enOnde: true,
@@ -60,7 +70,7 @@ app.whenReady().then(async () => {
 
   // La régie : c'est elle qui détient l'état et le diffuse.
   const regie = new BrowserWindow({
-    width: 1600, height: 1000, show: false,
+    width: 1600, height: 895, show: false,
     webPreferences: { preload: join(RACINE, "preload.js"), contextIsolation: true, offscreen: true }
   });
   await regie.loadURL(`http://127.0.0.1:${PORT}/regie`);
@@ -96,6 +106,33 @@ app.whenReady().then(async () => {
   console.log("Captures :");
   await photographier(antenne, "antenne.png");
   await photographier(regie, "regie.png");
+
+  // Troisième vue : le panneau d'impression des cartes, dans les
+  // Paramètres. C'est la seule fonction qui ne se voit sur aucun des
+  // deux écrans précédents.
+  const impression = new BrowserWindow({
+    width: 1200, height: 428, show: false,
+    webPreferences: { preload: join(RACINE, "preload.js"), contextIsolation: true, offscreen: true }
+  });
+  await impression.loadURL(`http://127.0.0.1:${PORT}/regie`);
+  await attendre(900);
+  await impression.webContents.executeJavaScript(`
+    (() => {
+      document.getElementById("btn-reglages").click();
+      const titre = document.getElementById("titre-impression");
+      // On cherche l'ancêtre qui défile réellement : selon la hauteur de la
+      // fenêtre, ce peut être .param-corps ou le document lui-même.
+      let boite = titre.parentElement;
+      while (boite && boite.scrollHeight <= boite.clientHeight) boite = boite.parentElement;
+      const cible = boite || document.scrollingElement;
+      const ecart = titre.getBoundingClientRect().top - cible.getBoundingClientRect().top;
+      cible.scrollTop += ecart - 18;   // 18 px d'air au-dessus du titre
+      return { conteneur: cible.className || cible.tagName, position: Math.round(cible.scrollTop) };
+    })();
+  `).then((r) => console.log(`  (défilement : ${r.conteneur} → ${r.position} px)`));
+  await attendre(400);
+  await photographier(impression, "impression.png");
+
   console.log(`\nDossier → ${SORTIE}`);
 
   serveur.close();

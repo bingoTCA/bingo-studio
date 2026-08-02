@@ -15,6 +15,7 @@ import {
 } from "../core/canal.js";
 import * as sons from "../core/sons.js";
 import * as medias from "../core/medias.js";
+import { monterHtml, DISPOSITIONS, FORMATS } from "../core/feuilles.js";
 
 const $ = (id) => document.getElementById(id);
 const canal = creerCanal();
@@ -60,6 +61,36 @@ function heureQuebec() {
   return new Intl.DateTimeFormat("fr-CA", {
     timeZone: "America/Toronto", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23"
   }).format(new Date());
+}
+
+// ---------------------------------------------------------------------
+//  Confirmation — remplace le confirm() du navigateur
+// ---------------------------------------------------------------------
+
+let confirmationEnCours = null;
+
+/**
+ * Demande confirmation et renvoie une promesse : true si l'opératrice
+ * accepte. Le ton est léger, mais le message dit toujours exactement ce
+ * qui va disparaître — c'est ça qui évite les accidents, pas la peur.
+ */
+function demander({ titre, texte, detail, oui, non }) {
+  $("confirm-titre").textContent = titre;
+  $("confirm-texte").innerHTML = texte;
+  $("confirm-detail").textContent = detail ?? "";
+  $("confirm-oui").textContent = oui ?? "Oui, vas-y";
+  $("confirm-non").textContent = non ?? "Non, j'ai eu peur";
+  $("confirmation").hidden = false;
+  $("confirm-non").focus();
+
+  return new Promise((resolve) => { confirmationEnCours = resolve; });
+}
+
+function repondreConfirmation(reponse) {
+  $("confirmation").hidden = true;
+  const resoudre = confirmationEnCours;
+  confirmationEnCours = null;
+  if (resoudre) resoudre(reponse);
 }
 
 // ---------------------------------------------------------------------
@@ -549,6 +580,91 @@ function fermerParametres() {
   $("btn-reglages").classList.remove("actif");
 }
 
+// ---------------------------------------------------------------------
+//  Impression des cartes
+// ---------------------------------------------------------------------
+
+let manifesteCartes = { droits: "" };
+
+function optionsImpression() {
+  const nums = numerosCatalogue();
+  return {
+    parFeuille: Number($("imp-par-feuille").value) || 3,
+    format: $("imp-format").value || "Letter",
+    de: Number($("imp-de").value) || nums[0],
+    a: Number($("imp-a").value) || nums.at(-1),
+    couleur: $("imp-couleur").value === "#ffffff" ? null : $("imp-couleur").value,
+    graine: "feuilles",
+    droits: manifesteCartes.droits
+  };
+}
+
+function majResumeImpression() {
+  if (!Object.keys(catalogue).length) { $("imp-resume").textContent = "Catalogue non chargé."; return; }
+  try {
+    const o = optionsImpression();
+    const m = monterHtml(catalogue, o);
+    $("imp-resume").textContent =
+      `${m.grilles.toLocaleString("fr-CA")} grilles · ${m.feuilles.toLocaleString("fr-CA")} feuilles`
+      + (m.derniereIncomplete ? ` · la dernière n'en porte que ${m.derniereIncomplete}` : "");
+  } catch (err) {
+    $("imp-resume").textContent = err.message;
+  }
+}
+
+async function produireFeuilles(enPdf) {
+  if (!Object.keys(catalogue).length) { dire("Le catalogue n'est pas chargé.", "erreur"); return; }
+  let montage;
+  try { montage = monterHtml(catalogue, optionsImpression()); }
+  catch (err) { dire(err.message, "erreur"); return; }
+  if (!montage.grilles) { dire("Aucune carte dans la tranche demandée.", "erreur"); return; }
+
+  const o = optionsImpression();
+  if (enPdf && window.studio?.presente) {
+    dire("Rendu du PDF en cours…", "ok");
+    const r = await window.studio.feuillesEnPdf({
+      html: montage.html,
+      largeurMm: montage.page.l,
+      hauteurMm: montage.page.h,
+      nomSuggere: `feuilles-${o.parFeuille}-grilles.pdf`
+    });
+    if (r?.annule) dire("Enregistrement annulé.", "");
+    else if (r?.erreur) dire(`Rendu impossible : ${r.erreur}`, "erreur");
+    else dire(`PDF enregistré — ${montage.feuilles} feuilles.`, "ok");
+    return;
+  }
+
+  // Sans Electron : on ouvre le document, l'impression du navigateur fait
+  // le PDF (Fichier → Imprimer → Enregistrer en PDF, marges : aucune).
+  const f = window.open("", "_blank");
+  if (!f) { dire("Le navigateur a bloqué la fenêtre des feuilles.", "erreur"); return; }
+  f.document.write(montage.html);
+  f.document.close();
+  dire(`${montage.feuilles} feuilles montées — imprime en PDF depuis cette fenêtre.`, "ok");
+}
+
+function brancherImpression() {
+  for (const n of Object.keys(DISPOSITIONS).map(Number).sort((a, b) => a - b)) {
+    const o = document.createElement("option");
+    o.value = n; o.textContent = `${n} grille${n > 1 ? "s" : ""}`;
+    $("imp-par-feuille").appendChild(o);
+  }
+  $("imp-par-feuille").value = "3";
+
+  for (const nom of Object.keys(FORMATS)) {
+    const o = document.createElement("option");
+    o.value = nom; o.textContent = nom;
+    $("imp-format").appendChild(o);
+  }
+
+  for (const id of ["imp-par-feuille", "imp-format", "imp-de", "imp-a"]) {
+    $(id).oninput = majResumeImpression;
+    $(id).onchange = majResumeImpression;
+  }
+  $("btn-imprimer-pdf").onclick = () => produireFeuilles(true);
+  $("btn-imprimer-apercu").onclick = () => produireFeuilles(false);
+}
+
 function brancherControles() {
   const ecran = (nom) => { etat.ecran = nom; pousser(); };
   $("btn-gen-debut").onclick = () => ecran(etat.ecran === "debut" ? "jeu" : "debut");
@@ -996,10 +1112,24 @@ function brancher() {
     dire("Nouvelle partie — le tableau est vide.", "ok");
     pousser();
   };
-  $("btn-vider-tirage").onclick = () => {
-    if (!confirm("Vider tous les numéros du tableau ?")) return;
+  $("btn-vider-tirage").onclick = async () => {
+    const sortis = etat.tirage.length;
+    if (!sortis) { dire("Le tableau est déjà vide.", "erreur"); return; }
+
+    const ok = await demander({
+      titre: "Attention, ça part pour de bon",
+      texte: `Tu es sur le point d'éteindre <strong>${sortis} numéro${sortis > 1 ? "s" : ""}</strong> `
+           + `du tableau. L'antenne se videra en même temps, devant tout le monde.`,
+      detail: "Si c'est le mauvais bouton, c'est le moment de faire marche arrière.",
+      oui: "Oui, vide-moi ça",
+      non: "Non, fausse manœuvre"
+    });
+    if (!ok) return;
+
     etat.tirage = []; etat.horodatage = []; etat.verification = null;
-    rafraichirVerification(); pousser();
+    rafraichirVerification();
+    dire("Tableau vidé.", "ok");
+    pousser();
   };
   $("btn-ajouter-partie").onclick = () => {
     etat.parties.push({ nom: `Partie ${etat.parties.length + 1}`, figure: "PLEINE", lot: 100 });
@@ -1062,12 +1192,16 @@ function brancher() {
   }
   $("reg-commanditaire").oninput = () => { etat.commanditaire = $("reg-commanditaire").value; pousserLeger(); };
   $("btn-rapport").onclick = rapport;
-  $("btn-nouvelle").onclick = () => {
-    if (!confirm(
-      "Effacer la session et tout recommencer ?\n\n"
-      + "Les numéros tirés et les gagnants sont effacés.\n"
-      + "L'habillage, les parties et les textes sont conservés."
-    )) return;
+  $("btn-nouvelle").onclick = async () => {
+    const ok = await demander({
+      titre: "On repart à zéro ?",
+      texte: `Les <strong>numéros tirés</strong> et les <strong>gagnants</strong> de la journée `
+           + `seront effacés. Ton habillage, tes parties et tes textes, eux, restent en place.`,
+      detail: "Pense à sortir ton rapport de session avant, si tu en as besoin.",
+      oui: "Oui, nouvelle session",
+      non: "Non, pas encore"
+    });
+    if (!ok) return;
 
     // Ce qui appartient à la STATION se garde ; seule la partie du jour part.
     // Sans ça, il faudrait retéléverser le logo et resaisir les quatre
@@ -1090,8 +1224,13 @@ function brancher() {
 
   brancherParametres();
   brancherControles();
+  brancherImpression();
 
   // --- écrans ---
+  $("confirm-oui").onclick = () => repondreConfirmation(true);
+  $("confirm-non").onclick = () => repondreConfirmation(false);
+  $("confirmation").onclick = (e) => { if (e.target.id === "confirmation") repondreConfirmation(false); };
+
   $("btn-ecrans").onclick = ouvrirChoixEcran;
   $("btn-fermer-ecrans").onclick = () => { $("choix-ecran").hidden = true; };
   $("btn-antenne-fenetre").onclick = async () => {
@@ -1101,6 +1240,13 @@ function brancher() {
 
   // --- raccourcis globaux ---
   document.addEventListener("keydown", (e) => {
+    // Une confirmation ouverte capte Échap et Entrée : on ne veut surtout
+    // pas qu'un numéro parte à l'antenne pendant qu'elle est affichée.
+    if (!$("confirmation").hidden) {
+      if (e.key === "Escape") { e.preventDefault(); repondreConfirmation(false); }
+      if (e.key === "Enter" && e.target.id === "confirm-oui") { e.preventDefault(); repondreConfirmation(true); }
+      return;
+    }
     const dansUnChamp = ["INPUT", "SELECT", "TEXTAREA"].includes(e.target.tagName);
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") { e.preventDefault(); annulerDernier(); return; }
     if (e.key === "F1") { e.preventDefault(); $("saisie").focus(); $("saisie").select(); return; }
@@ -1208,6 +1354,16 @@ async function demarrer() {
     if (!rep.ok) throw new Error(`HTTP ${rep.status}`);
     catalogue = await rep.json();
     $("verif-verdict").textContent = descriptionCatalogue();
+
+    const nums = numerosCatalogue();
+    $("imp-de").value = nums[0];
+    $("imp-a").value = nums.at(-1);
+    $("imp-de").min = nums[0]; $("imp-a").max = nums.at(-1);
+    try {
+      const m = await fetch("/data/cartes.manifeste.json");
+      if (m.ok) manifesteCartes = await m.json();
+    } catch { /* pas de manifeste : la mention de droits sera vide */ }
+    majResumeImpression();
   } catch (err) {
     dire("Catalogue de cartes introuvable — la vérification est indisponible.", "erreur");
     $("verif-num").disabled = true;

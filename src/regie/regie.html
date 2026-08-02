@@ -283,6 +283,32 @@
         <input id="reg-gen-vitesse" type="range" min="15" max="240" step="5">
       </label>
 
+      <h3 id="titre-impression">Imprimer les cartes</h3>
+      <p class="aide">Monte les feuilles à envoyer à l'imprimeur. Les numéros de série
+         sont éparpillés : une feuille ne porte jamais 1-2-3.</p>
+      <div class="reg-impression">
+        <label>Grilles par feuille
+          <select id="imp-par-feuille"></select>
+        </label>
+        <label>Format
+          <select id="imp-format"></select>
+        </label>
+        <label>De la carte
+          <input id="imp-de" type="number" min="1">
+        </label>
+        <label>à la carte
+          <input id="imp-a" type="number" min="1">
+        </label>
+        <label>Teinte du papier
+          <input id="imp-couleur" type="color" value="#ffffff">
+        </label>
+      </div>
+      <p id="imp-resume" class="aide"></p>
+      <div class="verif-actions">
+        <button id="btn-imprimer-pdf" class="bouton bouton-primaire">Produire le PDF</button>
+        <button id="btn-imprimer-apercu" class="bouton">Voir un aperçu</button>
+      </div>
+
       <h3>Diffusion</h3>
       <p class="aide" id="adresse-antenne">Source navigateur pour OBS ou Tricaster : http://127.0.0.1:7777/antenne</p>
       <div class="verif-actions">
@@ -290,6 +316,20 @@
         <button id="btn-nouvelle" class="bouton bouton-danger">Nouvelle session</button>
       </div>
 
+  </div>
+</div>
+
+<!-- Confirmation maison : le confirm() du navigateur est laid, non traduit
+     et impossible à habiller. Celui-ci porte le ton du logiciel. -->
+<div id="confirmation" class="modale" hidden>
+  <div class="modale-boite modale-alerte">
+    <h2 id="confirm-titre">Attention</h2>
+    <p id="confirm-texte" class="confirm-texte"></p>
+    <p id="confirm-detail" class="aide"></p>
+    <div class="confirm-boutons">
+      <button id="confirm-non" class="bouton">Non, j'ai eu peur</button>
+      <button id="confirm-oui" class="bouton bouton-danger-plein">Oui, vas-y</button>
+    </div>
   </div>
 </div>
 

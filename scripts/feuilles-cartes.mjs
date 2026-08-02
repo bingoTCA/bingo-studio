@@ -19,7 +19,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { generateur, melanger } from "./hasard.mjs";
+import { monterHtml, DISPOSITIONS, FORMATS } from "../src/core/feuilles.js";
 
 const RACINE = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -46,25 +46,9 @@ Monteur de feuilles de bingo
 }
 
 // ---------------------------------------------------------------------
-//  Réglages
+//  Réglages — la mise en page vit dans src/core/feuilles.js, partagée
+//  avec le logiciel. Ici on ne fait que lire les arguments et écrire.
 // ---------------------------------------------------------------------
-
-const DISPOSITIONS = {
-  1: { colonnes: 1, rangees: 1 },
-  2: { colonnes: 1, rangees: 2 },
-  3: { colonnes: 1, rangees: 3 },   // la bande classique
-  4: { colonnes: 2, rangees: 2 },
-  6: { colonnes: 2, rangees: 3 },
-  9: { colonnes: 3, rangees: 3 },
-  12: { colonnes: 3, rangees: 4 },
-  18: { colonnes: 3, rangees: 6 }
-};
-
-const FORMATS = {
-  Letter: { l: 215.9, h: 279.4 },
-  Legal: { l: 215.9, h: 355.6 },
-  A4: { l: 210, h: 297 }
-};
 
 const PAR_FEUILLE = Number(args["par-feuille"] ?? 3);
 const GRAINE = String(args.graine ?? "feuilles");
@@ -80,139 +64,36 @@ if (!FORMATS[FORMAT]) {
   process.exit(1);
 }
 
-// ---------------------------------------------------------------------
-//  Base + manifeste
-// ---------------------------------------------------------------------
-
 const catalogue = JSON.parse(readFileSync(join(RACINE, "data/cartes.json"), "utf8"));
 const cheminManifeste = join(RACINE, "data/cartes.manifeste.json");
 const manifeste = existsSync(cheminManifeste)
   ? JSON.parse(readFileSync(cheminManifeste, "utf8"))
-  : { droits: "", detenteur: "" };
+  : { droits: "" };
 
-let numeros = Object.keys(catalogue).map(Number).sort((a, b) => a - b);
-if (args.de || args.a) {
-  const de = Number(args.de ?? numeros[0]);
-  const a = Number(args.a ?? numeros.at(-1));
-  numeros = numeros.filter((n) => n >= de && n <= a);
+let montage;
+try {
+  montage = monterHtml(catalogue, {
+    parFeuille: PAR_FEUILLE,
+    de: args.de ? Number(args.de) : null,
+    a: args.a ? Number(args.a) : null,
+    graine: GRAINE,
+    format: FORMAT,
+    couleur: COULEUR,
+    droits: manifeste.droits
+  });
+} catch (err) {
+  console.error(err.message);
+  process.exit(1);
 }
-if (!numeros.length) {
+if (!montage.grilles) {
   console.error("Aucune carte dans la tranche demandée.");
   process.exit(1);
 }
 
-// C'est ICI que les séries se retrouvent éparpillées : on brasse la liste
-// complète, puis on découpe en feuilles.
-const melange = melanger(numeros, generateur(GRAINE));
-const feuilles = [];
-for (let i = 0; i < melange.length; i += PAR_FEUILLE) {
-  feuilles.push(melange.slice(i, i + PAR_FEUILLE));
-}
-const derniereIncomplete = feuilles.at(-1).length < PAR_FEUILLE ? feuilles.at(-1).length : 0;
-
-// ---------------------------------------------------------------------
-//  Montage HTML
-// ---------------------------------------------------------------------
-
-const { colonnes, rangees } = DISPOSITIONS[PAR_FEUILLE];
-const page = FORMATS[FORMAT];
-const echapper = (s) => String(s ?? "").replace(/[&<>"]/g, (c) =>
-  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-
-function grilleHtml(numero) {
-  const g = catalogue[String(numero)];
-  let cases = "";
-  for (let r = 0; r < 5; r++) {
-    for (let c = 0; c < 5; c++) {
-      const n = g[r][c];
-      cases += n === 0
-        ? '<div class="case libre">★</div>'
-        : `<div class="case">${n}</div>`;
-    }
-  }
-  return `<div class="grille">
-    <div class="entete"><span>B</span><span>I</span><span>N</span><span>G</span><span>O</span></div>
-    <div class="cases">${cases}</div>
-    <div class="serie">N° ${numero}</div>
-  </div>`;
-}
-
-const corps = feuilles.map((serie) => {
-  const vides = PAR_FEUILLE - serie.length;
-  return `<section class="feuille">
-    <div class="plateau">${serie.map(grilleHtml).join("")}${'<div class="grille vide"></div>'.repeat(vides)}</div>
-    <footer class="pied-feuille">${echapper(manifeste.droits)}</footer>
-  </section>`;
-}).join("\n");
-
-const html = `<!doctype html>
-<html lang="fr-CA"><head><meta charset="utf-8">
-<title>Feuilles de bingo — ${PAR_FEUILLE} grilles</title>
-<style>
-  @page { size: ${page.l}mm ${page.h}mm; margin: 0; }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  /* Couleurs FORCÉES : sans ça, un navigateur en mode sombre imposerait
-     son fond noir, et printBackground l'imprimerait tel quel. */
-  html, body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background: ${COULEUR ?? "#ffffff"};
-    color: #000;
-    color-scheme: only light;
-    -webkit-print-color-adjust: exact; print-color-adjust: exact;
-  }
-  .feuille {
-    width: ${page.l}mm; height: ${page.h}mm;
-    padding: 10mm 10mm 6mm;
-    display: flex; flex-direction: column;
-    page-break-after: always; break-after: page;
-    background: ${COULEUR ?? "#ffffff"};
-    color: #000;
-  }
-  .feuille:last-child { page-break-after: auto; break-after: auto; }
-  .plateau {
-    flex: 1; display: grid;
-    grid-template-columns: repeat(${colonnes}, 1fr);
-    grid-template-rows: repeat(${rangees}, 1fr);
-    gap: 5mm;
-  }
-  .grille {
-    border: 0.6mm solid #000; border-radius: 2mm;
-    padding: 2mm; display: flex; flex-direction: column;
-    min-height: 0; min-width: 0;
-  }
-  .grille.vide { border-style: dashed; border-color: #bbb; }
-  .entete {
-    display: grid; grid-template-columns: repeat(5, 1fr);
-    text-align: center; font-weight: 800;
-    font-size: ${PAR_FEUILLE >= 9 ? 4 : PAR_FEUILLE >= 6 ? 5 : 7}mm;
-    line-height: 1.1; letter-spacing: 0.5mm;
-    border-bottom: 0.5mm solid #000; padding-bottom: 0.8mm; margin-bottom: 1mm;
-  }
-  .cases {
-    flex: 1; display: grid;
-    grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(5, 1fr);
-    gap: 0.6mm;
-  }
-  .case {
-    display: flex; align-items: center; justify-content: center;
-    border: 0.3mm solid #444; border-radius: 1mm;
-    font-weight: 700; font-size: ${PAR_FEUILLE >= 9 ? 4 : PAR_FEUILLE >= 6 ? 5.5 : 7}mm;
-    color: #000;
-  }
-  .case.libre { background: #e8e8e8; }
-  .serie {
-    text-align: right; font-size: ${PAR_FEUILLE >= 9 ? 3 : 3.6}mm;
-    color: #000; font-weight: 700; padding-top: 0.8mm; letter-spacing: 0.2mm;
-  }
-  .pied-feuille {
-    flex-shrink: 0; padding-top: 2.5mm;
-    font-size: 2.6mm; color: #555; text-align: center;
-  }
-</style></head>
-<body>
-${corps}
-</body></html>
-`;
+const { html, page } = montage;
+const feuilles = { length: montage.feuilles };
+const numeros = montage.numeros;
+const derniereIncomplete = montage.derniereIncomplete;
 
 const SORTIE = resolve(RACINE, String(args.sortie ?? `data/feuilles-${PAR_FEUILLE}-grilles.html`));
 mkdirSync(dirname(SORTIE), { recursive: true });

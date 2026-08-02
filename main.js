@@ -10,7 +10,8 @@
 //  deux adresses et on place les fenêtres à la main.
 // =====================================================================
 
-const { app, BrowserWindow, screen, ipcMain, shell } = require("electron");
+const { app, BrowserWindow, screen, ipcMain, shell, dialog } = require("electron");
+const { writeFileSync } = require("node:fs");
 const path = require("path");
 const { demarrer } = require("./src/server");
 
@@ -92,6 +93,38 @@ ipcMain.handle("antenne-fenetre", () => {
 });
 
 ipcMain.handle("adresse-antenne", () => `http://127.0.0.1:${port}/antenne`);
+
+/**
+ * Convertit un document HTML en PDF et propose de l'enregistrer.
+ * Sert à produire les feuilles de cartes pour l'imprimeur, sans passer
+ * par la boîte d'impression du navigateur : les marges et le format sont
+ * exactement ceux de la mise en page.
+ */
+ipcMain.handle("feuilles-en-pdf", async (_e, { html, largeurMm, hauteurMm, nomSuggere }) => {
+  const cible = await dialog.showSaveDialog(fenetreRegie, {
+    title: "Enregistrer les feuilles",
+    defaultPath: nomSuggere || "feuilles-bingo.pdf",
+    filters: [{ name: "PDF", extensions: ["pdf"] }]
+  });
+  if (cible.canceled || !cible.filePath) return { annule: true };
+
+  const rendu = new BrowserWindow({ show: false, webPreferences: { offscreen: true } });
+  try {
+    await rendu.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(html));
+    // ⚠️ Depuis Electron 21, pageSize attend des POUCES, pas des microns.
+    const pdf = await rendu.webContents.printToPDF({
+      pageSize: { width: largeurMm / 25.4, height: hauteurMm / 25.4 },
+      margins: { marginType: "none" },
+      printBackground: true
+    });
+    writeFileSync(cible.filePath, pdf);
+    return { chemin: cible.filePath };
+  } catch (err) {
+    return { erreur: err.message };
+  } finally {
+    rendu.destroy();
+  }
+});
 
 ipcMain.handle("ouvrir-dans-navigateur", (_e, url) => {
   if (typeof url === "string" && url.startsWith(`http://127.0.0.1:${port}/`)) {

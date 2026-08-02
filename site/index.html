@@ -188,6 +188,11 @@
   <section id="telecharger" class="bande bande-sombre">
     <div class="dedans">
       <h2>Obtenir le logiciel</h2>
+      <!-- Version publiée : à changer ici et dans site/telecharger/index.html
+           à chaque nouvelle sortie. -->
+      <p class="surtitre" style="margin-bottom:18px">
+        Version 1.0.1 · Mac et Windows · 2 août 2026
+      </p>
       <p class="intro">
         Laisse-moi ton courriel et je t'envoie le lien de téléchargement tout
         de suite. C'est gratuit, et ça le restera.
@@ -234,7 +239,10 @@
 
       <p class="petit">
         Mac et Windows · français · aucun compte à créer dans le logiciel ·
-        fonctionne hors ligne
+        fonctionne hors ligne<br>
+        Déjà inscrit ? <a href="telecharger/">La page de téléchargement est ici</a>,
+        et <a href="https://github.com/bingoTCA/bingo-studio/releases" rel="noopener">toutes
+        les versions sont sur GitHub</a>.
       </p>
     </div>
   </section>
@@ -562,9 +570,6 @@
 
   // Tant que les fichiers ne sont pas en ligne, les tuiles de téléchargement
   // ne doivent pas donner l'illusion d'un lien mort.
-  for (const lien of document.querySelectorAll('.telechargement[aria-disabled="true"]')) {
-    lien.addEventListener("click", (e) => e.preventDefault());
-  }
 </script>
 </body>
 </html>

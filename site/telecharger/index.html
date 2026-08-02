@@ -9,6 +9,13 @@
 </head>
 <body>
 
+<!-- =====================================================================
+     À CHAQUE NOUVELLE VERSION, une seule chose à changer ici : le numéro
+     dans les quatre adresses ci-dessous et dans les trois mentions
+     « 1.0.1 ». Les fichiers portent la version dans leur nom, exprès :
+     une station qui nous écrit peut dire laquelle elle utilise.
+     ===================================================================== -->
+
 <header class="entete">
   <div class="dedans entete-dedans">
     <a class="marque" href="../">Bingo&nbsp;Studio</a>
@@ -28,44 +35,85 @@
         Le logiciel est le même sur les deux systèmes. Prends celle qui
         correspond à l'ordinateur de ta régie.
       </p>
+      <p class="petit">Version <strong>1.0.1</strong> · publiée le 2 août 2026</p>
     </div>
   </section>
 
   <section class="bande">
     <div class="dedans">
       <div class="grille-deux">
-        <!-- Remplacer les href par les adresses des fichiers dans GitHub Releases -->
-        <a class="telechargement" href="#" data-plateforme="mac" aria-disabled="true">
+        <a class="telechargement"
+           href="https://github.com/bingoTCA/bingo-studio/releases/download/v1.0.1/BingoStudio-1.0.1-mac.dmg">
           <span class="tele-titre">macOS</span>
-          <span class="tele-detail">Fichier .dmg · Apple Silicon et Intel</span>
-          <span class="tele-etat">Bientôt disponible</span>
+          <span class="tele-detail">BingoStudio-1.0.1-mac.dmg · 180 Mo<br>Apple Silicon et Intel · macOS 10.12 et plus</span>
+          <span class="tele-etat">Télécharger</span>
         </a>
-        <a class="telechargement" href="#" data-plateforme="windows" aria-disabled="true">
+        <a class="telechargement"
+           href="https://github.com/bingoTCA/bingo-studio/releases/download/v1.0.1/BingoStudio-1.0.1-windows.exe">
           <span class="tele-titre">Windows</span>
-          <span class="tele-detail">Fichier .exe · Windows 10 et 11</span>
-          <span class="tele-etat">Bientôt disponible</span>
+          <span class="tele-detail">BingoStudio-1.0.1-windows.exe · 85 Mo<br>Windows 10 et 11 · 64 bits</span>
+          <span class="tele-etat">Télécharger</span>
         </a>
       </div>
 
       <h2 style="margin-top:44px">À la première ouverture</h2>
       <p class="intro">
-        Le système préviendra peut-être que le développeur n'est pas
-        identifié. C'est normal pour un logiciel offert gratuitement, sans
-        certificat payant.
+        Ton système va prévenir qu'il ne reconnaît pas le développeur. C'est
+        normal : faire signer un logiciel coûte une centaine de dollars par an
+        chez Apple et autant chez Microsoft, et ce projet est donné. Le
+        logiciel n'est pas moins sûr pour autant — il est ouvert, et tu peux
+        <a href="https://github.com/bingoTCA/bingo-studio" rel="noopener">en
+        lire tout le code</a>. Voici comment passer l'avertissement, une seule
+        fois.
+      </p>
+
+      <div class="grille-deux">
+        <article class="carte">
+          <h3>Sur Mac</h3>
+          <p>Ouvre le fichier <code>.dmg</code> et glisse <strong>Bingo Studio</strong> dans <em>Applications</em>.</p>
+          <p>Au premier lancement, un message dit qu'Apple n'a pas pu vérifier l'application. Ferme-le, puis&nbsp;:</p>
+          <ol class="liste-simple">
+            <li>Menu <strong></strong> → <em>Réglages du système</em></li>
+            <li><em>Confidentialité et sécurité</em></li>
+            <li>Descends jusqu'au message sur Bingo Studio, puis <strong>Ouvrir quand même</strong></li>
+          </ol>
+          <p class="petit">Sur les Mac plus anciens, un clic droit sur l'application puis <em>Ouvrir</em> suffit.</p>
+        </article>
+        <article class="carte">
+          <h3>Sur Windows</h3>
+          <p>Lance le fichier <code>.exe</code>. L'installation ne demande <strong>pas</strong> les droits administrateur.</p>
+          <p>Windows affichera « Windows a protégé votre ordinateur »&nbsp;:</p>
+          <ol class="liste-simple">
+            <li>Clique sur <strong>Informations complémentaires</strong></li>
+            <li>Puis sur <strong>Exécuter quand même</strong></li>
+          </ol>
+          <p class="petit">Un raccourci est créé sur le bureau et dans le menu Démarrer.</p>
+        </article>
+      </div>
+
+      <h2 style="margin-top:44px">Vérifier le fichier téléchargé</h2>
+      <p class="intro">
+        Facultatif, mais c'est la preuve que le fichier reçu est bien celui
+        publié. Compare l'empreinte de ton fichier à celle-ci.
       </p>
       <ul class="liste-simple">
-        <li><strong>Sur Mac</strong> — clic droit sur l'application, puis <em>Ouvrir</em>. Une seule fois.</li>
-        <li><strong>Sur Windows</strong> — <em>Informations complémentaires</em>, puis <em>Exécuter quand même</em>.</li>
+        <li><strong>Mac</strong> — dans le Terminal : <code>shasum -a 256 ~/Downloads/BingoStudio-1.0.1-mac.dmg</code></li>
+        <li><strong>Windows</strong> — dans PowerShell : <code>Get-FileHash BingoStudio-1.0.1-windows.exe</code></li>
       </ul>
+      <p class="petit" style="word-break:break-all">
+        <code>153eae10871aea8332f1a3749781d12925e6291cc5d94098b0203b79c0fd2c80</code> — mac.dmg<br>
+        <code>0789ece7d00eb5141f92e06b365caa94fdbb519282489447951055995ba3878e</code> — windows.exe
+      </p>
 
       <h2 style="margin-top:44px">Et ensuite</h2>
       <p class="intro">
         Deux fenêtres s'ouvrent : la <strong>régie</strong> pour toi, l'<strong>antenne</strong>
         pour le téléviseur. Le <a href="../#emploi">mode d'emploi</a> te guide
-        en six étapes.
+        en sept étapes.
       </p>
       <div class="boutons">
         <a class="bouton" href="../#emploi">Lire le mode d'emploi</a>
+        <a class="bouton" href="https://github.com/bingoTCA/bingo-studio/releases" rel="noopener">Toutes les versions</a>
         <a class="bouton bouton-fort" href="../#contribution">Soutenir le projet</a>
       </div>
     </div>
@@ -75,15 +123,12 @@
 <footer class="pied">
   <div class="dedans">
     <p><strong>Bingo Studio</strong> — construit en Gaspésie, pour les bingos communautaires.</p>
-    <p class="petit">© <span id="annee">2026</span> Marc Bert. Logiciel offert gratuitement.</p>
+    <p class="petit">© <span id="annee">2026</span> Marc Bert. Logiciel offert gratuitement. Version 1.0.1.</p>
   </div>
 </footer>
 
 <script>
   document.getElementById("annee").textContent = new Date().getFullYear();
-  for (const lien of document.querySelectorAll('.telechargement[aria-disabled="true"]')) {
-    lien.addEventListener("click", (e) => e.preventDefault());
-  }
 </script>
 </body>
 </html>

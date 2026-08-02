@@ -33,7 +33,9 @@ const DEMO = {
   tirage: [12, 27, 44, 51, 68, 3, 33, 59, 17, 40, 71, 25, 8, 55, 62],
   enOnde: true,
   ecran: "jeu",
-  gagnants: [],
+  gagnants: [
+    { partie: "Partie 1", figure: "LIGNE", carte: 259, nom: "Jeannine Cyr, Grande-Rivière", lot: 100, heure: "12 h 41 min 08 s" }
+  ],
   rssTitres: [],
   horodatage: [],
   tic: 15

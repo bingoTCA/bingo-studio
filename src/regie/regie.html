@@ -47,6 +47,8 @@
       <span id="verif-verdict" class="verdict">Catalogue…</span>
     </div>
     <div id="verif-grille" class="carte-grille"></div>
+    <label for="verif-nom">Nom du gagnant <span class="facultatif">facultatif</span></label>
+    <input id="verif-nom" type="text" autocomplete="off" placeholder="Il s'affichera à l'antenne">
     <div class="verif-actions">
       <button id="btn-montrer" class="bouton">Montrer à l'antenne</button>
       <button id="btn-cacher" class="bouton">Retirer de l'antenne</button>
@@ -232,7 +234,47 @@
         <input id="reg-vol-effets" type="range" min="0" max="100" step="5">
       </label>
 
+      <h3>Fond de l'antenne</h3>
+      <p class="aide">Une image ou une vidéo par-dessus le dégradé. Sans média, le
+         dégradé s'affiche seul. La vidéo a priorité si les deux sont déposées.</p>
+      <div class="reg-medias">
+        <div>
+          <label class="bouton bouton-fichier">
+            Image de fond…
+            <input id="reg-fond-image" type="file" accept="image/*" hidden>
+          </label>
+          <p id="reg-fond-image-nom" class="aide">Aucune image</p>
+        </div>
+        <div>
+          <label class="bouton bouton-fichier">
+            Vidéo de fond (MP4)…
+            <input id="reg-fond-video" type="file" accept="video/mp4,video/*" hidden>
+          </label>
+          <p id="reg-fond-video-nom" class="aide">Aucune vidéo</p>
+        </div>
+        <button id="btn-fond-media-retirer" class="bouton bouton-danger">Retirer le fond</button>
+      </div>
+      <label class="reg-angle"><span>Transparence du fond : <span id="reg-fond-opacite-val">45</span> %</span>
+        <input id="reg-fond-opacite" type="range" min="0" max="100" step="5">
+      </label>
+
       <h3>Génériques</h3>
+      <label class="case-a-cocher"><input id="reg-reglement-actif" type="checkbox"> Inclure le règlement dans le générique de début</label>
+      <label for="reg-reglement">Règlement — une ligne vide entre chaque article</label>
+      <textarea id="reg-reglement" rows="8"></textarea>
+
+      <p class="aide">Musique des génériques — une piste est tirée au hasard et tourne en boucle.</p>
+      <div class="reg-logo-actions">
+        <label class="bouton bouton-fichier">
+          Ajouter des musiques…
+          <input id="reg-musiques" type="file" accept="audio/*" multiple hidden>
+        </label>
+      </div>
+      <div id="reg-musiques-liste" class="reg-liste-simple"></div>
+      <label class="reg-angle"><span>Volume de la musique : <span id="reg-gen-volume-val">35</span> %</span>
+        <input id="reg-gen-volume" type="range" min="0" max="100" step="5">
+      </label>
+
       <label for="reg-gen-debut">Texte du générique de début</label>
       <textarea id="reg-gen-debut" rows="3"></textarea>
       <label for="reg-gen-fin">Texte du générique de fin</label>

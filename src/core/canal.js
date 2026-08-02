@@ -13,6 +13,27 @@ const NOM_CANAL = "bingo-studio";
 const CLE_SAUVEGARDE = "bingo-studio-session";
 
 /**
+ * Règlement de bingo télé — un point de départ général, à adapter par
+ * chaque station. Les montants, les délais et le mode de paiement varient
+ * d'un organisme à l'autre, et la licence est propre à chacun.
+ */
+const REGLEMENT_PAR_DEFAUT = `Les cartes sont en vente chez nos détaillants jusqu'au début de la diffusion.
+
+Une carte porte un numéro de série unique. Conservez-la : c'est elle qui fait foi.
+
+Suivez le tirage à l'écran et marquez votre carte. Les numéros sont tirés au boulier, en direct.
+
+Dès que votre carte complète la figure annoncée, téléphonez immédiatement au numéro affiché à l'écran. Un appel reçu après le tirage de la boule suivante n'est plus recevable.
+
+Votre numéro de carte sera vérifié en ondes avant toute annonce.
+
+En cas de gagnants multiples sur une même figure, le lot est partagé également.
+
+La décision de l'organisme est finale.
+
+Le jeu est réservé aux personnes de 18 ans et plus.`;
+
+/**
  * Habillage de l'antenne — repris du modèle BINGO 2.0 (jeu-main).
  * Violet profond, Impact, cases rouges, caméra en chroma bleu pur.
  */
@@ -63,10 +84,22 @@ export function themeNeuf() {
       volumeEffets: 0.55
     },
 
+    // Fond de l'antenne : une image ou une vidéo par-dessus le dégradé.
+    // Sans média déposé, c'est le dégradé seul qui s'affiche.
+    fondMedia: {
+      image: null,           // fiche { cle, nom, type, taille }
+      video: null,
+      opacite: 0.45          // 0 = invisible, 1 = couvre le dégradé
+    },
+
     // Génériques de début et de fin
     generique: {
       texteDebut: "Bienvenue à votre bingo communautaire.\n\nMerci à nos commanditaires et à nos bénévoles.",
       texteFin: "Merci d'avoir joué avec nous.\n\nÀ la semaine prochaine !",
+      reglement: REGLEMENT_PAR_DEFAUT,
+      reglementActif: true,
+      musiques: [],          // fiches de fichiers audio, jouées en boucle
+      volumeMusique: 0.35,
       vitesse: 60            // secondes pour un défilement complet
     }
   };
@@ -82,7 +115,7 @@ export function fusionnerTheme(sauve) {
   if (!sauve || typeof sauve !== "object") return base;
 
   const sortie = { ...base, ...sauve };
-  for (const groupe of ["bandeau", "pubs", "sons", "generique"]) {
+  for (const groupe of ["bandeau", "pubs", "sons", "generique", "fondMedia"]) {
     sortie[groupe] = { ...base[groupe], ...(sauve[groupe] ?? {}) };
   }
   return sortie;
@@ -107,7 +140,7 @@ export function etatNeuf() {
     verification: null,   // carte montrée à l'antenne, si l'animateur le veut
     ecran: "jeu",         // "jeu" | "debut" | "fin" — générique à l'antenne
     horodatage: [],       // [{ numero, heure }] — journal pour le rapport
-    gagnants: [],         // [{ partie, figure, carte, lot, heure }]
+    gagnants: [],         // [{ partie, figure, carte, nom, lot, heure }]
     rssTitres: [],        // titres du flux, rafraîchis par la régie
     tic: 0                // incrémenté à chaque boule : déclenche le ding
   };

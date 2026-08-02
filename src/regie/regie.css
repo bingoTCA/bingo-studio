@@ -292,3 +292,15 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: #f0b429
 }
 .ecran-choix:hover { background: #2f2f27; border-color: #f0b429; }
 .ecran-choix small { display: block; color: #7c7b74; font-size: 12px; margin-top: 2px; }
+
+/* ---------- Médias : musiques, fond image ou vidéo ---------- */
+.reg-medias { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 12px; }
+.reg-medias > div { display: flex; flex-direction: column; gap: 6px; }
+.reg-medias .aide { margin: 0; }
+.reg-nom-fichier {
+  flex: 1; min-width: 0; font-size: 13px; color: #c9c8c1;
+  padding: 7px 10px; border-radius: 7px;
+  background: #0d0d09; border: 1px solid #33332c;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+#reg-reglement { font-size: 14px; line-height: 1.5; }

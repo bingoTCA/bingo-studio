@@ -7,6 +7,7 @@
 import { COLONNES, rangee, lettre, FIGURES } from "../core/bingo.js";
 import { creerCanal, reclamerEtat, etatNeuf, fusionnerTheme } from "../core/canal.js";
 import * as sons from "../core/sons.js";
+import * as medias from "../core/medias.js";
 
 const $ = (id) => document.getElementById(id);
 const scene = document.getElementById("scene");
@@ -100,8 +101,84 @@ function appliquerTheme(theme) {
   if (t.logo) { genLogo.src = t.logo; genLogo.hidden = false; }
   else { genLogo.removeAttribute("src"); genLogo.hidden = true; }
 
+  majFondMedia(t.fondMedia);
+
   sons.reglerVolumes({ effets: t.sons.volumeEffets, musique: t.sons.volumeMusique });
   return t;
+}
+
+// ---------------------------------------------------------------------
+//  Fond image ou vidéo
+// ---------------------------------------------------------------------
+
+let signatureFond = "";
+let urlFond = null;
+
+async function majFondMedia(reglages) {
+  const fiche = reglages.video ?? reglages.image ?? null;
+  // Signature : on ne relit le fichier que s'il change réellement. Sans ça,
+  // chaque boule tirée relancerait la vidéo depuis le début.
+  const signature = fiche ? `${fiche.cle}|${reglages.opacite}` : "";
+  if (signature === signatureFond) return;
+  signatureFond = signature;
+
+  const boite = $("fond-media"), img = $("fond-image"), video = $("fond-video");
+  medias.libererUrl(urlFond);
+  urlFond = null;
+  img.hidden = true; video.hidden = true;
+  video.removeAttribute("src");
+  img.removeAttribute("src");
+
+  if (!fiche) { boite.hidden = true; return; }
+
+  urlFond = await medias.urlDe(fiche.cle);
+  if (!urlFond) { boite.hidden = true; return; }
+
+  boite.style.opacity = String(reglages.opacite);
+  boite.hidden = false;
+
+  if (reglages.video) {
+    video.src = urlFond;
+    video.hidden = false;
+    video.play().catch(() => {});
+  } else {
+    img.src = urlFond;
+    img.hidden = false;
+  }
+}
+
+// ---------------------------------------------------------------------
+//  Musique des génériques
+// ---------------------------------------------------------------------
+
+let urlMusique = null;
+let musiqueEnCours = false;
+
+async function majMusiqueGenerique(t, etat) {
+  const audio = $("musique-generique");
+  const enGenerique = etat.ecran === "debut" || etat.ecran === "fin";
+  const voulue = enGenerique && etat.enOnde !== false && t.generique.musiques.length > 0;
+
+  if (!voulue) {
+    if (musiqueEnCours) {
+      audio.pause();
+      medias.libererUrl(urlMusique);
+      urlMusique = null;
+      musiqueEnCours = false;
+    }
+    return;
+  }
+  if (musiqueEnCours) { audio.volume = t.generique.volumeMusique; return; }
+
+  // Une piste au hasard parmi celles déposées, en boucle.
+  const liste = t.generique.musiques;
+  const choisie = liste[Math.floor(Math.random() * liste.length)];
+  urlMusique = await medias.urlDe(choisie.cle);
+  if (!urlMusique) return;
+  audio.src = urlMusique;
+  audio.volume = t.generique.volumeMusique;
+  audio.play().catch(() => {});
+  musiqueEnCours = true;
 }
 
 // ---------------------------------------------------------------------
@@ -236,9 +313,18 @@ function dessinerGagnants(gagnants) {
   for (const g of [...gagnants].reverse()) {
     const li = document.createElement("li");
     const lot = Number(g.lot) || 0;
-    li.innerHTML = `<span class="g-carte">Carte ${g.carte}</span>`
-      + ` — ${FIGURES[g.figure]?.nom ?? g.figure}`
+
+    const nom = document.createElement("span");
+    nom.className = "g-nom";
+    nom.textContent = g.nom?.trim() || `Carte ${g.carte}`;
+
+    const detail = document.createElement("span");
+    detail.className = "g-detail";
+    detail.textContent = (g.nom?.trim() ? `Carte ${g.carte} · ` : "")
+      + (FIGURES[g.figure]?.nom ?? g.figure)
       + (lot ? ` · ${lot.toLocaleString("fr-CA")} $` : "");
+
+    li.append(nom, detail);
     liste.appendChild(li);
   }
 }
@@ -326,6 +412,7 @@ function majGenerique(t, etat) {
 
   const gagnants = etat.gagnants ?? [];
   const signature = `${ecran}|${t.generique.texteDebut}|${t.generique.texteFin}|${t.generique.vitesse}`
+    + `|${t.generique.reglementActif ? t.generique.reglement : ""}`
     + `|${etat.parties.map((p) => `${p.figure}:${p.lot}`).join(",")}|${gagnants.length}`;
   if (signature === signatureGenerique) return;
   signatureGenerique = signature;
@@ -366,6 +453,15 @@ function majGenerique(t, etat) {
     for (const p of etat.parties) {
       const lot = Number(p.lot) || 0;
       ligne(`${FIGURES[p.figure]?.nom ?? p.figure}${lot ? ` — ${lot.toLocaleString("fr-CA")} $` : ""}`);
+    }
+    if (t.generique.reglementActif && t.generique.reglement?.trim()) {
+      section("Règlement");
+      for (const bloc of t.generique.reglement.split(/\n\s*\n/)) {
+        const el = document.createElement("p");
+        el.className = "gen-reglement";
+        el.textContent = bloc.trim();
+        if (el.textContent) piste.appendChild(el);
+      }
     }
   } else {
     section("Gagnants du jour");
@@ -457,6 +553,7 @@ function rendre(etat) {
   majBandeau(t, etat);
   majGenerique(t, etat);
   majSons(t, etat);
+  majMusiqueGenerique(t, etat);
 
   // Superpositions — antenne coupée : plus rien ne passe, carte comprise.
   const coupe = etat.enOnde === false;

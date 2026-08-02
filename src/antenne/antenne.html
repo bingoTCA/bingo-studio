@@ -8,6 +8,13 @@
 <body>
 <main id="scene" class="scene">
 
+  <!-- Fond : une image ou une vidéo par-dessus le dégradé. Derrière tout le
+       reste, jamais cliquable, jamais dans le parcours au clavier. -->
+  <div id="fond-media" class="fond-media" aria-hidden="true" hidden>
+    <img id="fond-image" alt="" hidden>
+    <video id="fond-video" muted loop playsinline hidden></video>
+  </div>
+
   <!-- ============== Bandeau : logo · titre · date/heure · téléphone ============== -->
   <header class="bandeau">
     <div class="bandeau-gauche">
@@ -125,6 +132,8 @@
   <div id="annonce" class="voile voile-annonce" hidden>
     <p id="annonce-texte" class="voile-titre"></p>
   </div>
+
+  <audio id="musique-generique" loop></audio>
 
   <!-- Générique de début ou de fin — plein écran, texte qui défile -->
   <div id="generique" class="generique" hidden>

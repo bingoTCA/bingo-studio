@@ -14,6 +14,7 @@ import {
   creerCanal, diffuser, etatNeuf, themeNeuf, sauvegarder, restaurer, effacerSauvegarde
 } from "../core/canal.js";
 import * as sons from "../core/sons.js";
+import * as medias from "../core/medias.js";
 
 const $ = (id) => document.getElementById(id);
 const canal = creerCanal();
@@ -338,7 +339,20 @@ function dessinerParametresTheme() {
   $("reg-vol-effets-val").textContent = Math.round(t.sons.volumeEffets * 100);
   sons.reglerVolumes({ effets: t.sons.volumeEffets, musique: t.sons.volumeMusique });
 
+  // Fond image ou vidéo
+  $("reg-fond-image-nom").textContent = t.fondMedia.image
+    ? `${t.fondMedia.image.nom} · ${medias.formaterTaille(t.fondMedia.image.taille)}` : "Aucune image";
+  $("reg-fond-video-nom").textContent = t.fondMedia.video
+    ? `${t.fondMedia.video.nom} · ${medias.formaterTaille(t.fondMedia.video.taille)}` : "Aucune vidéo";
+  $("reg-fond-opacite").value = Math.round(t.fondMedia.opacite * 100);
+  $("reg-fond-opacite-val").textContent = Math.round(t.fondMedia.opacite * 100);
+
   // Génériques
+  $("reg-reglement-actif").checked = t.generique.reglementActif;
+  if (document.activeElement !== $("reg-reglement")) $("reg-reglement").value = t.generique.reglement || "";
+  $("reg-gen-volume").value = Math.round(t.generique.volumeMusique * 100);
+  $("reg-gen-volume-val").textContent = Math.round(t.generique.volumeMusique * 100);
+  dessinerMusiques();
   if (document.activeElement !== $("reg-gen-debut")) $("reg-gen-debut").value = t.generique.texteDebut || "";
   if (document.activeElement !== $("reg-gen-fin")) $("reg-gen-fin").value = t.generique.texteFin || "";
   $("reg-gen-vitesse").value = t.generique.vitesse;
@@ -371,6 +385,37 @@ function dessinerTelephones() {
     sup.onclick = () => { etat.telephones.splice(i, 1); pousser(); };
 
     rang.append(champ, sup);
+    boite.appendChild(rang);
+  });
+}
+
+function dessinerMusiques() {
+  const boite = $("reg-musiques-liste");
+  boite.innerHTML = "";
+  const liste = theme().generique.musiques;
+  if (!liste.length) {
+    boite.innerHTML = '<p class="aide">Aucune musique — les génériques défileront en silence.</p>';
+    return;
+  }
+  liste.forEach((piste, i) => {
+    const rang = document.createElement("div");
+    rang.className = "reg-ligne-bouton";
+
+    const nom = document.createElement("span");
+    nom.className = "reg-nom-fichier";
+    nom.textContent = `${piste.nom} · ${medias.formaterTaille(piste.taille)}`;
+
+    const sup = document.createElement("button");
+    sup.className = "reg-supprimer"; sup.textContent = "×";
+    sup.title = "Retirer cette musique";
+    sup.onclick = async () => {
+      await medias.retirer(piste.cle);
+      theme().generique.musiques.splice(i, 1);
+      dessinerParametresTheme();
+      pousser();
+    };
+
+    rang.append(nom, sup);
     boite.appendChild(rang);
   });
 }
@@ -646,7 +691,65 @@ function brancherParametres() {
     pousserLeger();
   };
 
+  // --- Fond image ou vidéo ---
+  // Les médias ne passent PAS par l'état : ils vont au magasin IndexedDB,
+  // et l'état ne garde qu'une fiche { cle, nom, type, taille }.
+  const deposerFond = (type) => async (e) => {
+    const fichier = e.target.files?.[0];
+    e.target.value = "";
+    if (!fichier) return;
+    try {
+      const ancienne = theme().fondMedia[type];
+      if (ancienne) await medias.retirer(ancienne.cle);
+      theme().fondMedia[type] = await medias.deposer(`fond-${type}`, fichier);
+      dessinerParametresTheme();
+      dire(`${type === "video" ? "Vidéo" : "Image"} de fond en place.`, "ok");
+      pousser();
+    } catch (err) {
+      dire(`Impossible d'enregistrer ce fichier (${err.message}).`, "erreur");
+    }
+  };
+  $("reg-fond-image").onchange = deposerFond("image");
+  $("reg-fond-video").onchange = deposerFond("video");
+
+  $("btn-fond-media-retirer").onclick = async () => {
+    for (const type of ["image", "video"]) {
+      const fiche = theme().fondMedia[type];
+      if (fiche) await medias.retirer(fiche.cle);
+      theme().fondMedia[type] = null;
+    }
+    dessinerParametresTheme();
+    dire("Le fond revient au dégradé.", "ok");
+    pousser();
+  };
+  $("reg-fond-opacite").oninput = () => {
+    theme().fondMedia.opacite = Number($("reg-fond-opacite").value) / 100;
+    $("reg-fond-opacite-val").textContent = $("reg-fond-opacite").value;
+    pousserLeger();
+  };
+
   // --- Génériques ---
+  $("reg-reglement-actif").onchange = () => majTheme2("generique", "reglementActif", $("reg-reglement-actif").checked);
+  $("reg-reglement").oninput = () => { theme().generique.reglement = $("reg-reglement").value; pousserLeger(); };
+  $("reg-gen-volume").oninput = () => {
+    theme().generique.volumeMusique = Number($("reg-gen-volume").value) / 100;
+    $("reg-gen-volume-val").textContent = $("reg-gen-volume").value;
+    pousserLeger();
+  };
+  $("reg-musiques").onchange = async (e) => {
+    const fichiers = [...(e.target.files ?? [])];
+    e.target.value = "";
+    if (!fichiers.length) return;
+    let ajoutees = 0;
+    for (const f of fichiers) {
+      try { theme().generique.musiques.push(await medias.deposer("musique", f)); ajoutees++; }
+      catch { /* fichier refusé, on continue avec les suivants */ }
+    }
+    dessinerParametresTheme();
+    dire(`${ajoutees} musique${ajoutees > 1 ? "s" : ""} ajoutée${ajoutees > 1 ? "s" : ""}.`, ajoutees ? "ok" : "erreur");
+    pousser();
+  };
+
   $("reg-gen-debut").oninput = () => { theme().generique.texteDebut = $("reg-gen-debut").value; pousserLeger(); };
   $("reg-gen-fin").oninput = () => { theme().generique.texteFin = $("reg-gen-fin").value; pousserLeger(); };
   $("reg-gen-vitesse").oninput = () => {
@@ -775,8 +878,8 @@ function rapport() {
 
   const gagnants = (etat.gagnants ?? []).map((g) =>
     `<tr><td>${echapper(g.partie)}</td><td>${echapper(FIGURES[g.figure]?.nom ?? g.figure)}</td>
-     <td>Carte ${g.carte}</td><td>${Number(g.lot).toLocaleString("fr-CA")} $</td><td>${echapper(g.heure)}</td></tr>`).join("")
-    || '<tr><td colspan="5">Aucun gagnant consigné.</td></tr>';
+     <td>Carte ${g.carte}</td><td>${echapper(g.nom || "—")}</td><td>${Number(g.lot).toLocaleString("fr-CA")} $</td><td>${echapper(g.heure)}</td></tr>`).join("")
+    || '<tr><td colspan="6">Aucun gagnant consigné.</td></tr>';
 
   const html = `<!doctype html><html lang="fr-CA"><head><meta charset="utf-8">
 <title>Rapport — ${echapper(etat.titre)}</title>
@@ -801,7 +904,7 @@ ${etat.parties.map((p) => `<tr><td>${echapper(p.nom)}</td><td>${echapper(FIGURES
 </table>
 
 <h2>Gagnants</h2>
-<table><tr><th>Partie</th><th>Figure</th><th>Carte</th><th>Lot</th><th>Heure</th></tr>${gagnants}</table>
+<table><tr><th>Partie</th><th>Figure</th><th>Carte</th><th>Nom</th><th>Lot</th><th>Heure</th></tr>${gagnants}</table>
 
 <h2>Numéros tirés (${etat.tirage.length})</h2>
 <div class="ordre"><table><tr><th>#</th><th>Boule</th><th>Heure</th></tr>${lignes}</table></div>
@@ -1025,14 +1128,18 @@ function annoncerGagnant() {
   const partie = partieCourante();
   const lot = Number(partie.lot || 0);
 
+  const nom = $("verif-nom").value.trim();
+
   etat.gagnants = etat.gagnants ?? [];
   etat.gagnants.push({
     partie: partie.nom, figure: partie.figure,
-    carte: verification.numero, lot, heure: heureQuebec()
+    carte: verification.numero, nom, lot, heure: heureQuebec()
   });
   etat.annonce = {
-    texte: `BINGO !\nCarte ${verification.numero}` + (lot ? ` — ${lot.toLocaleString("fr-CA")} $` : "")
+    texte: `BINGO !\n${nom ? nom + "\n" : ""}Carte ${verification.numero}`
+      + (lot ? ` — ${lot.toLocaleString("fr-CA")} $` : "")
   };
+  $("verif-nom").value = "";
   etat.verification = verification;
   dire(`Gagnant annoncé : carte ${verification.numero}. Reclique « Annoncer » pour retirer l'annonce.`, "ok");
   pousser();

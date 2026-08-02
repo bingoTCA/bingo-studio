@@ -41,8 +41,15 @@ Bloc **Contrôles antenne** dans la Régie. Tout est instantané.
 | **Musique** | Musique de fond, volume bas pour ne pas couvrir l'animateur |
 | **Son régie** | La clochette de confirmation sur **ta** machine — indépendante de ce qui part à l'antenne |
 
-Le générique de début reprend automatiquement les **prix du jour**, celui de
-fin les **gagnants de la session**, le commanditaire et le téléphone.
+Le générique de début reprend automatiquement les **prix du jour** et le
+**règlement**, celui de fin les **gagnants de la session**, le commanditaire et
+les téléphones. Il tourne en boucle tant que tu ne reviens pas au jeu, avec une
+musique tirée au hasard parmi celles que tu as déposées.
+
+Le **règlement** est fourni avec un texte général de bingo télé — cartes en
+vente chez les détaillants, appel immédiat, vérification en ondes, partage des
+lots, 18 ans et plus. À adapter : les montants, les délais et la licence sont
+propres à chaque organisme.
 
 ## Sons
 
@@ -71,7 +78,8 @@ Bouton **Paramètres**, en haut à droite. Tout part à l'antenne immédiatement
 | **Bandeau défilant** | Au choix : **tes messages** (un par ligne) **ou** un vrai **flux RSS**. Jamais les deux mélangés. Durée du passage réglable |
 | **Publicités** | Images téléversées, réduites en JPEG 1280×720. Délai entre les changements réglable. Une seule image reste fixe |
 | **Sons** | Clochette, fanfare, musique, et les deux volumes |
-| **Génériques** | Textes de début et de fin, vitesse de défilement |
+| **Fond de l'antenne** | Une **image** ou une **vidéo MP4 en boucle** par-dessus le dégradé, avec réglage de transparence. Sans média, le dégradé s'affiche seul |
+| **Génériques** | Textes de début et de fin, **règlement du bingo**, **musiques** jouées en boucle, vitesse de défilement |
 | **Textes** | Titre, **un ou plusieurs téléphones** (côte à côte dans le même bloc), mention de commandite |
 | **Parties** | Nom, figure et lot de chaque partie de la session |
 
@@ -84,9 +92,13 @@ recolore les blocs, les cadres, le bandeau et la colonne des lettres d'un coup.
 Le fond ne la suit pas automatiquement — ce serait écraser sans prévenir un
 dégradé réglé à la main — mais un bouton l'accorde en un geste.
 
-⚠️ Les images de pub sont enregistrées dans le navigateur, dont la réserve
-tourne autour de 5 Mo. Si tu en mets trop, la Régie te le dit clairement au
-lieu de perdre tes réglages en silence.
+**Où vont les fichiers.** Le logo et les images de pub sont enregistrés dans le
+navigateur, dont la réserve tourne autour de 5 Mo — si tu en mets trop, la Régie
+te le dit au lieu de perdre tes réglages en silence.
+
+Les **musiques et les fonds vidéo**, eux, vont dans un magasin séparé
+(`src/core/medias.js`) qui se compte en gigaoctets. La session ne garde qu'une
+référence : une musique de 200 Ko déposée laisse la sauvegarde à 4 Ko.
 
 L'habillage appartient à la station, pas à la session : « Nouvelle session »
 efface les numéros et les gagnants, mais **garde le logo et les couleurs**.
@@ -163,7 +175,9 @@ retenue en jaune.
 - **Montrer à l'antenne** — affiche la carte dans le coin, et elle se met à
   jour toute seule au fil des tirages.
 - **Annoncer le gagnant** — refusé si la carte n'est pas réellement gagnante.
-  Consigne le gagnant dans le rapport de session.
+  Tu peux saisir le **nom du gagnant** : il s'affiche en grand à l'antenne avec
+  son numéro de carte, dans le bloc des gagnants — donc visible dès qu'aucune
+  carte n'est montrée. Le nom est consigné dans le rapport de session.
 
 ## Le rapport de session
 

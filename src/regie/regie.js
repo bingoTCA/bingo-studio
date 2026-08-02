@@ -629,7 +629,7 @@ function optionsImpression() {
     format: $("imp-format").value || "Letter",
     de: Number($("imp-de").value) || nums[0],
     a: Number($("imp-a").value) || nums.at(-1),
-    couleur: $("imp-couleur").value === "#ffffff" ? null : $("imp-couleur").value,
+    couleur: $("imp-couleur").value,
     graine: "feuilles",
     droits: manifesteCartes.droits
   };

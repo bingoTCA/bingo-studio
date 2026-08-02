@@ -35,6 +35,21 @@ const echapper = (s) => String(s ?? "").replace(/[&<>"]/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 /**
+ * Noir ou blanc par-dessus une couleur, selon ce qui se lit.
+ * Une station qui choisit un jaune vif aurait des lettres blanches
+ * illisibles ; sur un bleu marine, des lettres noires. On tranche pour elle.
+ */
+export function encreLisible(fond) {
+  const hex = String(fond || "#000000").replace("#", "");
+  const plein = hex.length === 3 ? hex.split("").map((c) => c + c).join("") : hex;
+  const n = parseInt(plein, 16);
+  if (!Number.isFinite(n) || plein.length !== 6) return "#ffffff";
+  // Luminance perçue : l'œil est bien plus sensible au vert qu'au bleu.
+  const r = (n >> 16) & 255, v = (n >> 8) & 255, b = n & 255;
+  return (0.299 * r + 0.587 * v + 0.114 * b) > 150 ? "#000000" : "#ffffff";
+}
+
+/**
  * Découpe la base en feuilles, séries mélangées.
  * Renvoie { feuilles, numeros, derniereIncomplete }.
  */
@@ -60,7 +75,11 @@ export function decouper(catalogue, { parFeuille = 3, de = null, a = null, grain
 export function monterHtml(catalogue, options = {}) {
   const parFeuille = Number(options.parFeuille ?? 3);
   const format = options.format ?? "Letter";
-  const couleur = options.couleur || null;
+  // La couleur ne touche QUE les blocs B-I-N-G-O. Le papier reste blanc et
+  // les carreaux noir sur blanc : c'est ce qui s'imprime le mieux, coûte le
+  // moins cher, et reste lisible pour tout le monde à distance.
+  const couleurBlocs = options.couleur || "#000000";
+  const encre = encreLisible(couleurBlocs);
   const droits = options.droits ?? "";
 
   if (!DISPOSITIONS[parFeuille]) throw new Error(`Disposition inconnue : ${parFeuille} grilles par feuille`);
@@ -108,7 +127,7 @@ export function monterHtml(catalogue, options = {}) {
      son fond noir, et printBackground l'imprimerait tel quel. */
   html, body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background: ${couleur ?? "#ffffff"};
+    background: #fff;
     color: #000;
     color-scheme: only light;
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
@@ -118,7 +137,7 @@ export function monterHtml(catalogue, options = {}) {
     padding: 10mm 10mm 6mm;
     display: flex; flex-direction: column;
     page-break-after: always; break-after: page;
-    background: ${couleur ?? "#ffffff"}; color: #000;
+    background: #fff; color: #000;
   }
   .feuille:last-child { page-break-after: auto; break-after: auto; }
   .plateau {
@@ -133,11 +152,18 @@ export function monterHtml(catalogue, options = {}) {
     min-height: 0; min-width: 0;
   }
   .grille.vide { border-style: dashed; border-color: #bbb; }
+  /* Les blocs B-I-N-G-O : le SEUL endroit coloré de la feuille. */
   .entete {
     display: grid; grid-template-columns: repeat(5, 1fr);
-    text-align: center; font-weight: 800;
-    font-size: ${tailleEntete}mm; line-height: 1.1; letter-spacing: 0.5mm;
-    border-bottom: 0.5mm solid #000; padding-bottom: 0.8mm; margin-bottom: 1mm;
+    gap: 0.6mm; margin-bottom: 0.6mm;
+  }
+  .entete span {
+    display: flex; align-items: center; justify-content: center;
+    background: ${couleurBlocs}; color: ${encre};
+    border-radius: 1mm;
+    font-weight: 800; font-size: ${tailleEntete}mm;
+    line-height: 1; letter-spacing: 0.3mm;
+    padding: ${parFeuille >= 9 ? "0.8" : "1.2"}mm 0;
   }
   .cases {
     flex: 1; display: grid;

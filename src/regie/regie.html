@@ -286,7 +286,9 @@
 
       <h3 id="titre-impression">Imprimer les cartes</h3>
       <p class="aide">Monte les feuilles à envoyer à l'imprimeur. Les numéros de série
-         sont éparpillés : une feuille ne porte jamais 1-2-3.</p>
+         sont éparpillés : une feuille ne porte jamais 1-2-3. Seuls les blocs
+         B-I-N-G-O prennent ta couleur ; le reste est noir sur blanc, pour que
+         l'impression reste lisible et bon marché.</p>
       <div class="reg-impression">
         <label>Grilles par feuille
           <select id="imp-par-feuille"></select>
@@ -300,8 +302,8 @@
         <label>à la carte
           <input id="imp-a" type="number" min="1">
         </label>
-        <label>Teinte du papier
-          <input id="imp-couleur" type="color" value="#ffffff">
+        <label>Couleur des blocs BINGO
+          <input id="imp-couleur" type="color" value="#000000">
         </label>
       </div>
       <p id="imp-resume" class="aide"></p>

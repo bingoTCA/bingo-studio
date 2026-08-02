@@ -38,7 +38,7 @@ Monteur de feuilles de bingo
   --de=N --a=N      ne monter qu'une tranche de la base       (défaut : toute)
   --graine=TEXTE    graine de répartition — À NOTER           (défaut "feuilles")
   --format=NOM      Letter, Legal ou A4                        (défaut Letter)
-  --couleur=#HEX    teinte de la série (papier de couleur)     (défaut aucune)
+  --couleur=#HEX    couleur des blocs B-I-N-G-O                  (défaut noir)
   --sortie=CHEMIN   fichier HTML produit
   --pdf             produit aussi le PDF (via Electron, déjà installé)
 `);
@@ -53,7 +53,7 @@ Monteur de feuilles de bingo
 const PAR_FEUILLE = Number(args["par-feuille"] ?? 3);
 const GRAINE = String(args.graine ?? "feuilles");
 const FORMAT = String(args.format ?? "Letter");
-const COULEUR = args.couleur ? String(args.couleur) : null;
+const COULEUR = args.couleur ? String(args.couleur) : "#000000";
 
 if (!DISPOSITIONS[PAR_FEUILLE]) {
   console.error(`--par-feuille=${PAR_FEUILLE} : choisis parmi ${Object.keys(DISPOSITIONS).join(", ")}`);

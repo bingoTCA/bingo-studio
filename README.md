@@ -230,16 +230,26 @@ des gagnants à perdre.
 
 ## La base de cartes — scellée
 
-`data/cartes.json` porte **10 000 cartes originales de Marc Bert**, générées
-avec la graine `bingo-studio 2026`. Elle est **scellée** : `data/cartes.manifeste.json`
-consigne son origine, son empreinte SHA-256 et les droits.
+`data/cartes.json` porte **10 000 cartes, numérotées de 1 à 10 000**, générées
+avec la graine `bingo-studio 2026`. Elle est **libre de droits pour les
+télévisions communautaires autonomes**.
 
-`npm test` vérifie cette empreinte à chaque exécution. Si un octet change,
-les tests échouent avec un message clair — une modification accidentelle est
-attrapée avant la diffusion, pas devant public.
+**Cette base ne change jamais, et c'est essentiel.** Les cartes papier vivent
+des années dans les salles ; si la carte n° 4321 portait d'autres numéros après
+une mise à jour, toutes celles déjà vendues deviendraient fausses et la
+vérification en ondes donnerait de mauvais verdicts. Trois garde-fous :
 
-Tu n'as donc **rien à régénérer** : la base reste telle quelle. Après un
-changement volontaire, resceller :
+1. **L'empreinte.** `data/cartes.manifeste.json` consigne le SHA-256 du
+   fichier. `npm test` le recalcule à chaque exécution : un seul octet modifié
+   fait échouer les tests, avant la diffusion et non devant public.
+2. **La graine.** À graine égale, le générateur reproduit la base
+   *rigoureusement* à l'identique — vérifié : régénérer avec
+   `bingo-studio 2026` redonne un fichier identique octet pour octet. La base
+   est donc reconstructible même si le fichier était perdu.
+3. **La numérotation.** De 1 à 10 000, sans trou. (Il n'y a pas de carte n° 0 :
+   une série commence à 1.)
+
+Tu n'as donc **rien à régénérer**. Après un changement volontaire, resceller :
 
 ```bash
 npm run sceller -- --graine="bingo-studio 2026"
@@ -258,7 +268,7 @@ Produit `data/feuilles-3-grilles.html` **et le PDF** à envoyer à l'imprimeur.
 | `--par-feuille=N` | 1, 2, 3, 4, 6, 9, 12 ou 18 grilles par feuille |
 | `--de=N --a=N` | ne monter qu'une tranche de la base |
 | `--format=NOM` | Letter (défaut), Legal ou A4 |
-| `--couleur=#HEX` | teinte de la série — les livrets de bingo changent de couleur à chaque page |
+| `--couleur=#HEX` | couleur des blocs B-I-N-G-O (défaut noir) — une par série pour les distinguer |
 | `--graine=TEXTE` | graine de répartition, à noter |
 | `--pdf` | produit le PDF (rendu par Electron, aucune bibliothèque en plus) |
 
@@ -268,7 +278,31 @@ découpée en feuilles. Un acheteur ne peut pas deviner ce qu'il aura, et les
 grilles voisines ne se retrouvent pas dans la même main. À graine égale la
 répartition est identique — un lot perdu se réimprime à l'identique.
 
+**Seuls les blocs B-I-N-G-O prennent la couleur.** Le papier reste blanc et les
+carreaux noir sur blanc : c'est ce qui s'imprime le mieux, coûte le moins cher
+en encre et se lit de plus loin. L'encre des lettres bascule toute seule entre
+noir et blanc selon la luminance du fond choisi — un jaune vif ne donnera pas
+des lettres blanches illisibles.
+
 La mention de droits du manifeste est imprimée au bas de chaque feuille.
+
+### Plus de 10 000 numéros de série
+
+Une station qui écoule beaucoup de cartes peut en vouloir davantage. Générer
+une base plus grande ne pose aucun problème de fond : il existe environ
+**5,5 × 10²⁶** cartes de bingo distinctes, donc les collisions sont
+impensables. Mesuré sur cette machine :
+
+| Cartes | Fichier | Temps |
+|---|---|---|
+| 10 000 | 878 Ko | 0,11 s |
+| 50 000 | 4,3 Mo | 0,30 s |
+| 200 000 | 17 Mo | 1,12 s |
+| 500 000 | 44 Mo | 2,85 s |
+
+La limite n'est pas la génération mais la **mémoire du navigateur** : le
+catalogue entier est chargé pour la vérification en ondes. Jusqu'à 50 000, rien
+à signaler. Au-delà de 200 000, il faudrait charger la base par tranches.
 
 > **Format du papier.** Le PDF sort en Letter 8,5 × 11 po par défaut. Je n'ai
 > pas trouvé de source fiable sur les formats de papier de bingo en usage au

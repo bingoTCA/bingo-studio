@@ -132,6 +132,10 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
 }
 
 .grille-deux { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+/* Deux colonnes imposées, pas « autant que ça rentre » : avec quatre cartes,
+   l'auto-fit en place trois et laisse la dernière seule au bas de la page. */
+.grille-paire { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+@media (max-width: 720px) { .grille-paire { grid-template-columns: 1fr; } }
 
 .carte {
   background: linear-gradient(180deg, rgba(74,31,122,.42) 0%, rgba(26,18,38,.42) 100%);

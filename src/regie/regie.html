@@ -119,8 +119,10 @@
       <h3>Textes à l'antenne</h3>
       <label for="reg-titre">Titre</label>
       <input id="reg-titre" type="text">
-      <label for="reg-telephone">Téléphone à afficher</label>
-      <input id="reg-telephone" type="text" placeholder="418 555-0143">
+      <label>Téléphones à afficher</label>
+      <p class="aide">Un ou plusieurs — ils s'affichent côte à côte dans le même bloc.</p>
+      <div id="reg-telephones" class="reg-liste-simple"></div>
+      <button id="btn-ajouter-telephone" class="bouton">+ Ajouter un numéro</button>
       <label for="reg-commanditaire">Mention de commandite</label>
       <input id="reg-commanditaire" type="text" placeholder="Présenté par…">
       <label class="case-a-cocher">
@@ -140,6 +142,19 @@
           </label>
           <button id="btn-logo-retirer" class="bouton bouton-danger">Retirer</button>
         </div>
+      </div>
+
+      <h3>Couleurs</h3>
+      <p class="aide">La couleur d'ambiance donne le ton à tous les blocs et cadres.
+         Le reste des teintes s'en déduit tout seul.</p>
+      <div class="reg-couleurs">
+        <label><span>Ambiance</span><input id="reg-ambiance" type="color"></label>
+        <label><span>Accent</span><input id="reg-accent" type="color"></label>
+        <label><span>Numéros sortis</span><input id="reg-marquage" type="color"></label>
+        <button id="btn-couleurs-defaut" class="bouton">Défaut</button>
+      </div>
+      <div class="verif-actions">
+        <button id="btn-accorder-fond" class="bouton bouton-primaire">Accorder le fond à l'ambiance</button>
       </div>
 
       <h3>Couleur de fond</h3>
@@ -169,6 +184,18 @@
 
       <h3>Bandeau défilant</h3>
       <label class="case-a-cocher"><input id="reg-bandeau-actif" type="checkbox"> Afficher le bandeau</label>
+
+      <div class="reg-choix">
+        <label class="case-a-cocher">
+          <input type="radio" name="bandeau-source" value="messages" id="reg-source-messages">
+          <span>Mes propres messages</span>
+        </label>
+        <label class="case-a-cocher">
+          <input type="radio" name="bandeau-source" value="rss" id="reg-source-rss">
+          <span>Un flux de nouvelles (RSS)</span>
+        </label>
+      </div>
+
       <label for="reg-bandeau-messages">Messages — un par ligne</label>
       <textarea id="reg-bandeau-messages" rows="4" placeholder="Merci à nos commanditaires&#10;Prochain bingo dimanche 12 h 30"></textarea>
       <label for="reg-bandeau-rss">Flux RSS (facultatif)</label>

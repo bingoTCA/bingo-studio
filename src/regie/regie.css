@@ -69,6 +69,11 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: #f0b429
 
 .reg-ligne-bouton { display: flex; gap: 8px; align-items: stretch; }
 .reg-ligne-bouton .bouton { flex-shrink: 0; }
+.reg-liste-simple { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.reg-liste-simple .aide { margin: 0; }
+.reg-choix { display: flex; gap: 22px; flex-wrap: wrap; margin: 4px 0 12px; }
+.reg-choix .case-a-cocher { margin: 0; }
+.reg-choix input { accent-color: #f0b429; }
 
 .reg-pubs-liste { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
 .reg-pub { position: relative; width: 92px; height: 52px; border-radius: 6px; overflow: hidden; border: 1px solid #33332c; background: #0d0d09; }

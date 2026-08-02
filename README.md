@@ -63,22 +63,26 @@ Bouton **Paramètres**, en haut à droite. Tout part à l'antenne immédiatement
 | Réglage | Ce que ça fait |
 |---|---|
 | **Logo** | Téléversé, réduit automatiquement à 400 px max, affiché en haut à gauche |
-| **Couleur de fond** | Trois teintes du dégradé + angle, avec aperçu. Bouton « Défaut » |
+| **Couleurs** | Une **couleur d'ambiance** donne le ton à tous les blocs et cadres ; un **accent** pour les mises en valeur ; la couleur des **numéros sortis**. Tout le reste s'en déduit |
+| **Couleur de fond** | Trois teintes du dégradé + angle, avec aperçu. Bouton « Accorder le fond à l'ambiance » |
 | **Halo · texture** | Le réflecteur de scène et la texture pointillée, désactivables |
 | **Zone caméra** | La couleur d'incrustation — bleu pur par défaut, vert si ta régie key en vert. Masquable |
 | **Date et heure** | Heure du Québec, quelle que soit la machine. Masquable |
-| **Bandeau défilant** | Messages (un par ligne) + **flux RSS** facultatif, durée du passage réglable |
+| **Bandeau défilant** | Au choix : **tes messages** (un par ligne) **ou** un vrai **flux RSS**. Jamais les deux mélangés. Durée du passage réglable |
 | **Publicités** | Images téléversées, réduites en JPEG 1280×720. Délai entre les changements réglable. Une seule image reste fixe |
 | **Sons** | Clochette, fanfare, musique, et les deux volumes |
 | **Génériques** | Textes de début et de fin, vitesse de défilement |
-| **Textes** | Titre, téléphone, mention de commandite |
+| **Textes** | Titre, **un ou plusieurs téléphones** (côte à côte dans le même bloc), mention de commandite |
 | **Parties** | Nom, figure et lot de chaque partie de la session |
 
 Le **flux RSS** est chargé par le serveur local, pas par le navigateur : sans
 ce relais, le navigateur bloquerait la requête (CORS). Seuls les titres des
-articles sont extraits. Clique
-« Charger » pour rafraîchir ; les titres partent à l'antenne avec tes propres
-messages.
+articles sont extraits. Clique « Charger » pour rafraîchir.
+
+La **couleur d'ambiance** est le seul réglage qui compte vraiment : elle
+recolore les blocs, les cadres, le bandeau et la colonne des lettres d'un coup.
+Le fond ne la suit pas automatiquement — ce serait écraser sans prévenir un
+dégradé réglé à la main — mais un bouton l'accorde en un geste.
 
 ⚠️ Les images de pub sont enregistrées dans le navigateur, dont la réserve
 tourne autour de 5 Mo. Si tu en mets trop, la Régie te le dit clairement au

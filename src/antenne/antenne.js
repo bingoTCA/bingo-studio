@@ -68,6 +68,12 @@ function appliquerTheme(theme) {
   const t = fusionnerTheme(theme);
   const s = document.documentElement.style;
 
+  // Les trois couleurs réglables. Toutes les autres teintes de la feuille
+  // de style s'en déduisent par color-mix — rien d'autre à poser ici.
+  s.setProperty("--ambiance", t.ambiance);
+  s.setProperty("--accent", t.accent);
+  s.setProperty("--marquage", t.marquage);
+
   s.setProperty("--fond-haut", t.fondHaut);
   s.setProperty("--fond-milieu", t.fondMilieu);
   s.setProperty("--fond-bas", t.fondBas);
@@ -200,6 +206,25 @@ function dessinerFormes(etat) {
   $("formes-total-val").textContent = total ? `${total.toLocaleString("fr-CA")} $` : "—";
 }
 
+const COMBINE_TELEPHONE = "M20 15.5c-1.25 0-2.45-.2-3.57-.57a1 1 0 0 0-1.02.24l-2.2 2.2a15.05 15.05 0 0 1-6.59-6.58l2.2-2.21a1 1 0 0 0 .25-1.02A11.36 11.36 0 0 1 8.5 4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1c0 9.39 7.61 17 17 17a1 1 0 0 0 1-1v-3.5a1 1 0 0 0-1-1z";
+
+function dessinerTelephones(numeros) {
+  const boite = $("telephones");
+  const liste = (numeros ?? []).map((n) => String(n).trim()).filter(Boolean);
+  boite.innerHTML = "";
+  boite.hidden = liste.length === 0;
+  if (!liste.length) return;
+
+  for (const numero of liste) {
+    const el = document.createElement("div");
+    el.className = "tel";
+    el.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">`
+      + `<path d="${COMBINE_TELEPHONE}"/></svg><span></span>`;
+    el.querySelector("span").textContent = numero;
+    boite.appendChild(el);
+  }
+}
+
 function dessinerGagnants(gagnants) {
   const liste = $("liste-gagnants");
   liste.innerHTML = "";
@@ -257,17 +282,18 @@ function dessinerCarte(v) {
 let signatureBandeau = "";
 
 function majBandeau(t, etat) {
-  const messages = [
-    ...(t.bandeau.messages || []),
-    ...(etat.rssTitres || [])
-  ].map((m) => String(m).trim()).filter(Boolean);
+  // Soit tes messages, soit le flux — jamais les deux mélangés : un bandeau
+  // qui alterne entre « Merci à nos commanditaires » et un titre de nouvelle
+  // n'a plus de propos.
+  const source = t.bandeau.source === "rss" ? (etat.rssTitres || []) : (t.bandeau.messages || []);
+  const messages = source.map((m) => String(m).trim()).filter(Boolean);
 
   const actif = t.bandeau.actif && messages.length > 0;
   $("defilant").hidden = !actif;
 
   // On ne reconstruit que si le contenu change : sinon le défilement
   // repartirait de zéro à chaque boule tirée.
-  const signature = actif ? `${t.bandeau.vitesse}|${messages.join("¦")}` : "";
+  const signature = actif ? `${t.bandeau.source}|${t.bandeau.vitesse}|${messages.join("¦")}` : "";
   if (signature === signatureBandeau) return;
   signatureBandeau = signature;
   if (!actif) return;
@@ -351,7 +377,8 @@ function majGenerique(t, etat) {
   }
 
   if (etat.commanditaire) { section("Merci à"); ligne(etat.commanditaire); }
-  if (etat.telephone) { section("Pour nous joindre"); ligne(etat.telephone); }
+  const tels = (etat.telephones ?? []).filter(Boolean);
+  if (tels.length) { section("Pour nous joindre"); for (const n of tels) ligne(n); }
   etoiles();
 
   piste.style.animationDuration = `${Math.max(15, Number(t.generique.vitesse) || 60)}s`;
@@ -407,9 +434,7 @@ function rendre(etat) {
   $("partie-nom").textContent = partie.nom || "";
   $("figure-aide").textContent = f ? `${f.nom} — ${f.aide}` : "";
 
-  const tel = $("telephone");
-  if (etat.telephone) { $("telephone-num").textContent = etat.telephone; tel.hidden = false; }
-  else tel.hidden = true;
+  dessinerTelephones(etat.telephones);
   $("commanditaire").textContent = etat.commanditaire || "";
 
   dessinerFormes(etat);

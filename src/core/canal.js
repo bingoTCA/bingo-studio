@@ -19,6 +19,14 @@ const CLE_SAUVEGARDE = "bingo-studio-session";
 export function themeNeuf() {
   return {
     logo: null,              // image téléversée (data URL) ; null = pas de logo
+
+    // Couleur d'ambiance : la teinte dominante de l'antenne — blocs, cadres,
+    // bandeau. L'accent sert aux mises en valeur : dernier numéro, prix,
+    // figure en cours. Tout le reste s'en déduit.
+    ambiance: "#4a1f7a",
+    accent: "#ffd700",
+    marquage: "#c8102e",     // les numéros sortis, sur le tableau
+
     fondHaut: "#080313",     // dégradé du fond, du plus foncé…
     fondMilieu: "#140928",
     fondBas: "#2a1456",      // …au plus clair
@@ -29,11 +37,13 @@ export function themeNeuf() {
     chromaVisible: true,
     dateHeure: true,         // date et heure du moment dans le bandeau
 
-    // Bandeau de messages qui défile sous le haut de l'écran
+    // Bandeau qui défile sous le haut de l'écran. Soit tes propres messages,
+    // soit un vrai flux de nouvelles — jamais les deux mélangés.
     bandeau: {
       actif: false,
+      source: "messages",    // "messages" | "rss"
       messages: [],          // une ligne = un message
-      rssUrl: "",            // flux optionnel, relayé par le serveur local
+      rssUrl: "",            // flux relayé par le serveur local
       vitesse: 90            // secondes pour un défilement complet
     },
 
@@ -82,7 +92,7 @@ export function fusionnerTheme(sauve) {
 export function etatNeuf() {
   return {
     titre: "Bingo communautaire",
-    telephone: "",
+    telephones: [],       // un ou plusieurs numéros, affichés côte à côte
     commanditaire: "",
     theme: themeNeuf(),
     parties: [
@@ -139,7 +149,18 @@ export function restaurer() {
     const etat = JSON.parse(brut);
     // Fusion avec l'état neuf : une session sauvegardée par une version
     // plus ancienne ne doit pas faire planter la nouvelle.
-    return { ...etatNeuf(), ...etat, theme: fusionnerTheme(etat.theme) };
+    const fusionne = { ...etatNeuf(), ...etat, theme: fusionnerTheme(etat.theme) };
+
+    // Le numéro unique d'avant devient le premier de la liste. Sans ça,
+    // une station qui met à jour verrait son téléphone disparaître de
+    // l'antenne sans comprendre pourquoi.
+    if (!Array.isArray(fusionne.telephones)) fusionne.telephones = [];
+    if (typeof etat.telephone === "string" && etat.telephone.trim() && !fusionne.telephones.length) {
+      fusionne.telephones = [etat.telephone.trim()];
+    }
+    delete fusionne.telephone;
+
+    return fusionne;
   } catch {
     return null;
   }

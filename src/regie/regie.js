@@ -282,7 +282,7 @@ function rendre() {
 
   // Paramètres
   $("reg-titre").value = etat.titre || "";
-  $("reg-telephone").value = etat.telephone || "";
+  dessinerTelephones();
   $("reg-commanditaire").value = etat.commanditaire || "";
   dessinerParametresTheme();
   dessinerReglagesParties();
@@ -296,6 +296,9 @@ function rendre() {
 function dessinerParametresTheme() {
   const t = theme();
   $("reg-dateheure").checked = t.dateHeure;
+  $("reg-ambiance").value = t.ambiance;
+  $("reg-accent").value = t.accent;
+  $("reg-marquage").value = t.marquage;
   $("reg-fond-haut").value = t.fondHaut;
   $("reg-fond-milieu").value = t.fondMilieu;
   $("reg-fond-bas").value = t.fondBas;
@@ -311,6 +314,8 @@ function dessinerParametresTheme() {
 
   // Bandeau défilant
   $("reg-bandeau-actif").checked = t.bandeau.actif;
+  $("reg-source-messages").checked = t.bandeau.source !== "rss";
+  $("reg-source-rss").checked = t.bandeau.source === "rss";
   if (document.activeElement !== $("reg-bandeau-messages")) {
     $("reg-bandeau-messages").value = (t.bandeau.messages || []).join("\n");
   }
@@ -342,6 +347,34 @@ function dessinerParametresTheme() {
   majApercuFond();
 }
 
+function dessinerTelephones() {
+  const boite = $("reg-telephones");
+  boite.innerHTML = "";
+  if (!Array.isArray(etat.telephones)) etat.telephones = [];
+
+  if (!etat.telephones.length) {
+    boite.innerHTML = '<p class="aide">Aucun numéro — le bloc reste masqué à l\'antenne.</p>';
+    return;
+  }
+
+  etat.telephones.forEach((numero, i) => {
+    const rang = document.createElement("div");
+    rang.className = "reg-ligne-bouton";
+
+    const champ = document.createElement("input");
+    champ.type = "text"; champ.value = numero; champ.placeholder = "418 555-0143";
+    champ.oninput = () => { etat.telephones[i] = champ.value; pousserLeger(); };
+
+    const sup = document.createElement("button");
+    sup.className = "reg-supprimer"; sup.textContent = "×";
+    sup.title = "Retirer ce numéro";
+    sup.onclick = () => { etat.telephones.splice(i, 1); pousser(); };
+
+    rang.append(champ, sup);
+    boite.appendChild(rang);
+  });
+}
+
 function dessinerListePubs() {
   const boite = $("reg-pubs-liste");
   boite.innerHTML = "";
@@ -366,6 +399,21 @@ function dessinerListePubs() {
     cadre.append(img, sup);
     boite.appendChild(cadre);
   });
+}
+
+/**
+ * Assombrit une couleur vers le noir. `part` = proportion de noir.
+ * Sert à déduire les trois teintes du fond de la couleur d'ambiance.
+ */
+function melangerVersNoir(hex, part) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(hex).trim());
+  if (!m) return hex;
+  const n = parseInt(m[1], 16);
+  const canal = (decalage) => {
+    const v = (n >> decalage) & 0xff;
+    return Math.round(v * (1 - part)).toString(16).padStart(2, "0");
+  };
+  return `#${canal(16)}${canal(8)}${canal(0)}`;
 }
 
 function majApercuFond() {
@@ -871,7 +919,44 @@ function brancher() {
     fermerParametres();
   };
   $("reg-titre").oninput = () => { etat.titre = $("reg-titre").value; pousserLeger(); };
-  $("reg-telephone").oninput = () => { etat.telephone = $("reg-telephone").value; pousserLeger(); };
+  $("btn-ajouter-telephone").onclick = () => {
+    if (!Array.isArray(etat.telephones)) etat.telephones = [];
+    etat.telephones.push("");
+    pousser();
+    // La main tombe directement dans le champ qu'on vient de créer.
+    $("reg-telephones").querySelector("input:last-of-type")?.focus();
+  };
+
+  for (const [id, champ] of [["reg-ambiance", "ambiance"], ["reg-accent", "accent"], ["reg-marquage", "marquage"]]) {
+    $(id).oninput = () => { theme()[champ] = $(id).value; pousserLeger(); };
+  }
+  // Le fond ne suit PAS l'ambiance automatiquement : ce serait écraser sans
+  // prévenir un dégradé réglé à la main. Un bouton, un geste volontaire.
+  $("btn-accorder-fond").onclick = () => {
+    const a = theme().ambiance;
+    Object.assign(theme(), {
+      fondHaut: melangerVersNoir(a, 0.90),
+      fondMilieu: melangerVersNoir(a, 0.72),
+      fondBas: melangerVersNoir(a, 0.38)
+    });
+    dessinerParametresTheme();
+    dire("Le fond reprend la couleur d'ambiance.", "ok");
+    pousser();
+  };
+
+  $("btn-couleurs-defaut").onclick = () => {
+    const d = themeNeuf();
+    Object.assign(theme(), { ambiance: d.ambiance, accent: d.accent, marquage: d.marquage });
+    dessinerParametresTheme();
+    pousser();
+  };
+
+  for (const id of ["reg-source-messages", "reg-source-rss"]) {
+    $(id).onchange = () => {
+      theme().bandeau.source = $("reg-source-rss").checked ? "rss" : "messages";
+      pousser();
+    };
+  }
   $("reg-commanditaire").oninput = () => { etat.commanditaire = $("reg-commanditaire").value; pousserLeger(); };
   $("btn-rapport").onclick = rapport;
   $("btn-nouvelle").onclick = () => {
@@ -888,7 +973,7 @@ function brancher() {
       theme: theme(),
       parties: etat.parties,
       titre: etat.titre,
-      telephone: etat.telephone,
+      telephones: etat.telephones,
       commanditaire: etat.commanditaire
     };
     effacerSauvegarde();

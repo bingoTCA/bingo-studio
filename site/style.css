@@ -86,6 +86,42 @@ em { color: var(--jaune); font-style: normal; }
 .bouton-fort { background: var(--jaune); border-color: var(--jaune); color: #2a1456; font-weight: 700; }
 .bouton-fort:hover { background: #ffe34d; border-color: #ffe34d; }
 
+/* ---------- Pictogrammes ----------
+   Dessinés en trait, sans bibliothèque. Ils prennent la couleur du texte
+   qui les entoure, donc ils suivent le thème sans réglage. */
+svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- Appel à contribution, dans l'accroche ---------- */
+.appel-contribution {
+  display: flex; align-items: center; gap: 16px;
+  margin-top: 30px; max-width: 640px;
+  padding: 16px 20px; border-radius: 14px;
+  text-decoration: none; color: var(--texte);
+  background: linear-gradient(90deg, rgba(255,215,0,.11) 0%, rgba(74,31,122,.20) 100%);
+  border: 1px solid rgba(255,215,0,.32);
+  transition: border-color .15s, transform .15s;
+}
+.appel-contribution:hover { border-color: var(--jaune); transform: translateY(-1px); }
+.appel-contribution > svg { width: 30px; height: 30px; flex-shrink: 0; color: var(--jaune); }
+.appel-contribution span { font-size: 15.5px; line-height: 1.5; }
+.appel-contribution strong { color: var(--jaune); display: block; }
+.appel-fleche { font-size: 22px; color: var(--jaune); flex-shrink: 0; }
+
+/* ---------- Bande d'atouts ---------- */
+.bande-atouts { padding: 46px 0; background: #0a0413; }
+.atouts {
+  list-style: none;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+  gap: 30px 26px;
+}
+.atouts li { display: flex; flex-direction: column; gap: 7px; }
+.atouts svg { width: 32px; height: 32px; color: var(--jaune); margin-bottom: 4px; }
+.atouts strong {
+  font-family: Impact, "Arial Narrow", Arial, sans-serif;
+  font-weight: 400; font-size: 19px; letter-spacing: .4px; color: #fff;
+}
+.atouts span { font-size: 15px; color: var(--texte-doux); line-height: 1.55; }
+
 /* ---------- Bandes ---------- */
 .bande { padding: 72px 0; border-bottom: 1px solid var(--bord); }
 .bande-sombre { background: #0a0413; }

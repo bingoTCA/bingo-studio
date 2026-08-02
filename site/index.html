@@ -236,8 +236,12 @@
           </label>
         </div>
 
+        <!-- ⚠️ name="OPT_IN" est INDISPENSABLE. Le compte Brevo déclare cet
+             attribut comme OBLIGATOIRE. Sans lui, Brevo accepte la requête et
+             répond {"success":true} — mais ne crée aucun contact, en silence.
+             Le formulaire a l'air de marcher et personne ne s'inscrit. -->
         <label class="consentement">
-          <input type="checkbox" required>
+          <input type="checkbox" name="OPT_IN" value="1" required>
           <span>J'accepte de recevoir le lien de téléchargement, les avis de
                 mise à jour et un rappel annuel. Je peux me désabonner à tout
                 moment.</span>

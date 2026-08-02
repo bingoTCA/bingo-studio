@@ -11,6 +11,9 @@
 #  Actions → New repository secret → nom « BREVO_API_KEY ».
 #  Sans ce secret, l'ouvrage ne fait rien et le site n'affiche pas de
 #  compteur — il ne casse pas.
+#
+#  La liste visée est « BINGO STUDIO » (n° 3). Pour en viser une autre :
+#  même écran, onglet « Variables » → BREVO_LISTE_ID.
 # =====================================================================
 
 name: Relever le compteur
@@ -39,6 +42,9 @@ jobs:
         id: brevo
         env:
           CLE: ${{ secrets.BREVO_API_KEY }}
+          # Numéro de la liste « BINGO STUDIO » dans Brevo. Si elle est un jour
+          # recréée, son numéro change : on le pose ici plutôt qu'en dur.
+          LISTE: ${{ vars.BREVO_LISTE_ID || '3' }}
         run: |
           if [ -z "$CLE" ]; then
             echo "Secret BREVO_API_KEY absent — rien à faire."
@@ -46,19 +52,23 @@ jobs:
             exit 0
           fi
 
+          # On interroge la LISTE « BINGO STUDIO » (n° 3), pas le compte
+          # entier : le compte peut contenir des contacts venus d'ailleurs, et
+          # le chiffre affiché doit vouloir dire « télévisions inscrites à
+          # Bingo Studio », rien d'autre.
           reponse=$(curl -s -w '\n%{http_code}' \
             -H "api-key: $CLE" -H "accept: application/json" \
-            "https://api.brevo.com/v3/contacts?limit=1&offset=0")
+            "https://api.brevo.com/v3/contacts/lists/${LISTE:-3}")
           code=$(printf '%s' "$reponse" | tail -n1)
           corps=$(printf '%s' "$reponse" | sed '$d')
 
           if [ "$code" != "200" ]; then
-            echo "Brevo a répondu $code — on ne touche à rien."
+            echo "Brevo a répondu $code pour la liste ${LISTE:-3} — on ne touche à rien."
             echo "ok=non" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          nombre=$(printf '%s' "$corps" | jq -r '.count // empty')
+          nombre=$(printf '%s' "$corps" | jq -r '.totalSubscribers // empty')
           # Un nombre absent ou non numérique ne doit JAMAIS écraser le
           # compteur : mieux vaut un chiffre d'hier qu'un « null » à l'écran.
           case "$nombre" in

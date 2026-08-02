@@ -212,6 +212,29 @@ pour la comptabilité.
 La session s'enregistre à chaque geste dans le navigateur. Si l'application
 ferme en plein direct, relance-la : tu retrouves les numéros déjà tirés.
 
+**Une mise à jour n'efface rien.** Les réglages, les parties et les médias
+vivent dans le dossier de données du système — `~/Library/Application
+Support/bingo-studio` sur Mac, `%APPDATA%\bingo-studio` sur Windows — pas dans
+l'application. Installer une nouvelle version remplace l'application seule ; le
+dossier de données n'est pas touché. Vérifié : la version empaquetée ouvre
+exactement le même dossier que les précédentes.
+
+⚠️ **Mais le rangement dépend du PORT.** Le navigateur classe les données sous
+l'adresse complète : `http://127.0.0.1:7777` et `http://127.0.0.1:7778` sont
+deux rangements séparés. Si le port habituel est occupé et que l'application se
+replie sur le suivant, l'opératrice retrouve un logiciel vierge et croit tout
+avoir perdu. Deux garde-fous :
+
+1. **Une seule copie à la fois** (`requestSingleInstanceLock`). Deux copies
+   ouvertes étaient la première cause de port occupé ; une deuxième ouverture
+   ramène maintenant la fenêtre existante.
+2. Si le repli arrive quand même, une **boîte de dialogue** le dit au
+   démarrage, explique que rien n'est perdu, et donne la nouvelle adresse pour
+   OBS.
+
+L'export des réglages reste la vraie ceinture de sécurité : un fichier gardé de
+côté se réimporte n'importe où, quel que soit le port.
+
 ## Repartir à zéro
 
 **Réinitialiser le jeu**, sous le tableau de la régie. Efface les numéros

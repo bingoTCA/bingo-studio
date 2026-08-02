@@ -176,12 +176,26 @@ ipcMain.handle("ouvrir-dans-navigateur", (_e, url) => {
 
 // ---------------------------------------------------------------------
 
+// Une seule copie à la fois. Deux copies ouvertes, c'est la PREMIÈRE cause de
+// port occupé — et un port différent, ce sont des réglages qui semblent
+// disparus (voir plus bas). Une deuxième ouverture ramène donc la fenêtre
+// existante au lieu de démarrer un rival.
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+} else {
+  app.on("second-instance", () => {
+    if (fenetreRegie) {
+      if (fenetreRegie.isMinimized()) fenetreRegie.restore();
+      fenetreRegie.focus();
+    }
+  });
+}
+
 app.whenReady().then(async () => {
   let replie = false;
   try {
     ({ serveur, port, replie } = await demarrer(__dirname, PORT_SOUHAITE));
   } catch (err) {
-    const { dialog } = require("electron");
     dialog.showErrorBox(
       "Démarrage impossible",
       `Aucun port libre entre ${PORT_SOUHAITE} et ${PORT_SOUHAITE + 10} sur cet ordinateur.\n\n` +
@@ -190,13 +204,32 @@ app.whenReady().then(async () => {
     app.quit();
     return;
   }
-  if (replie) {
-    // Le port habituel était pris : on le dit, parce que l'adresse à mettre
-    // dans OBS ou Tricaster change.
-    console.log(`Port ${PORT_SOUHAITE} occupé — Bingo Studio tourne sur ${port}.`);
-  }
+
   creerRegie();
   creerAntenne();
+
+  if (replie) {
+    // ⚠️ Ce n'est PAS un détail technique. Le navigateur range les réglages,
+    // les médias et les parties sous l'adresse complète, port compris :
+    // http://127.0.0.1:7777 et http://127.0.0.1:7778 sont deux rangements
+    // séparés. Sur un autre port, l'opératrice retrouve un logiciel vierge et
+    // croit tout avoir perdu. Il faut donc le lui dire, en clair, tout de
+    // suite — et lui dire aussi que rien n'est perdu.
+    dialog.showMessageBox(fenetreRegie, {
+      type: "warning",
+      title: "Bingo Studio a dû changer de port",
+      message: `Le port ${PORT_SOUHAITE} était déjà occupé. Bingo Studio tourne sur ${port}.`,
+      detail:
+        `Deux conséquences :\n\n` +
+        `1. Tes réglages, tes parties et tes médias vont sembler VIDES. ` +
+        `Ils ne sont pas perdus : ils sont rangés sous le port ${PORT_SOUHAITE}. ` +
+        `Ferme ce qui occupe ce port — souvent une autre copie de Bingo Studio — ` +
+        `puis relance, et tout revient.\n\n` +
+        `2. L'adresse à mettre dans OBS ou Tricaster devient ` +
+        `http://127.0.0.1:${port}/antenne`,
+      buttons: ["J'ai compris"]
+    }).catch(() => { /* la boîte n'est pas indispensable au démarrage */ });
+  }
 });
 
 app.on("before-quit", () => {

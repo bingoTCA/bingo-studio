@@ -348,6 +348,18 @@
   </div>
 </div>
 
+<!-- Rendu du PDF : il peut durer plusieurs minutes sur une grosse tranche.
+     Sans cette fenêtre, l'écran ne bouge plus et on croit à un plantage. -->
+<div id="rendu-pdf" class="modale" hidden>
+  <div class="modale-boite">
+    <h2>Rendu du PDF en cours</h2>
+    <p id="rendu-quoi" class="confirm-texte"></p>
+    <div class="jauge"><div id="rendu-jauge" class="jauge-remplissage"></div></div>
+    <p id="rendu-temps" class="aide"></p>
+    <p class="aide">Laisse la fenêtre ouverte. Elle se fermera toute seule.</p>
+  </div>
+</div>
+
 <div id="choix-ecran" class="modale" hidden>
   <div class="modale-boite">
     <h2>Où envoyer l'antenne ?</h2>

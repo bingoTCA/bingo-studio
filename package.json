@@ -1,6 +1,6 @@
 {
   "name": "bingo-studio",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Régie de bingo télé — saisie du boulier, habillage antenne, vérification des cartes",
   "main": "main.js",
   "private": true,

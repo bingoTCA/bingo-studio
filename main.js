@@ -11,7 +11,8 @@
 // =====================================================================
 
 const { app, BrowserWindow, screen, ipcMain, shell, dialog } = require("electron");
-const { writeFileSync } = require("node:fs");
+const { writeFileSync, unlinkSync } = require("node:fs");
+const { pathToFileURL } = require("node:url");
 const path = require("path");
 const { demarrer } = require("./src/server");
 
@@ -95,34 +96,53 @@ ipcMain.handle("antenne-fenetre", () => {
 ipcMain.handle("adresse-antenne", () => `http://127.0.0.1:${port}/antenne`);
 
 /**
- * Convertit un document HTML en PDF et propose de l'enregistrer.
- * Sert à produire les feuilles de cartes pour l'imprimeur, sans passer
- * par la boîte d'impression du navigateur : les marges et le format sont
- * exactement ceux de la mise en page.
+ * Produire les feuilles de cartes pour l'imprimeur, sans passer par la boîte
+ * d'impression du navigateur : les marges et le format sont exactement ceux
+ * de la mise en page. En deux temps.
+ *
+ * Étape 1 — où enregistrer. Séparée du rendu exprès : la régie doit pouvoir
+ * afficher sa jauge APRÈS que l'opératrice a choisi le fichier, et pas
+ * pendant qu'une boîte système attend sa réponse.
  */
-ipcMain.handle("feuilles-en-pdf", async (_e, { html, largeurMm, hauteurMm, nomSuggere }) => {
+ipcMain.handle("choisir-fichier-pdf", async (_e, { nomSuggere }) => {
   const cible = await dialog.showSaveDialog(fenetreRegie, {
     title: "Enregistrer les feuilles",
     defaultPath: nomSuggere || "feuilles-bingo.pdf",
     filters: [{ name: "PDF", extensions: ["pdf"] }]
   });
   if (cible.canceled || !cible.filePath) return { annule: true };
+  return { chemin: cible.filePath };
+});
 
+/**
+ * Étape 2 — le rendu lui-même, qui peut durer plusieurs minutes.
+ *
+ * ⚠️ Le document passe par un FICHIER TEMPORAIRE, jamais par une adresse
+ * `data:`. Chromium refuse les adresses data: au-delà de quelques mégaoctets
+ * (ERR_INVALID_URL) : au-dessus d'environ 200 feuilles, le rendu échouait —
+ * et c'est justement pour les gros lots qu'on en a besoin.
+ */
+ipcMain.handle("rendre-feuilles-pdf", async (_e, { html, largeurMm, hauteurMm, chemin }) => {
+  if (!chemin) return { erreur: "aucun fichier de destination" };
+
+  const provisoire = path.join(app.getPath("temp"), `bingo-feuilles-${process.pid}.html`);
   const rendu = new BrowserWindow({ show: false, webPreferences: { offscreen: true } });
   try {
-    await rendu.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(html));
+    writeFileSync(provisoire, html, "utf8");
+    await rendu.loadURL(pathToFileURL(provisoire).href);
     // ⚠️ Depuis Electron 21, pageSize attend des POUCES, pas des microns.
     const pdf = await rendu.webContents.printToPDF({
       pageSize: { width: largeurMm / 25.4, height: hauteurMm / 25.4 },
       margins: { marginType: "none" },
       printBackground: true
     });
-    writeFileSync(cible.filePath, pdf);
-    return { chemin: cible.filePath };
+    writeFileSync(chemin, pdf);
+    return { chemin, octets: pdf.length };
   } catch (err) {
     return { erreur: err.message };
   } finally {
     rendu.destroy();
+    try { unlinkSync(provisoire); } catch { /* déjà parti */ }
   }
 });
 

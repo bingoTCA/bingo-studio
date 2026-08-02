@@ -282,11 +282,29 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: #f0b429
 .reg-supprimer:hover { background: #2a1414; }
 
 /* ---------- Modale des écrans ---------- */
+/* Plan 40 : AU-DESSUS de la page Paramètres, qui est au plan 30. Plusieurs
+   fenêtres modales s'ouvrent depuis les Paramètres — la confirmation d'import
+   et la jauge du rendu PDF. Au plan 10, elles s'ouvraient bel et bien, mais
+   derrière la page : l'opératrice cliquait et ne voyait rien bouger. */
 .modale {
   position: fixed; inset: 0; background: rgba(6,6,6,0.82);
-  display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 10;
+  display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 40;
 }
 .modale-boite { background: #1b1b15; border: 1px solid #3a3a32; border-radius: 12px; padding: 22px 24px; width: 100%; max-width: 460px; }
+/* Jauge du rendu PDF. Elle avance sur l'estimation — printToPDF ne rend
+   aucun compte pendant qu'il travaille — et plafonne à 95 % tant que le
+   fichier n'est pas écrit : une jauge coincée à 100 % ferait croire que
+   l'application est bloquée, ce qui est exactement ce qu'on veut éviter. */
+.jauge {
+  height: 10px; border-radius: 999px; overflow: hidden;
+  background: #2a2a22; border: 1px solid #3a3a32; margin: 14px 0 10px;
+}
+.jauge-remplissage {
+  height: 100%; width: 0%; border-radius: 999px;
+  background: linear-gradient(90deg, #f0b429, #ffd76a);
+  transition: width .45s linear;
+}
+
 .liste-ecrans { display: flex; flex-direction: column; gap: 8px; }
 .ecran-choix {
   font: inherit; text-align: left; padding: 12px 14px; border-radius: 8px;

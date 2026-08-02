@@ -681,6 +681,51 @@ function majResumeImpression() {
   }
 }
 
+/** « 1 min 12 s », « 47 s » — jamais « 72 secondes ». */
+function enDuree(secondes) {
+  const s = Math.max(0, Math.round(secondes));
+  return s < 60 ? `${s} s` : `${Math.floor(s / 60)} min ${String(s % 60).padStart(2, "0")} s`;
+}
+
+let minuterieRendu = null;
+
+/**
+ * Ouvre la fenêtre de rendu et fait avancer la jauge.
+ *
+ * printToPDF est une seule grosse opération : Electron ne dit rien tant
+ * qu'elle n'est pas finie. La jauge avance donc sur le TEMPS ÉCOULÉ rapporté
+ * à l'estimation, et plafonne à 95 %. Le temps affiché, lui, est réel — on
+ * annonce « écoulées » et « environ », jamais un pourcentage inventé.
+ */
+function ouvrirRendu(feuilles) {
+  const secondesPrevues = Math.max(1, feuilles * MS_PAR_FEUILLE / 1000);
+  const depart = Date.now();
+
+  $("rendu-quoi").textContent =
+    `${feuilles.toLocaleString("fr-CA")} feuille${feuilles > 1 ? "s" : ""} à composer.`;
+  $("rendu-jauge").style.width = "0%";
+  $("rendu-pdf").hidden = false;
+
+  const battre = () => {
+    const ecoulees = (Date.now() - depart) / 1000;
+    $("rendu-jauge").style.width = `${Math.min(95, (ecoulees / secondesPrevues) * 100).toFixed(1)}%`;
+    $("rendu-temps").textContent = ecoulees > secondesPrevues * 1.15
+      // Dépassé l'estimation : on le dit plutôt que de laisser un compteur
+      // filer sous une jauge figée.
+      ? `${enDuree(ecoulees)} écoulées — c'est plus long que prévu, mais ça travaille.`
+      : `${enDuree(ecoulees)} écoulées sur environ ${enDuree(secondesPrevues)}.`;
+  };
+  battre();
+  minuterieRendu = setInterval(battre, 500);
+}
+
+function fermerRendu(reussi) {
+  clearInterval(minuterieRendu);
+  minuterieRendu = null;
+  if (reussi) $("rendu-jauge").style.width = "100%";
+  $("rendu-pdf").hidden = true;
+}
+
 async function produireFeuilles(enPdf) {
   if (!Object.keys(catalogue).length) { dire("Le catalogue n'est pas chargé.", "erreur"); return; }
   let montage;
@@ -690,26 +735,53 @@ async function produireFeuilles(enPdf) {
 
   const o = optionsImpression();
   if (enPdf && window.studio?.presente) {
-    dire("Rendu du PDF en cours…", "ok");
-    const r = await window.studio.feuillesEnPdf({
-      html: montage.html,
-      largeurMm: montage.page.l,
-      hauteurMm: montage.page.h,
-      nomSuggere: `feuilles-${o.parFeuille}-grilles.pdf`
+    // On demande la destination D'ABORD : la jauge n'a pas à tourner pendant
+    // qu'une boîte système attend une réponse.
+    const cible = await window.studio.choisirFichierPdf({
+      nomSuggere: `feuilles-${o.parFeuille}-grilles-${o.de}-a-${o.a}.pdf`
     });
-    if (r?.annule) dire("Enregistrement annulé.", "");
-    else if (r?.erreur) dire(`Rendu impossible : ${r.erreur}`, "erreur");
-    else dire(`PDF enregistré — ${montage.feuilles} feuilles.`, "ok");
+    if (cible?.annule) { dire("Enregistrement annulé.", ""); return; }
+    if (cible?.erreur || !cible?.chemin) { dire("Destination impossible à ouvrir.", "erreur"); return; }
+
+    ouvrirRendu(montage.feuilles);
+    let r;
+    try {
+      r = await window.studio.rendreFeuillesPdf({
+        html: montage.html,
+        largeurMm: montage.page.l,
+        hauteurMm: montage.page.h,
+        chemin: cible.chemin
+      });
+    } finally {
+      fermerRendu(!r?.erreur);
+    }
+    if (r?.erreur) dire(`Rendu impossible : ${r.erreur}`, "erreur");
+    else dire(`PDF enregistré — ${montage.feuilles.toLocaleString("fr-CA")} feuilles`
+              + `${r?.octets ? `, ${medias.formaterTaille(r.octets)}` : ""}.`, "ok");
     return;
   }
 
-  // Sans Electron : on ouvre le document, l'impression du navigateur fait
-  // le PDF (Fichier → Imprimer → Enregistrer en PDF, marges : aucune).
+  // Aperçu — et repli sans Electron, où l'impression du navigateur fait le
+  // PDF (Fichier → Imprimer → Enregistrer en PDF, marges : aucune).
+  //
+  // On BORNE l'aperçu : écrire seize mille feuilles dans une fenêtre fige le
+  // navigateur pour de bon. Regarder les premières suffit à juger la mise en
+  // page, qui est la même partout.
+  const APERCU_MAX = 40;
+  const borne = montage.feuilles > APERCU_MAX;
+  const vu = borne
+    ? monterHtml(catalogue, { ...o, de: o.de, a: Math.min(o.a, o.de + APERCU_MAX * o.parFeuille - 1) })
+    : montage;
+
   const f = window.open("", "_blank");
   if (!f) { dire("Le navigateur a bloqué la fenêtre des feuilles.", "erreur"); return; }
-  f.document.write(montage.html);
+  f.document.write(vu.html);
   f.document.close();
-  dire(`${montage.feuilles} feuilles montées — imprime en PDF depuis cette fenêtre.`, "ok");
+
+  dire(borne
+    ? `Aperçu des ${vu.feuilles} premières feuilles sur ${montage.feuilles.toLocaleString("fr-CA")}. `
+      + `La mise en page est la même partout — « Produire le PDF » les monte toutes.`
+    : `${montage.feuilles} feuilles montées — imprime en PDF depuis cette fenêtre.`, "ok");
 }
 
 function brancherImpression() {

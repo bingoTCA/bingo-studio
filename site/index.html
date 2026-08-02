@@ -146,20 +146,17 @@
       </p>
 
       <!-- Formulaire Brevo — envoi direct, sans iframe, pour garder l'habillage
-           du site. Les noms de champs viennent d'attributs Brevo existants,
-           nommés en espagnol :
-               NOMBRE    = le nom de la personne
-               APELLIDOS = le nom de la télévision communautaire
-           Ne pas les « corriger » ici : ils doivent correspondre exactement
-           aux attributs du compte Brevo, sinon la donnée est jetée en silence. -->
+           du site. Les noms de champs (NOM, ORGANISME, EMAIL) doivent
+           correspondre EXACTEMENT aux attributs du compte Brevo : un nom qui
+           ne correspond pas est jeté en silence, sans message d'erreur. -->
       <form class="inscription" method="POST"
             action="https://d37cf71c.sibforms.com/serve/MUIFABNqFg0la_YHhXG9PD7spLY72e7-uTZy6el7Qg2yYerzy16LuA8-oeFUVbsVhrVx-rcXVcuuYe0FDbn1OtxzhWJf0qtB20dLN8ZeYsa2idNfVeqeg-wSgDshgeVtAufVJ0WfGIJxJ3kt7H8gXwKc7WfciyRFOd1CCJom1XeXq57_ki9Cj68DDIV_DLO-U2eH8Ij_NiayIjfWNw==">
         <div class="inscription-grille">
           <label>Ton nom
-            <input type="text" name="NOMBRE" maxlength="200" autocomplete="name" required>
+            <input type="text" name="NOM" maxlength="200" autocomplete="name" required>
           </label>
           <label>Ta télévision communautaire
-            <input type="text" name="APELLIDOS" maxlength="200" autocomplete="organization" required>
+            <input type="text" name="ORGANISME" maxlength="200" autocomplete="organization" required>
           </label>
           <label class="pleine-largeur">Courriel
             <input type="email" name="EMAIL" autocomplete="email" required>

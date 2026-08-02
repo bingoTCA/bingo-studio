@@ -100,15 +100,13 @@ Dans Brevo (gratuit : contacts illimités, 300 courriels par jour) :
 
 Pour le rappel annuel : une campagne ordinaire, une fois l'an, à cette liste.
 
-⚠️ **Les noms de champs sont en espagnol** — ce sont des attributs Brevo
-existants réutilisés : `NOMBRE` porte le nom de la personne, `APELLIDOS` le nom
-de la télévision communautaire. Ne pas les « corriger » dans le HTML : ils
-doivent correspondre exactement aux attributs du compte, sinon Brevo jette la
-donnée en silence, sans message d'erreur.
+Champs envoyés : `EMAIL`, `NOM`, `ORGANISME`, plus `email_address_check`
+(piège à robots, doit rester vide) et `locale`.
 
-Pour repartir sur des noms clairs, il faut créer de nouveaux attributs dans
-Brevo (Contacts → Paramètres → Attributs), refaire le formulaire et migrer les
-contacts déjà enregistrés. À faire tôt, ou jamais.
+⚠️ Ces noms doivent correspondre **exactement** aux attributs du compte Brevo.
+Si tu modifies un attribut là-bas, modifie-le ici aussi : un nom qui ne
+correspond pas est jeté en silence, sans message d'erreur. Tu recevrais des
+inscriptions sans nom ni organisme sans jamais t'en rendre compte.
 
 ### 2. ~~Le lien Ko-fi~~ ✅ branché — `https://ko-fi.com/marcoso77`
 

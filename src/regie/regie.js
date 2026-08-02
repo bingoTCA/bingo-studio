@@ -664,13 +664,15 @@ function majResumeImpression() {
     let texte = `${m.grilles.toLocaleString("fr-CA")} grilles · ${m.feuilles.toLocaleString("fr-CA")} feuilles`
       + (m.derniereIncomplete ? ` · la dernière n'en porte que ${m.derniereIncomplete}` : "");
 
-    // Un gros lot n'est pas une erreur — mais partir sans savoir que ça prendra
-    // deux minutes et pèsera 400 Mo, ça ressemble à un plantage.
+    // Un gros lot n'est pas une erreur : certaines stations impriment toute
+    // leur base d'un coup pour ne commander qu'une fois par année. On annonce
+    // donc ce qui s'en vient — sans ça, deux minutes d'attente sans rien à
+    // l'écran ressemblent à un plantage — mais on ne suggère rien.
     if (m.feuilles >= FEUILLES_QUI_INQUIETENT) {
       const secondes = Math.round(m.feuilles * MS_PAR_FEUILLE / 1000);
       const duree = secondes >= 90 ? `${Math.round(secondes / 60)} minutes` : `${secondes} secondes`;
-      texte += ` — environ ${duree} de rendu et ${medias.formaterTaille(m.feuilles * OCTETS_PAR_FEUILLE)}.`
-             + ` Resserre « de la carte » et « à la carte » pour n'imprimer que le lot dont tu as besoin.`;
+      texte += ` — compte environ ${duree} de rendu, pour un fichier de `
+             + `${medias.formaterTaille(m.feuilles * OCTETS_PAR_FEUILLE)}. Laisse travailler.`;
       ligne.classList.add("aide-alerte");
     }
     ligne.textContent = texte;

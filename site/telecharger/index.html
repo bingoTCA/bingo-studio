@@ -129,6 +129,14 @@
 
 <script>
   document.getElementById("annee").textContent = new Date().getFullYear();
+
+  // Après l'inscription, Brevo redirige ICI — mais à l'intérieur du cadre
+  // qui porte son formulaire sur la page d'accueil. On sort du cadre, sinon
+  // la page de téléchargement s'afficherait à l'étroit dans une boîte de
+  // 640 px, avec le reste du site autour.
+  if (window.top !== window.self) {
+    window.top.location.replace(window.self.location.href);
+  }
 </script>
 </body>
 </html>

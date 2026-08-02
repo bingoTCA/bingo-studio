@@ -299,6 +299,26 @@ code {
 }
 .compteur span { color: var(--texte-doux); font-size: 15px; }
 
+/* ---------- Le cadre du formulaire Brevo ----------
+   Leur formulaire arrive avec son propre habillage clair. On lui donne une
+   carte blanche franche plutôt que d'essayer de le fondre dans le violet :
+   un dégradé raté autour d'un cadre étranger se voit bien plus qu'un
+   encadrement assumé. */
+.cadre-inscription {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  max-width: 720px;
+  box-shadow: 0 18px 40px rgba(0,0,0,.35);
+}
+/* Hauteur fixe : le contenu du cadre vient d'un autre domaine, donc le
+   navigateur interdit d'en mesurer la hauteur pour l'ajuster. On prend large
+   plutôt que juste — un formulaire coupé en bas, personne ne le remplit. */
+.cadre-inscription iframe {
+  display: block; width: 100%; height: 760px; border: 0;
+}
+@media (max-width: 620px) { .cadre-inscription iframe { height: 820px; } }
+
 /* ---------- Inscription : après l'envoi ---------- */
 
 /* Le cadre qui reçoit la réponse de Brevo. Pas display:none — un iframe

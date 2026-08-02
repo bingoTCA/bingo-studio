@@ -215,7 +215,3 @@ export function restaurer() {
     return null;
   }
 }
-
-export function effacerSauvegarde() {
-  try { localStorage.removeItem(CLE_SAUVEGARDE); } catch { /* sans effet */ }
-}

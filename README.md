@@ -120,8 +120,9 @@ Les **musiques et les fonds vidéo**, eux, vont dans un magasin séparé
 (`src/core/medias.js`) qui se compte en gigaoctets. La session ne garde qu'une
 référence : une musique de 200 Ko déposée laisse la sauvegarde à 4 Ko.
 
-L'habillage appartient à la station, pas à la session : « Nouvelle session »
-efface les numéros et les gagnants, mais **garde le logo et les couleurs**.
+L'habillage appartient à la station, pas à la session : « Réinitialiser le
+jeu » efface les numéros et les gagnants, mais **garde le logo et les
+couleurs**.
 
 ## Envoyer l'antenne à la diffusion
 
@@ -183,7 +184,7 @@ tout est modifiable — ajouter, renommer, choisir la figure parmi les 11, fixer
 le lot, réordonner avec ↑ ↓, supprimer.
 
 Les parties, les textes et l'habillage appartiennent à la **station**, pas à la
-session : « Nouvelle session » efface les numéros et les gagnants, mais tu
+session : « Réinitialiser le jeu » efface les numéros et les gagnants, mais tu
 retrouves ta formule telle quelle à la prochaine ouverture.
 
 ## Vérifier une carte
@@ -210,7 +211,20 @@ pour la comptabilité.
 
 La session s'enregistre à chaque geste dans le navigateur. Si l'application
 ferme en plein direct, relance-la : tu retrouves les numéros déjà tirés.
-« Nouvelle session » efface tout, sur confirmation.
+
+## Repartir à zéro
+
+**Réinitialiser le jeu**, sous le tableau de la régie. Efface les numéros
+tirés, le journal, les gagnants, et ramène à la première partie. L'habillage,
+les parties et les textes restent.
+
+Ce qui n'est **pas** touché : ce qui est en ondes à cet instant — générique ou
+jeu, antenne coupée ou pas. Remettre le jeu à l'antenne pendant le générique
+d'ouverture serait pire que le mal.
+
+La confirmation énumère ce qui va disparaître (« 15 numéros du tableau et
+3 gagnants ») et rappelle de sortir le rapport de session d'abord, quand il y a
+des gagnants à perdre.
 
 ---
 

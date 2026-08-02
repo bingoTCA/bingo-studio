@@ -11,7 +11,7 @@ import {
   verifierCarte, validerSaisie, restantsDansBoulier
 } from "../core/bingo.js";
 import {
-  creerCanal, diffuser, etatNeuf, themeNeuf, sauvegarder, restaurer, effacerSauvegarde,
+  creerCanal, diffuser, etatNeuf, themeNeuf, sauvegarder, restaurer,
   messagesDuBandeau
 } from "../core/canal.js";
 import * as sons from "../core/sons.js";
@@ -1340,21 +1340,43 @@ function brancher() {
   };
   $("btn-vider-tirage").onclick = async () => {
     const sortis = etat.tirage.length;
-    if (!sortis) { dire("Le tableau est déjà vide.", "erreur"); return; }
+    const gagnants = etat.gagnants.length;
+    if (!sortis && !gagnants) { dire("Le jeu est déjà à zéro.", "erreur"); return; }
+
+    // On énumère ce qui va disparaître, pas « des données » : c'est ce qui
+    // permet de reconnaître la fausse manœuvre avant de cliquer, pas la peur.
+    const perdu = [];
+    if (sortis) perdu.push(`<strong>${sortis} numéro${sortis > 1 ? "s" : ""} du tableau</strong>`);
+    if (gagnants) perdu.push(`<strong>${gagnants} gagnant${gagnants > 1 ? "s" : ""}</strong>`);
 
     const ok = await demander({
       titre: "Attention, ça part pour de bon",
-      texte: `Tu es sur le point d'éteindre <strong>${sortis} numéro${sortis > 1 ? "s" : ""}</strong> `
-           + `du tableau. L'antenne se videra en même temps, devant tout le monde.`,
-      detail: "Si c'est le mauvais bouton, c'est le moment de faire marche arrière.",
-      oui: "Oui, vide-moi ça",
+      texte: `Tu effaces ${perdu.join(" et ")}, et tu reviens à la première partie. `
+           + `L'antenne se vide en même temps, devant tout le monde.`,
+      detail: gagnants
+        ? "Sors ton rapport de session avant, si tu en as besoin : les gagnants n'y seront plus après."
+        : "Si c'est le mauvais bouton, c'est le moment de faire marche arrière.",
+      oui: "Oui, on repart à zéro",
       non: "Non, fausse manœuvre"
     });
     if (!ok) return;
 
-    etat.tirage = []; etat.horodatage = []; etat.verification = null;
-    rafraichirVerification();
-    dire("Tableau vidé.", "ok");
+    // La soirée s'efface ; l'habillage, les parties et les textes restent —
+    // sinon il faudrait tout resaisir entre deux bingos.
+    etat.tirage = [];
+    etat.horodatage = [];
+    etat.gagnants = [];
+    etat.verification = null;
+    etat.annonce = null;
+    etat.partieIndex = 0;
+    // On ne touche NI à `ecran` NI à `enOnde` : ce qui est en ondes en ce
+    // moment ne regarde pas la remise à zéro du jeu. Remettre le jeu à
+    // l'antenne pendant le générique d'ouverture serait pire que le mal.
+    verification = null;
+    $("verif-num").value = "";
+    $("verif-nom").value = "";
+    dessinerVerification();
+    dire("Jeu réinitialisé — habillage et parties conservés.", "ok");
     pousser();
   };
   $("btn-ajouter-partie").onclick = () => {
@@ -1418,35 +1440,10 @@ function brancher() {
   }
   $("reg-commanditaire").oninput = () => { etat.commanditaire = $("reg-commanditaire").value; pousserLeger(); };
   $("btn-rapport").onclick = rapport;
-  $("btn-nouvelle").onclick = async () => {
-    const ok = await demander({
-      titre: "On repart à zéro ?",
-      texte: `Les <strong>numéros tirés</strong> et les <strong>gagnants</strong> de la journée `
-           + `seront effacés. Ton habillage, tes parties et tes textes, eux, restent en place.`,
-      detail: "Pense à sortir ton rapport de session avant, si tu en as besoin.",
-      oui: "Oui, nouvelle session",
-      non: "Non, pas encore"
-    });
-    if (!ok) return;
-
-    // Ce qui appartient à la STATION se garde ; seule la partie du jour part.
-    // Sans ça, il faudrait retéléverser le logo et resaisir les quatre
-    // parties chaque semaine — et chaque télé communautaire a sa formule.
-    const station = {
-      theme: theme(),
-      parties: etat.parties,
-      titre: etat.titre,
-      telephones: etat.telephones,
-      commanditaire: etat.commanditaire
-    };
-    effacerSauvegarde();
-    etat = { ...etatNeuf(), ...station, ecran: "jeu" };
-    verification = null;
-    $("verif-num").value = "";
-    dessinerVerification();
-    dire("Nouvelle session — parties et habillage conservés.", "ok");
-    pousser();
-  };
+  // Il n'y a plus qu'UNE remise à zéro, « Réinitialiser le jeu », dans la
+  // régie. « Nouvelle session » faisait exactement la même chose sous un autre
+  // nom, deux écrans plus loin : dans une régie en direct, deux boutons pour
+  // un seul geste, c'est comme ça qu'on se trompe.
 
   brancherParametres();
   brancherControles();

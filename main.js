@@ -126,6 +126,26 @@ ipcMain.handle("feuilles-en-pdf", async (_e, { html, largeurMm, hauteurMm, nomSu
   }
 });
 
+/**
+ * Enregistre un fichier texte là où l'opératrice le demande. Sans ça, un
+ * téléchargement Electron atterrit en silence dans le dossier par défaut —
+ * et un fichier de réglages qu'on ne retrouve pas ne sert à rien.
+ */
+ipcMain.handle("enregistrer-fichier", async (_e, { texte, nomSuggere, titre, extension }) => {
+  const cible = await dialog.showSaveDialog(fenetreRegie, {
+    title: titre || "Enregistrer",
+    defaultPath: nomSuggere || "fichier.txt",
+    filters: [{ name: (extension || "txt").toUpperCase(), extensions: [extension || "txt"] }]
+  });
+  if (cible.canceled || !cible.filePath) return { annule: true };
+  try {
+    writeFileSync(cible.filePath, texte, "utf8");
+    return { chemin: cible.filePath };
+  } catch (err) {
+    return { erreur: err.message };
+  }
+});
+
 ipcMain.handle("ouvrir-dans-navigateur", (_e, url) => {
   if (typeof url === "string" && url.startsWith(`http://127.0.0.1:${port}/`)) {
     shell.openExternal(url);

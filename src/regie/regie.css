@@ -24,6 +24,8 @@ h2 { font-size: 15px; font-weight: 600; margin-bottom: 10px; color: #f0b429; }
 h3 { font-size: 13px; font-weight: 600; margin: 16px 0 6px; color: #9a9992; text-transform: uppercase; letter-spacing: 0.08em; }
 label { display: block; font-size: 13px; color: #9a9992; margin: 8px 0 4px; }
 .aide { font-size: 13px; color: #7c7b74; margin-bottom: 6px; }
+/* Un réglage coché qui ne produit rien à l'antenne : ça doit se voir. */
+.aide.aide-alerte { color: #e8b23a; }
 
 /* ---------- En-tête ---------- */
 .entete {

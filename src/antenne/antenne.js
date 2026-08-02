@@ -5,7 +5,7 @@
 // =====================================================================
 
 import { COLONNES, rangee, lettre, FIGURES } from "../core/bingo.js";
-import { creerCanal, reclamerEtat, etatNeuf, fusionnerTheme } from "../core/canal.js";
+import { creerCanal, reclamerEtat, etatNeuf, fusionnerTheme, messagesDuBandeau } from "../core/canal.js";
 import * as sons from "../core/sons.js";
 import * as medias from "../core/medias.js";
 
@@ -368,13 +368,8 @@ function dessinerCarte(v) {
 let signatureBandeau = "";
 
 function majBandeau(t, etat) {
-  // Soit tes messages, soit le flux — jamais les deux mélangés : un bandeau
-  // qui alterne entre « Merci à nos commanditaires » et un titre de nouvelle
-  // n'a plus de propos.
-  const source = t.bandeau.source === "rss" ? (etat.rssTitres || []) : (t.bandeau.messages || []);
-  const messages = source.map((m) => String(m).trim()).filter(Boolean);
-
-  const actif = t.bandeau.actif && messages.length > 0;
+  const messages = messagesDuBandeau(t, etat);
+  const actif = messages.length > 0;
   $("defilant").hidden = !actif;
 
   // On ne reconstruit que si le contenu change : sinon le défilement

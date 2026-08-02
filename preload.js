@@ -16,5 +16,6 @@ contextBridge.exposeInMainWorld("studio", {
   antenneEnFenetre: () => ipcRenderer.invoke("antenne-fenetre"),
   adresseAntenne: () => ipcRenderer.invoke("adresse-antenne"),
   ouvrirDansNavigateur: (url) => ipcRenderer.invoke("ouvrir-dans-navigateur", url),
-  feuillesEnPdf: (charge) => ipcRenderer.invoke("feuilles-en-pdf", charge)
+  feuillesEnPdf: (charge) => ipcRenderer.invoke("feuilles-en-pdf", charge),
+  enregistrerFichier: (charge) => ipcRenderer.invoke("enregistrer-fichier", charge)
 });

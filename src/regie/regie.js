@@ -11,11 +11,15 @@ import {
   verifierCarte, validerSaisie, restantsDansBoulier
 } from "../core/bingo.js";
 import {
-  creerCanal, diffuser, etatNeuf, themeNeuf, sauvegarder, restaurer, effacerSauvegarde
+  creerCanal, diffuser, etatNeuf, themeNeuf, sauvegarder, restaurer, effacerSauvegarde,
+  messagesDuBandeau
 } from "../core/canal.js";
 import * as sons from "../core/sons.js";
 import * as medias from "../core/medias.js";
 import { monterHtml, DISPOSITIONS, FORMATS } from "../core/feuilles.js";
+import {
+  monterDossier, lireDossier, appliquerReglages, clesMedias, nomDeFichier
+} from "../core/reglages.js";
 
 const $ = (id) => document.getElementById(id);
 const canal = creerCanal();
@@ -325,6 +329,36 @@ function rendre() {
 //  Paramètres — habillage de l'antenne
 // ---------------------------------------------------------------------
 
+/**
+ * Dit d'avance ce que le bandeau fera. Cocher « Afficher le bandeau » ne
+ * suffit pas : sans message, l'antenne n'affiche rien du tout, et sans cette
+ * ligne l'opératrice cherche pendant dix minutes ce qui cloche.
+ */
+function majEtatBandeau(t) {
+  const ligne = $("reg-bandeau-etat");
+  const messages = messagesDuBandeau(t, etat);
+
+  if (!t.bandeau.actif) {
+    ligne.textContent = "Le bandeau ne s'affiche pas.";
+    ligne.classList.remove("aide-alerte");
+    return;
+  }
+  if (messages.length) {
+    const n = messages.length;
+    const pluriel = n > 1 ? "s" : "";        // le nom
+    const verbe = n > 1 ? "nt" : "";         // et le verbe, qui ne s'accorde pas pareil
+    ligne.textContent = t.bandeau.source === "rss"
+      ? `${n} titre${pluriel} du flux défile${verbe} à l'antenne.`
+      : `${n} message${pluriel} défile${verbe} à l'antenne.`;
+    ligne.classList.remove("aide-alerte");
+    return;
+  }
+  ligne.textContent = t.bandeau.source === "rss"
+    ? "Coché, mais aucun titre chargé — rien ne s'affiche à l'antenne. Colle l'adresse du flux, puis « Charger »."
+    : "Coché, mais aucun message — rien ne s'affiche à l'antenne. Le texte gris ci-dessous n'est qu'un exemple : écris tes lignes par-dessus.";
+  ligne.classList.add("aide-alerte");
+}
+
 function dessinerParametresTheme() {
   const t = theme();
   $("reg-dateheure").checked = t.dateHeure;
@@ -354,6 +388,8 @@ function dessinerParametresTheme() {
   if (document.activeElement !== $("reg-bandeau-rss")) $("reg-bandeau-rss").value = t.bandeau.rssUrl || "";
   $("reg-bandeau-vitesse").value = t.bandeau.vitesse;
   $("reg-bandeau-vitesse-val").textContent = t.bandeau.vitesse;
+  majEtatBandeau(t);
+  majResumeExport();   // le poids du fichier change dès qu'un média est déposé
 
   // Pubs
   $("reg-pubs-secondes").value = t.pubs.secondes;
@@ -663,6 +699,193 @@ function brancherImpression() {
   }
   $("btn-imprimer-pdf").onclick = () => produireFeuilles(true);
   $("btn-imprimer-apercu").onclick = () => produireFeuilles(false);
+}
+
+// ---------------------------------------------------------------------
+//  Sauvegarder et retrouver ses réglages
+//
+//  Les médias lourds vivent dans IndexedDB et l'état n'en transporte que la
+//  clé. Un fichier qui ne porterait que les réglages rendrait donc, après
+//  réinstallation, des renvois vers des fichiers absents : on les embarque.
+// ---------------------------------------------------------------------
+
+const TAILLE_QUI_INQUIETE = 200 * 1024 * 1024;   // au-delà, on prévient avant
+
+/** Les fiches des médias auxquels l'habillage courant fait référence. */
+function fichesMedias() {
+  const t = theme();
+  const fiches = [...(t.generique.musiques || [])];
+  if (t.fondMedia?.image) fiches.push(t.fondMedia.image);
+  if (t.fondMedia?.video) fiches.push(t.fondMedia.video);
+  return fiches.filter((f) => f?.cle);
+}
+
+function majResumeExport() {
+  const t = theme();
+  const fiches = fichesMedias();
+  const octets = fiches.reduce((s, f) => s + (f.taille || 0), 0);
+
+  const morceaux = [`${etat.parties.length} partie${etat.parties.length > 1 ? "s" : ""}`];
+  if (t.logo) morceaux.push("le logo");
+  if (t.pubs.images.length) morceaux.push(`${t.pubs.images.length} pub${t.pubs.images.length > 1 ? "s" : ""}`);
+  if (fiches.length) morceaux.push(`${fiches.length} média${fiches.length > 1 ? "s" : ""}`);
+
+  const ligne = $("reg-export-resume");
+  ligne.textContent = octets
+    ? `Le fichier emportera ${morceaux.join(", ")} — environ ${medias.formaterTaille(Math.round(octets * 1.37))}.`
+    : `Le fichier emportera ${morceaux.join(", ")}.`;
+  // 1,37 : le base64 gonfle d'un tiers, plus le texte des réglages. Mieux vaut
+  // annoncer un peu large qu'un peu court.
+  ligne.classList.toggle("aide-alerte", octets > TAILLE_QUI_INQUIETE);
+}
+
+/** Un fichier du magasin, en adresse data: — seul format qui tient dans du JSON. */
+function enDataUrl(fichier) {
+  return new Promise((resolve, reject) => {
+    const lecteur = new FileReader();
+    lecteur.onload = () => resolve(lecteur.result);
+    lecteur.onerror = () => reject(lecteur.error || new Error("lecture impossible"));
+    lecteur.readAsDataURL(fichier);
+  });
+}
+
+async function exporterReglages() {
+  const fiches = fichesMedias();
+  const octets = fiches.reduce((s, f) => s + (f.taille || 0), 0);
+
+  if (octets > TAILLE_QUI_INQUIETE) {
+    const suite = await demander({
+      titre: "Ça va être un gros fichier",
+      texte: `Tes médias pèsent ${medias.formaterTaille(octets)}. Le fichier de réglages `
+           + `sera encore plus lourd, et sa préparation peut prendre une minute.`,
+      detail: "Tu peux continuer, ou retirer la vidéo de fond d'abord et l'exporter à part.",
+      oui: "Continue, j'ai le temps",
+      non: "Laisse faire"
+    });
+    if (!suite) { dire("Export annulé.", ""); return; }
+  }
+
+  dire("Préparation du fichier…", "ok");
+
+  const paquet = {};
+  const introuvables = [];
+  for (const fiche of fiches) {
+    try {
+      const fichier = await medias.lire(fiche.cle);
+      if (!fichier) { introuvables.push(fiche.nom || fiche.cle); continue; }
+      paquet[fiche.cle] = {
+        nom: fiche.nom || fiche.cle,
+        type: fiche.type || fichier.type || "",
+        donnees: await enDataUrl(fichier)
+      };
+    } catch {
+      introuvables.push(fiche.nom || fiche.cle);
+    }
+  }
+
+  const jour = new Date().toISOString().slice(0, 10);
+  const texte = JSON.stringify(monterDossier(etat, paquet, new Date().toISOString()), null, 1);
+  const nom = nomDeFichier(etat.titre, jour);
+
+  // Ce qui n'a pas pu être lu doit se dire, pas se taire : le fichier serait
+  // incomplet et personne ne s'en apercevrait avant la réinstallation.
+  const reserve = introuvables.length
+    ? ` ⚠️ ${introuvables.length} média${introuvables.length > 1 ? "x" : ""} introuvable${introuvables.length > 1 ? "s" : ""} `
+      + `au magasin (${introuvables.join(", ")}) — non inclus.`
+    : "";
+
+  if (window.studio?.presente) {
+    const r = await window.studio.enregistrerFichier({
+      texte, nomSuggere: nom, titre: "Enregistrer mes réglages", extension: "json"
+    });
+    if (r?.annule) { dire("Enregistrement annulé.", ""); return; }
+    if (r?.erreur) { dire(`Enregistrement impossible : ${r.erreur}`, "erreur"); return; }
+    dire(`Réglages enregistrés.${reserve}`, reserve ? "erreur" : "ok");
+    return;
+  }
+
+  // Sans Electron : téléchargement ordinaire du navigateur.
+  const url = URL.createObjectURL(new Blob([texte], { type: "application/json" }));
+  const lien = document.createElement("a");
+  lien.href = url; lien.download = nom;
+  lien.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  dire(`Réglages téléchargés — ${nom}.${reserve}`, reserve ? "erreur" : "ok");
+}
+
+async function importerReglages(fichier) {
+  let dossier;
+  try {
+    dossier = lireDossier(JSON.parse(await fichier.text()));
+  } catch (err) {
+    // JSON.parse crache de l'anglais ; on ne le montre pas à l'opératrice.
+    const message = err instanceof SyntaxError
+      ? "Ce fichier n'est pas lisible — il a peut-être été modifié ou tronqué."
+      : err.message;
+    dire(message, "erreur");
+    return;
+  }
+
+  const { reglages, medias: paquet } = dossier;
+  const nbParties = Array.isArray(reglages.parties) ? reglages.parties.length : 0;
+  const nbMedias = Object.keys(paquet).length;
+
+  const enJeu = etat.tirage.length
+    ? `Un bingo est en cours : les ${etat.tirage.length} numéros déjà tirés et les gagnants restent en place. `
+    : "";
+
+  const suite = await demander({
+    titre: "Remplacer tes réglages ?",
+    texte: `${enJeu}Ton habillage actuel, tes textes`
+         + (nbParties ? ` et tes parties (${nbParties} arrivent)` : "")
+         + ` seront remplacés par ceux du fichier.`,
+    detail: nbMedias
+      ? `${nbMedias} média${nbMedias > 1 ? "s seront replacés" : " sera replacé"} au passage.`
+      : "Ce fichier ne porte aucun média.",
+    oui: "Oui, remplace",
+    non: "Non, garde les miens"
+  });
+  if (!suite) { dire("Import annulé.", ""); return; }
+
+  // On remet les médias au magasin sous LEUR clé d'origine : c'est elle que
+  // les réglages désignent.
+  const manquants = [];
+  for (const cle of clesMedias(reglages.theme)) {
+    const m = paquet[cle];
+    if (!m?.donnees) { manquants.push(cle); continue; }
+    try {
+      const blob = await (await fetch(m.donnees)).blob();
+      await medias.deposerSous(cle, new File([blob], m.nom || cle, { type: m.type || blob.type }));
+    } catch {
+      manquants.push(cle);
+    }
+  }
+
+  const { etat: suivant, retires } = appliquerReglages(etat, reglages, manquants);
+  etat = suivant;
+
+  pousser();          // enregistre, diffuse à l'antenne et redessine la régie
+  majResumeExport();
+
+  dire(
+    retires.length
+      ? `Réglages importés. ⚠️ Non repris, faute de fichier : ${retires.join(", ")}.`
+      : "Réglages importés.",
+    retires.length ? "erreur" : "ok"
+  );
+}
+
+function brancherSauvegarde() {
+  majResumeExport();
+  $("btn-exporter").onclick = () => exporterReglages();
+  $("btn-importer").onclick = () => $("fichier-reglages").click();
+  $("fichier-reglages").onchange = (e) => {
+    const f = e.target.files?.[0];
+    // On vide le champ tout de suite : sinon réimporter le MÊME fichier deux
+    // fois de suite ne déclenche rien, la valeur n'ayant pas changé.
+    e.target.value = "";
+    if (f) importerReglages(f);
+  };
 }
 
 function brancherControles() {
@@ -975,6 +1198,9 @@ function pousserLeger() {
   sauvegarder(etat);
   diffuser(canal, etat);
   $("entete-session").textContent = etat.titre || "";
+  // Cette ligne-là doit suivre la frappe. Elle n'écrit que du texte dans un
+  // <p> — jamais dans un champ —, donc elle ne déplace pas le curseur.
+  majEtatBandeau(theme());
 }
 
 // ---------------------------------------------------------------------
@@ -1225,6 +1451,7 @@ function brancher() {
   brancherParametres();
   brancherControles();
   brancherImpression();
+  brancherSauvegarde();
 
   // --- écrans ---
   $("confirm-oui").onclick = () => repondreConfirmation(true);

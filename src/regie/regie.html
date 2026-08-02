@@ -186,6 +186,7 @@
 
       <h3>Bandeau défilant</h3>
       <label class="case-a-cocher"><input id="reg-bandeau-actif" type="checkbox"> Afficher le bandeau</label>
+      <p id="reg-bandeau-etat" class="aide"></p>
 
       <div class="reg-choix">
         <label class="case-a-cocher">
@@ -308,6 +309,17 @@
         <button id="btn-imprimer-pdf" class="bouton bouton-primaire">Produire le PDF</button>
         <button id="btn-imprimer-apercu" class="bouton">Voir un aperçu</button>
       </div>
+
+      <h3 id="titre-sauvegarde">Sauvegarder tes réglages</h3>
+      <p class="aide">Un fichier à garder de côté — clé USB, courriel à toi-même,
+         nuage. Le jour où tu réinstalles le logiciel, tu le réimportes et tout
+         revient : habillage, parties, logo, pubs, musiques, fond.</p>
+      <p id="reg-export-resume" class="aide"></p>
+      <div class="verif-actions">
+        <button id="btn-exporter" class="bouton bouton-primaire">Exporter mes réglages</button>
+        <button id="btn-importer" class="bouton">Importer un fichier…</button>
+      </div>
+      <input id="fichier-reglages" type="file" accept="application/json,.json" hidden>
 
       <h3>Diffusion</h3>
       <p class="aide" id="adresse-antenne">Source navigateur pour OBS ou Tricaster : http://127.0.0.1:7777/antenne</p>

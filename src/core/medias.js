@@ -27,7 +27,17 @@ function ouvrir() {
     };
     demande.onsuccess = () => resolve(demande.result);
     demande.onerror = () => reject(demande.error);
+    // onblocked : une autre copie du logiciel tient le magasin. Sans ce
+    // renvoi, la demande n'aboutit NI ne rate — elle attend pour toujours, et
+    // l'import reste figé sans le moindre message.
+    demande.onblocked = () => reject(new Error(
+      "Le magasin de médias est retenu par une autre fenêtre de Bingo Studio. " +
+      "Ferme les autres copies, puis réessaie."
+    ));
   });
+  // Une ouverture ratée ne doit pas condamner les suivantes : on oublie la
+  // promesse en échec pour qu'un nouvel essai reparte à zéro.
+  connexion.catch(() => { connexion = null; });
   return connexion;
 }
 
@@ -55,6 +65,16 @@ export async function deposer(prefixe, fichier) {
   const cle = nouvelleCle(prefixe);
   await transaction("readwrite", (rayon) => rayon.put(fichier, cle));
   return { cle, nom: fichier.name, type: fichier.type, taille: fichier.size };
+}
+
+/**
+ * Dépose un fichier sous une clé imposée. Sert à la réimportation : les
+ * réglages exportés désignent leurs médias par clé, donc il faut pouvoir les
+ * remettre exactement là où ils étaient.
+ */
+export async function deposerSous(cle, fichier) {
+  await transaction("readwrite", (rayon) => rayon.put(fichier, cle));
+  return { cle, nom: fichier.name || cle, type: fichier.type, taille: fichier.size };
 }
 
 export async function lire(cle) {

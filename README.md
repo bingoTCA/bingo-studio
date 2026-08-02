@@ -82,10 +82,30 @@ Bouton **Paramètres**, en haut à droite. Tout part à l'antenne immédiatement
 | **Génériques** | Textes de début et de fin, **règlement du bingo**, **musiques** jouées en boucle, vitesse de défilement |
 | **Textes** | Titre, **un ou plusieurs téléphones** (côte à côte dans le même bloc), mention de commandite |
 | **Parties** | Nom, figure et lot de chaque partie de la session |
+| **Sauvegarde** | Exporte tous les réglages dans un fichier `.json`, médias compris, et les réimporte sur une autre machine |
 
 Le **flux RSS** est chargé par le serveur local, pas par le navigateur : sans
 ce relais, le navigateur bloquerait la requête (CORS). Seuls les titres des
 articles sont extraits. Clique « Charger » pour rafraîchir.
+
+Cocher **Afficher le bandeau** ne suffit pas : sans message écrit — ou sans
+flux chargé —, l'antenne n'affiche rien. Une ligne sous la case dit d'avance
+ce qui va défiler, et vire à l'ambre quand la réponse est « rien ». Le texte
+gris dans le champ des messages est un exemple, pas du contenu.
+
+### Sauvegarder ses réglages
+
+**Paramètres → Sauvegarder tes réglages**. Le fichier emporte l'habillage, les
+parties, les textes, le logo, les pubs, et **les fichiers du magasin de
+médias** — musiques et fond — encodés dans le JSON. Sans eux, une
+réinstallation ne récupérerait que des renvois vers des fichiers absents.
+
+Ce qui ne voyage **pas** : la soirée en cours — numéros tirés, gagnants,
+horodatage. Ce sont les traces d'un bingo précis. Importer par-dessus une
+partie en cours ne l'efface donc pas ; la confirmation le rappelle.
+
+Un média que le fichier ne porte pas est **retiré du réglage et nommé** dans le
+message de fin, plutôt que laissé à pointer dans le vide.
 
 La **couleur d'ambiance** est le seul réglage qui compte vraiment : elle
 recolore les blocs, les cadres, le bandeau et la colonne des lettres d'un coup.

@@ -121,6 +121,23 @@ export function fusionnerTheme(sauve) {
   return sortie;
 }
 
+/**
+ * Ce que le bandeau va réellement faire défiler — liste vide s'il ne doit
+ * rien afficher. Soit tes messages, soit le flux, jamais les deux mélangés :
+ * un bandeau qui alterne entre « Merci à nos commanditaires » et un titre de
+ * nouvelle n'a plus de propos.
+ *
+ * La règle vit ici et nulle part ailleurs : l'antenne s'en sert pour
+ * afficher, la régie pour te dire d'avance ce qui passera. Autrement les deux
+ * finissent par ne plus dire la même chose.
+ */
+export function messagesDuBandeau(theme, etat = {}) {
+  const b = theme?.bandeau;
+  if (!b || !b.actif) return [];
+  const source = b.source === "rss" ? (etat.rssTitres || []) : (b.messages || []);
+  return source.map((m) => String(m).trim()).filter(Boolean);
+}
+
 /** État d'une session neuve. */
 export function etatNeuf() {
   return {

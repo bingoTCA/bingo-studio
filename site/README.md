@@ -57,9 +57,9 @@ Puisque les fichiers sont déjà sur GitHub, tout vit au même endroit et il n'y
 qu'un compte à gérer. `.github/workflows/site.yml` publie le dossier `site/`
 à chaque poussée sur `main`.
 
-À activer une seule fois : dépôt → **Settings → Pages → Source = GitHub
-Actions**. Le site sort ensuite sur
-`https://<compte>.github.io/<depot>/`, ou sur ton propre domaine.
+✅ **Déjà en place.** Le site est en ligne sur
+<https://bingotca.github.io/bingo-studio/> et se met à jour à chaque poussée
+sur `main`. Un domaine personnalisé peut s'ajouter dans Settings → Pages.
 
 ### Firebase Spark — si tu préfères rester chez Firebase
 
@@ -79,9 +79,8 @@ Pense à inscrire le projet retenu dans `.firebaserc`.
 
 ## Trois choses à brancher avant la mise en ligne
 
-1. **Le lien de don.** L'ancre `#lien-don` pointe encore sur
-   `https://ko-fi.com`. Remplace-la par l'adresse de la page Ko-fi de Marc
-   Bert.
+1. **Le lien de don.** L'ancre `#lien-don` pointe encore sur `https://ko-fi.com`
+   tout court. Remplace-la par l'adresse de la page Ko-fi de Marc Bert.
 
 2. **Les fichiers à télécharger** — voir la marche à suivre ci-dessus.
 

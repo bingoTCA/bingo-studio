@@ -19,7 +19,8 @@
       <a href="#telecharger">Télécharger</a>
       <a href="#emploi">Mode d'emploi</a>
       <a href="#cartes">Les cartes</a>
-      <a href="#don" class="lien-don">Faire un don</a>
+      <a href="#surmesure">Sur mesure</a>
+      <a href="#contribution" class="lien-don">Contribuer</a>
     </nav>
   </div>
 </header>
@@ -37,10 +38,10 @@
         <strong>la vérification d'une carte au téléphone</strong>.
       </p>
       <div class="boutons">
-        <a class="bouton bouton-fort" href="#telecharger">Télécharger — c'est gratuit</a>
+        <a class="bouton bouton-fort" href="#telecharger">Obtenir le logiciel — gratuit</a>
         <a class="bouton" href="#emploi">Voir comment ça marche</a>
       </div>
-      <p class="petit">Mac et Windows · français · aucun compte à créer · fonctionne hors ligne</p>
+      <p class="petit">Mac et Windows · français · fonctionne hors ligne, sans abonnement</p>
     </div>
   </section>
 
@@ -73,35 +74,52 @@
     </div>
   </section>
 
-  <!-- ============================ Téléchargement ============================ -->
+  <!-- ============================ Inscription ============================ -->
   <section id="telecharger" class="bande bande-sombre">
     <div class="dedans">
-      <h2>Télécharger</h2>
+      <h2>Obtenir le logiciel</h2>
       <p class="intro">
-        Gratuit, sans compte, sans limite de temps. Si le logiciel te sert,
-        <a href="#don">un don</a> aide à le faire vivre.
+        Laisse-moi ton courriel et je t'envoie le lien de téléchargement tout
+        de suite. C'est gratuit, et ça le restera.
       </p>
-      <div class="grille-deux">
-        <!-- Les fichiers sont servis par GitHub Releases, pas par ce site :
-             aucune limite de bande passante, alors que l'hébergement du site
-             en a une. -->
-        <a class="telechargement" href="#" data-plateforme="mac" aria-disabled="true">
-          <span class="tele-titre">macOS</span>
-          <span class="tele-detail">Fichier .dmg · Apple Silicon et Intel</span>
-          <span class="tele-etat">Bientôt disponible</span>
-        </a>
-        <a class="telechargement" href="#" data-plateforme="windows" aria-disabled="true">
-          <span class="tele-titre">Windows</span>
-          <span class="tele-detail">Fichier .exe · Windows 10 et 11</span>
-          <span class="tele-etat">Bientôt disponible</span>
-        </a>
-      </div>
+      <p class="intro">
+        Pourquoi passer par là plutôt que par un bouton direct ? Pour savoir
+        qui utilise le logiciel, pouvoir te prévenir des mises à jour, et te
+        faire signe une fois l'an. Rien d'autre — pas de publicité, pas de
+        revente, et tu te désabonnes en un clic.
+      </p>
+
+      <!-- ⚠️ À BRANCHER : remplacer l'action par l'adresse du formulaire Brevo.
+           Brevo → Contacts → Formulaires → créer → « Partager » → URL de partage.
+           Les champs doivent porter exactement les noms des attributs Brevo. -->
+      <form class="inscription" action="https://sibforms.com/serve/REMPLACER-PAR-TON-ID"
+            method="POST" target="_blank">
+        <div class="inscription-grille">
+          <label>Ton nom
+            <input type="text" name="NOM" autocomplete="name" required>
+          </label>
+          <label>Ta télé ou ton organisme
+            <input type="text" name="ORGANISME" autocomplete="organization" required>
+          </label>
+          <label>Courriel
+            <input type="email" name="EMAIL" autocomplete="email" required>
+          </label>
+          <label>Ville ou région <span class="facultatif">facultatif</span>
+            <input type="text" name="REGION" autocomplete="address-level2">
+          </label>
+        </div>
+        <label class="consentement">
+          <input type="checkbox" name="OPT_IN" value="1" required>
+          <span>J'accepte de recevoir le lien de téléchargement, les avis de
+                mise à jour et un rappel annuel. Je peux me désabonner à tout
+                moment.</span>
+        </label>
+        <button type="submit" class="bouton bouton-fort">Recevoir le lien</button>
+      </form>
+
       <p class="petit">
-        À la première ouverture, le système peut prévenir que le développeur
-        n'est pas identifié : c'est normal pour un logiciel offert
-        gratuitement. Sur Mac, clic droit sur l'application puis
-        <em>Ouvrir</em>. Sur Windows, <em>Informations complémentaires</em>
-        puis <em>Exécuter quand même</em>.
+        Mac et Windows · français · aucun compte à créer dans le logiciel ·
+        fonctionne hors ligne
       </p>
     </div>
   </section>
@@ -219,22 +237,58 @@
     </div>
   </section>
 
-  <!-- ============================ Don ============================ -->
-  <section id="don" class="bande bande-don">
+  <!-- ============================ Contribution ============================ -->
+  <section id="contribution" class="bande bande-don">
     <div class="dedans">
-      <h2>Ce logiciel est donné, pas vendu</h2>
+      <h2>Gratuit, et une contribution volontaire une fois l'an</h2>
       <p class="intro">
-        Bingo Studio a été construit par une télévision communautaire, pour les
-        télévisions communautaires. Il ne coûte rien et ne coûtera jamais rien.
+        Bingo Studio ne se vend pas. Aucune licence, aucun abonnement, aucune
+        fonction bloquée : tu as le logiciel en entier, pour toujours.
       </p>
       <p class="intro">
-        S'il t'a évité un achat, une soirée de bricolage ou une erreur en
-        ondes, un don aide à l'entretenir et à l'améliorer. Ça se passe sur
-        <strong>Ko-fi</strong> : quelques secondes, sans créer de compte.
+        En échange, je propose une chose simple : <strong>une contribution
+        volontaire, une fois par année</strong>, du montant que tu juges juste.
+        Une station qui l'utilise chaque semaine n'a pas les mêmes moyens
+        qu'une autre qui l'essaie — c'est à toi de voir.
+      </p>
+      <p class="intro">
+        Je t'écrirai une fois l'an pour te le rappeler, avec les nouveautés de
+        l'année. Une fois l'an, pas plus. Et si une année tu ne peux pas,
+        <strong>ça ne change rien</strong> : le logiciel continue de
+        fonctionner, tu reçois les mises à jour, et je ne te relancerai pas.
       </p>
       <div class="boutons">
-        <!-- Remplacer par l'adresse de la page Ko-fi -->
-        <a class="bouton bouton-fort" id="lien-don" href="https://ko-fi.com" rel="noopener">Offrir un café</a>
+        <!-- ⚠️ À BRANCHER : adresse de la page Ko-fi -->
+        <a class="bouton bouton-fort" id="lien-don" href="https://ko-fi.com" rel="noopener">Contribuer</a>
+      </div>
+      <p class="petit">
+        Ça se passe sur Ko-fi, en quelques secondes, sans créer de compte.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================ Sur mesure ============================ -->
+  <section id="surmesure" class="bande">
+    <div class="dedans">
+      <div class="avis avis-affaires">
+        <h2>Ta station fonctionne autrement ?</h2>
+        <p>
+          Bingo Studio est déjà très souple — figures, parties, habillage,
+          incrustation, pubs, génériques. Mais chaque télé communautaire a ses
+          habitudes, et il arrive qu'on ait besoin de plus : une formule de
+          jeu particulière, un habillage aux couleurs de la station, une
+          intégration à votre chaîne technique, une reprise de vos propres
+          cartes.
+        </p>
+        <p>
+          <strong>Ça, ça se discute.</strong> Écris-moi et on regarde ce dont
+          vous avez besoin — c'est du développement sur mesure, et donc une
+          entente d'affaires.
+        </p>
+        <div class="boutons">
+          <!-- ⚠️ À BRANCHER : adresse courriel de contact -->
+          <a class="bouton bouton-fort" id="lien-affaires" href="mailto:REMPLACER@EXEMPLE.COM?subject=Bingo%20Studio%20—%20version%20sur%20mesure">Parlons-en</a>
+        </div>
       </div>
     </div>
   </section>

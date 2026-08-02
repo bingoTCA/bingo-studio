@@ -77,15 +77,56 @@ Pense à inscrire le projet retenu dans `.firebaserc`.
 
 ---
 
-## Trois choses à brancher avant la mise en ligne
+## Ce qui reste à brancher
 
-1. **Le lien de don.** L'ancre `#lien-don` pointe encore sur `https://ko-fi.com`
-   tout court. Remplace-la par l'adresse de la page Ko-fi de Marc Bert.
+Quatre repères `REMPLACER` dans les fichiers. Cherche-les, ils sont commentés.
 
-2. **Les fichiers à télécharger** — voir la marche à suivre ci-dessus.
+### 1. Le formulaire Brevo — `index.html`, attribut `action`
 
-3. ~~Des captures d'écran.~~ ✅ Faites — `npm run captures` les régénère à partir
-   d'une session de démonstration, si l'habillage change.
+Dans Brevo (gratuit : contacts illimités, 300 courriels par jour) :
+
+1. **Contacts → Attributs** : crée `NOM`, `ORGANISME`, `REGION` en type texte.
+   `EMAIL` existe déjà.
+2. **Contacts → Listes** : crée une liste, par exemple « Bingo Studio ».
+3. **Contacts → Formulaires** : crée un formulaire avec ces champs, rattaché à
+   la liste. Récupère son **URL de partage**, de la forme
+   `https://sibforms.com/serve/MUIF...`
+4. Colle-la dans l'attribut `action` du `<form class="inscription">`.
+5. Dans les réglages du formulaire, mets la **redirection après envoi** sur
+   `https://bingotca.github.io/bingo-studio/telecharger/` — la personne arrive
+   directement sur la page de téléchargement, sans attendre son courriel.
+6. **Automatisations** : « à l'inscription à la liste », envoie un courriel
+   contenant ce même lien. C'est lui qui sert de trace et de rappel.
+
+Pour le rappel annuel : une campagne ordinaire, une fois l'an, à cette liste.
+
+### 2. Le lien Ko-fi — `index.html`, ancre `#lien-don`
+
+Crée ta page sur [ko-fi.com](https://ko-fi.com) et remplace `https://ko-fi.com`.
+
+### 3. L'adresse de contact — `index.html`, ancre `#lien-affaires`
+
+Remplace `REMPLACER@EXEMPLE.COM` dans le `mailto:` de la section « Sur mesure ».
+
+### 4. Les fichiers à télécharger — `telecharger/index.html`
+
+Deux `href="#"` à remplacer par les adresses des fichiers dans GitHub Releases,
+puis retirer `aria-disabled="true"` et mettre à jour `.tele-etat`.
+
+---
+
+## Ce que l'inscription protège — et ce qu'elle ne protège pas
+
+Le formulaire sert à **savoir qui utilise le logiciel** et à pouvoir recontacter
+ces personnes : mises à jour, rappel annuel. Ce n'est **pas une serrure** : les
+fichiers sont sur GitHub Releases, publiquement accessibles, et le dépôt est
+public. Quelqu'un de déterminé contourne le formulaire en trente secondes.
+C'est assumé — la page `telecharger/` porte d'ailleurs `noindex`, pas un mot de
+passe.
+
+**Loi 25 :** la case à cocher est obligatoire et annonce précisément l'usage
+(lien, mises à jour, rappel annuel). Brevo fournit le lien de désabonnement et
+l'hébergement conforme. Ne retire pas la case.
 
 
 ## Ce que la page dit du cadre légal

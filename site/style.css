@@ -135,6 +135,48 @@ em { color: var(--jaune); font-style: normal; }
 }
 .telechargement[aria-disabled="true"] { cursor: default; opacity: .82; }
 
+/* ---------- Formulaire d'inscription ---------- */
+.inscription {
+  background: linear-gradient(180deg, rgba(74,31,122,.42) 0%, rgba(26,18,38,.42) 100%);
+  border: 1px solid var(--bord); border-radius: 14px;
+  padding: 26px; margin: 26px 0 18px;
+  max-width: 760px;
+}
+.inscription-grille {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+.inscription label {
+  display: flex; flex-direction: column; gap: 7px;
+  font-size: 15px; color: var(--texte-doux);
+}
+.facultatif { color: var(--texte-doux); opacity: .7; font-size: 13px; }
+
+.inscription input[type="text"],
+.inscription input[type="email"] {
+  font: inherit; font-size: 16px;
+  background: rgba(8,3,19,.6); color: var(--texte);
+  border: 1px solid var(--bord); border-radius: 9px;
+  padding: 11px 13px; width: 100%;
+}
+.inscription input:focus {
+  outline: none; border-color: var(--jaune);
+  box-shadow: 0 0 0 3px rgba(255,215,0,.16);
+}
+
+.consentement {
+  flex-direction: row !important; align-items: flex-start; gap: 11px;
+  margin: 20px 0 22px; font-size: 15px; line-height: 1.5; cursor: pointer;
+}
+.consentement input { width: 18px; height: 18px; margin-top: 3px; flex-shrink: 0; accent-color: var(--jaune); }
+
+.inscription button { border: none; cursor: pointer; font-family: inherit; }
+
+/* ---------- Liste simple ---------- */
+.liste-simple { list-style: none; max-width: 74ch; display: grid; gap: 10px; }
+.liste-simple li { padding-left: 20px; position: relative; }
+.liste-simple li::before { content: "—"; position: absolute; left: 0; color: var(--jaune); }
+
 /* ---------- Étapes ---------- */
 .etapes { list-style: none; counter-reset: etape; display: grid; gap: 22px; max-width: 78ch; }
 .etapes li { counter-increment: etape; padding-left: 62px; position: relative; }
@@ -158,6 +200,14 @@ em { color: var(--jaune); font-style: normal; }
 }
 .avis h2 { color: #fff; }
 .avis p + p { margin-top: 14px; }
+
+/* La proposition d'affaires : même cadre, mais en jaune plutôt qu'en rouge —
+   c'est une invitation, pas un avertissement. */
+.avis-affaires {
+  border-left-color: var(--jaune);
+  background: linear-gradient(90deg, rgba(255,215,0,.10) 0%, rgba(26,18,38,.25) 100%);
+}
+.avis-affaires .boutons { margin-top: 20px; margin-bottom: 0; }
 
 /* ---------- Pied ---------- */
 .pied { padding: 44px 0 60px; }

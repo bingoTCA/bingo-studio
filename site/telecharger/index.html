@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Télécharger Bingo Studio</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<header class="entete">
+  <div class="dedans entete-dedans">
+    <a class="marque" href="../">Bingo&nbsp;Studio</a>
+    <nav>
+      <a href="../#emploi">Mode d'emploi</a>
+      <a href="../#contribution" class="lien-don">Contribuer</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="heros">
+    <div class="dedans">
+      <p class="surtitre">Merci de t'être inscrit</p>
+      <h1>Choisis ta version</h1>
+      <p class="accroche">
+        Le logiciel est le même sur les deux systèmes. Prends celle qui
+        correspond à l'ordinateur de ta régie.
+      </p>
+    </div>
+  </section>
+
+  <section class="bande">
+    <div class="dedans">
+      <div class="grille-deux">
+        <!-- Remplacer les href par les adresses des fichiers dans GitHub Releases -->
+        <a class="telechargement" href="#" data-plateforme="mac" aria-disabled="true">
+          <span class="tele-titre">macOS</span>
+          <span class="tele-detail">Fichier .dmg · Apple Silicon et Intel</span>
+          <span class="tele-etat">Bientôt disponible</span>
+        </a>
+        <a class="telechargement" href="#" data-plateforme="windows" aria-disabled="true">
+          <span class="tele-titre">Windows</span>
+          <span class="tele-detail">Fichier .exe · Windows 10 et 11</span>
+          <span class="tele-etat">Bientôt disponible</span>
+        </a>
+      </div>
+
+      <h2 style="margin-top:44px">À la première ouverture</h2>
+      <p class="intro">
+        Le système préviendra peut-être que le développeur n'est pas
+        identifié. C'est normal pour un logiciel offert gratuitement, sans
+        certificat payant.
+      </p>
+      <ul class="liste-simple">
+        <li><strong>Sur Mac</strong> — clic droit sur l'application, puis <em>Ouvrir</em>. Une seule fois.</li>
+        <li><strong>Sur Windows</strong> — <em>Informations complémentaires</em>, puis <em>Exécuter quand même</em>.</li>
+      </ul>
+
+      <h2 style="margin-top:44px">Et ensuite</h2>
+      <p class="intro">
+        Deux fenêtres s'ouvrent : la <strong>régie</strong> pour toi, l'<strong>antenne</strong>
+        pour le téléviseur. Le <a href="../#emploi">mode d'emploi</a> te guide
+        en six étapes.
+      </p>
+      <div class="boutons">
+        <a class="bouton" href="../#emploi">Lire le mode d'emploi</a>
+        <a class="bouton bouton-fort" href="../#contribution">Soutenir le projet</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="pied">
+  <div class="dedans">
+    <p><strong>Bingo Studio</strong> — construit en Gaspésie, pour les bingos communautaires.</p>
+    <p class="petit">© <span id="annee">2026</span> Marc Bert. Logiciel offert gratuitement.</p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById("annee").textContent = new Date().getFullYear();
+  for (const lien of document.querySelectorAll('.telechargement[aria-disabled="true"]')) {
+    lien.addEventListener("click", (e) => e.preventDefault());
+  }
+</script>
+</body>
+</html>

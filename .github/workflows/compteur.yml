@@ -1,0 +1,112 @@
+# =====================================================================
+#  Relève le nombre d'inscriptions chez Brevo et l'écrit dans le site.
+#
+#  POURQUOI PASSER PAR ICI plutôt que d'interroger Brevo depuis la page :
+#  une clé d'API Brevo donne accès à TOUT le compte — envoyer des
+#  courriels, exporter la liste des contacts, la supprimer. Mise dans une
+#  page web, elle est lisible par n'importe qui en trois clics. Elle reste
+#  donc ici, dans les secrets du dépôt, et la page ne lit qu'un nombre.
+#
+#  À ACTIVER UNE FOIS : dépôt → Settings → Secrets and variables →
+#  Actions → New repository secret → nom « BREVO_API_KEY ».
+#  Sans ce secret, l'ouvrage ne fait rien et le site n'affiche pas de
+#  compteur — il ne casse pas.
+# =====================================================================
+
+name: Relever le compteur
+
+on:
+  schedule:
+    # Quatre fois par jour. Inutile d'être à la minute près : c'est un
+    # chiffre d'affichage, pas une donnée de gestion.
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: compteur
+  cancel-in-progress: false
+
+jobs:
+  relever:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Interroger Brevo
+        id: brevo
+        env:
+          CLE: ${{ secrets.BREVO_API_KEY }}
+        run: |
+          if [ -z "$CLE" ]; then
+            echo "Secret BREVO_API_KEY absent — rien à faire."
+            echo "ok=non" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          reponse=$(curl -s -w '\n%{http_code}' \
+            -H "api-key: $CLE" -H "accept: application/json" \
+            "https://api.brevo.com/v3/contacts?limit=1&offset=0")
+          code=$(printf '%s' "$reponse" | tail -n1)
+          corps=$(printf '%s' "$reponse" | sed '$d')
+
+          if [ "$code" != "200" ]; then
+            echo "Brevo a répondu $code — on ne touche à rien."
+            echo "ok=non" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          nombre=$(printf '%s' "$corps" | jq -r '.count // empty')
+          # Un nombre absent ou non numérique ne doit JAMAIS écraser le
+          # compteur : mieux vaut un chiffre d'hier qu'un « null » à l'écran.
+          case "$nombre" in
+            ''|*[!0-9]*) echo "Compte illisible — on ne touche à rien."
+                         echo "ok=non" >> "$GITHUB_OUTPUT"; exit 0 ;;
+          esac
+
+          echo "nombre=$nombre" >> "$GITHUB_OUTPUT"
+          echo "ok=oui" >> "$GITHUB_OUTPUT"
+          echo "Inscriptions : $nombre"
+
+      - name: Compter aussi les téléchargements publics
+        id: sorties
+        run: |
+          # Gratuit et sans clé : GitHub publie le compte de téléchargements
+          # de chaque fichier de version. Utile à Marc même si le site
+          # n'affiche pas ce chiffre-là.
+          total=$(curl -s -H "accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/releases" \
+            | jq '[.[].assets[].download_count] | add // 0')
+          case "$total" in
+            ''|*[!0-9]*) total=0 ;;
+          esac
+          echo "total=$total" >> "$GITHUB_OUTPUT"
+          echo "Téléchargements : $total"
+
+      - name: Écrire le fichier lu par le site
+        if: steps.brevo.outputs.ok == 'oui'
+        run: |
+          mkdir -p site/donnees
+          cat > site/donnees/compteur.json <<FIN
+          {
+            "inscriptions": ${{ steps.brevo.outputs.nombre }},
+            "telechargements": ${{ steps.sorties.outputs.total }},
+            "releve": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          FIN
+          cat site/donnees/compteur.json
+
+      - name: Publier si le chiffre a bougé
+        if: steps.brevo.outputs.ok == 'oui'
+        run: |
+          if git diff --quiet -- site/donnees/compteur.json; then
+            echo "Aucun changement — pas de publication."
+            exit 0
+          fi
+          git config user.name "Compteur Bingo Studio"
+          git config user.email "actions@users.noreply.github.com"
+          git add site/donnees/compteur.json
+          git commit -m "Compteur : ${{ steps.brevo.outputs.nombre }} inscriptions"
+          git push

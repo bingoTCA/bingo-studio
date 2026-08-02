@@ -193,6 +193,15 @@
       <p class="surtitre" style="margin-bottom:18px">
         Version 1.0.2 · Mac et Windows · 2 août 2026
       </p>
+      <!-- Compteur d'inscriptions. Rempli par .github/workflows/compteur.yml,
+           qui interroge Brevo quatre fois par jour. Reste caché tant que le
+           chiffre est bas : « 2 télévisions » dessert le projet bien plus
+           qu'un silence. -->
+      <p id="compteur" class="compteur" hidden>
+        <strong id="compteur-nombre">0</strong>
+        <span id="compteur-texte">télévisions communautaires ont déjà obtenu Bingo Studio.</span>
+      </p>
+
       <p class="intro">
         Laisse-moi ton courriel et je t'envoie le lien de téléchargement tout
         de suite. C'est gratuit, et ça le restera.
@@ -274,7 +283,7 @@
         Mac et Windows · français · aucun compte à créer dans le logiciel ·
         fonctionne hors ligne<br>
         Déjà inscrit ? <a href="telecharger/">La page de téléchargement est ici</a>,
-        et <a href="https://github.com/bingoTCA/bingo-studio/releases" rel="noopener">toutes
+        et <a href="https://github.com/bingoTCA/bingo-studio/releases" target="_blank" rel="noopener">toutes
         les versions sont sur GitHub</a>.
       </p>
     </div>
@@ -550,7 +559,7 @@
       </p>
 
       <div class="boutons">
-        <a class="bouton bouton-fort" id="lien-don" href="https://ko-fi.com/marcoso77" rel="noopener">Contribuer</a>
+        <a class="bouton bouton-fort" id="lien-don" href="https://ko-fi.com/marcoso77" target="_blank" rel="noopener">Contribuer</a>
         <a class="bouton" href="mailto:marcbert@mailo.com?subject=Bingo%20Studio%20—%20mes%20commentaires">Envoyer mes commentaires</a>
       </div>
       <p class="petit">
@@ -595,12 +604,39 @@
       La base de 50 000 cartes est <strong>libre de droits pour les télévisions
       communautaires autonomes</strong> : imprime-la, vends-la, elle est à toi.
     </p>
-    <p class="petit"><a href="https://github.com/bingoTCA/bingo-studio" rel="noopener">Le code source sur GitHub</a></p>
+    <p class="petit"><a href="https://github.com/bingoTCA/bingo-studio" target="_blank" rel="noopener">Le code source sur GitHub</a></p>
   </div>
 </footer>
 
 <script>
   document.getElementById("annee").textContent = new Date().getFullYear();
+
+  // ---------------------------------------------------------------------
+  //  Compteur d'inscriptions
+  //
+  //  Le chiffre vient de donnees/compteur.json, relevé chez Brevo par un
+  //  ouvrage GitHub. La clé d'API ne descend JAMAIS jusqu'ici : elle donnerait
+  //  accès à tout le compte, et une page web n'a pas de cachette.
+  // ---------------------------------------------------------------------
+  (function () {
+    // En dessous de ce seuil, on n'affiche rien. Un compteur qui annonce
+    // « 2 télévisions » dit surtout que personne n'utilise le logiciel —
+    // c'est l'inverse de ce qu'on cherche.
+    const SEUIL = 5;
+
+    fetch("donnees/compteur.json", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        const n = Number(d && d.inscriptions);
+        if (!Number.isFinite(n) || n < SEUIL) return;
+        document.getElementById("compteur-nombre").textContent = n.toLocaleString("fr-CA");
+        document.getElementById("compteur-texte").textContent =
+          n > 1 ? "télévisions communautaires ont déjà obtenu Bingo Studio."
+                : "télévision communautaire a déjà obtenu Bingo Studio.";
+        document.getElementById("compteur").hidden = false;
+      })
+      .catch(function () { /* pas de compteur : la page vit très bien sans */ });
+  })();
 
   // ---------------------------------------------------------------------
   //  Inscription — garder la personne sur le site

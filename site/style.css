@@ -286,6 +286,19 @@ code {
   padding: 1px 6px;
 }
 
+/* ---------- Compteur d'inscriptions ---------- */
+.compteur {
+  display: inline-flex; align-items: baseline; gap: 10px;
+  border: 1px solid rgba(255,215,0,.35);
+  background: rgba(255,215,0,.08);
+  border-radius: 999px; padding: 10px 20px; margin-bottom: 20px;
+}
+.compteur strong {
+  font-family: Impact, "Haettenschweiler", "Arial Narrow Bold", sans-serif;
+  font-size: 30px; color: var(--jaune); letter-spacing: 1px;
+}
+.compteur span { color: var(--texte-doux); font-size: 15px; }
+
 /* ---------- Inscription : après l'envoi ---------- */
 
 /* Le cadre qui reçoit la réponse de Brevo. Pas display:none — un iframe

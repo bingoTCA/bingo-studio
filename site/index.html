@@ -14,7 +14,11 @@
 
 <header class="entete">
   <div class="dedans entete-dedans">
-    <a class="marque" href="/">Bingo&nbsp;Studio</a>
+    <!-- « ./ » et non « / » : le site vit sous /bingo-studio/, pas à la racine
+         du domaine. Une barre oblique seule menait sur bingotca.github.io,
+         où il n'y a rien — donc sur un 404. Le chemin relatif suivra le site
+         partout, y compris le jour où il déménagera sur un domaine à nous. -->
+    <a class="marque" href="./">Bingo&nbsp;Studio</a>
     <nav>
       <a href="#autonomie">Autonomie</a>
       <a href="#telecharger">Télécharger</a>
@@ -202,13 +206,14 @@
         <span id="compteur-texte">télévisions communautaires ont déjà obtenu Bingo Studio.</span>
       </p>
 
-      <!-- On décrit ce qui se passe VRAIMENT : le formulaire ouvre la page de
-           téléchargement dans la seconde. Ne rien promettre par courriel tant
-           que l'envoi n'est pas confirmé de bout en bout — une promesse non
-           tenue au premier contact coûte plus cher qu'une promesse absente. -->
+      <!-- Les deux promesses sont vérifiées de bout en bout : la page s'ouvre
+           dans la seconde, et le courriel est livré (SPF, DKIM et DMARC
+           authentifiés sur myprospire.app). On ne réécrit ceci que parce que
+           l'envoi a été confirmé — pas avant. -->
       <p class="intro">
         Laisse-moi ton courriel et <strong>la page de téléchargement s'ouvre
-        tout de suite</strong>. C'est gratuit, et ça le restera.
+        tout de suite</strong>. Tu recevras aussi le lien par courriel, pour le
+        retrouver plus tard. C'est gratuit, et ça le restera.
       </p>
       <p class="intro">
         Pourquoi passer par là plutôt que par un bouton direct ? Pour savoir

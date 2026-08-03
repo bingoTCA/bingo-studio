@@ -1,0 +1,134 @@
+<!doctype html>
+<!-- =====================================================================
+     Courriel de confirmation d'inscription — modèle Brevo n° 1.
+
+     C'est le PREMIER message qu'une télévision communautaire reçoit du
+     projet. Il doit donner le lien, prévenir de l'avertissement au premier
+     lancement, et donner un visage à qui écrire.
+
+     Contraintes du courriel, qui expliquent le balisage démodé : pas de
+     flexbox ni de grid, pas de feuille de style externe, tout en tableaux
+     et en styles à même les balises. Outlook lit encore le HTML avec le
+     moteur de Word.
+
+     Pour l'installer, voir courriels/LISEZ-MOI.md
+     ===================================================================== -->
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Ton lien de téléchargement — Bingo Studio</title>
+</head>
+<body style="margin:0; padding:0; background:#f4f4f6;">
+<table width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f4f4f6;">
+<tr><td align="center" style="padding:24px 12px;">
+
+  <table width="560" cellspacing="0" cellpadding="0" border="0" style="max-width:560px; width:100%; background:#ffffff; border-radius:12px; overflow:hidden;">
+
+    <!-- En-tête -->
+    <tr>
+      <td align="center" style="background:#2a1456; padding:28px 24px;">
+        <div style="font-family:Impact,'Haettenschweiler','Arial Narrow Bold',sans-serif; font-size:30px; letter-spacing:1px; color:#ffffff;">
+          BINGO STUDIO
+        </div>
+        <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#ffd700; padding-top:6px; letter-spacing:1px;">
+          COMMUNAUTAIRE
+        </div>
+      </td>
+    </tr>
+
+    <!-- Corps -->
+    <tr>
+      <td style="padding:32px 32px 8px; font-family:Helvetica,Arial,sans-serif; font-size:16px; line-height:26px; color:#2f2f38;">
+        <p style="margin:0 0 18px;">Bonjour {{ contact.NOM }},</p>
+        <p style="margin:0 0 18px;">
+          Merci de ton intérêt pour Bingo Studio. Voici ton lien de
+          téléchargement — garde ce courriel, tu le retrouveras facilement.
+        </p>
+      </td>
+    </tr>
+
+    <!-- Bouton -->
+    <tr>
+      <td align="center" style="padding:14px 32px 8px;">
+        <table cellspacing="0" cellpadding="0" border="0">
+          <tr>
+            <td align="center" bgcolor="#ffd700" style="border-radius:10px;">
+              <a href="https://bingotca.github.io/bingo-studio/telecharger/"
+                 style="display:inline-block; padding:15px 34px; font-family:Helvetica,Arial,sans-serif;
+                        font-size:17px; font-weight:bold; color:#2a1456; text-decoration:none;">
+                Télécharger Bingo Studio
+              </a>
+            </td>
+          </tr>
+        </table>
+        <div style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#8a8a96; padding-top:12px;">
+          Mac et Windows &middot; gratuit &middot; fonctionne hors ligne
+        </div>
+      </td>
+    </tr>
+
+    <!-- L'avertissement au premier lancement : c'est LE moment où une
+         station abandonne si personne ne l'a prévenue. -->
+    <tr>
+      <td style="padding:26px 32px 8px; font-family:Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#2f2f38;">
+        <table width="100%" cellspacing="0" cellpadding="0" border="0"
+               style="background:#fff8e1; border-left:4px solid #ffd700; border-radius:0 8px 8px 0;">
+          <tr>
+            <td style="padding:16px 18px;">
+              <strong>Au premier lancement, ton ordinateur va râler.</strong><br>
+              Il dira qu'il ne reconnaît pas le développeur. C'est normal : faire
+              signer un logiciel coûte une centaine de dollars par année chez
+              Apple et autant chez Microsoft, et ce projet est donné. La marche à
+              suivre — une seule fois, deux clics — est expliquée sur la page de
+              téléchargement.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- Ce qu'il y a dedans -->
+    <tr>
+      <td style="padding:24px 32px 8px; font-family:Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#2f2f38;">
+        <p style="margin:0 0 10px;"><strong>Ce que tu as entre les mains :</strong></p>
+        <ul style="margin:0 0 4px; padding-left:20px;">
+          <li style="padding-bottom:6px;">L'habillage à l'antenne — tableau, boule, figure, prix, gagnants, incrustation caméra</li>
+          <li style="padding-bottom:6px;">La vérification d'une carte pendant que la personne est encore au téléphone</li>
+          <li style="padding-bottom:6px;">Une base de <strong>50&nbsp;000 cartes libres de droits</strong>, à imprimer toi-même en PDF</li>
+          <li style="padding-bottom:6px;">Tes couleurs, ton logo, tes parties — et l'export de tes réglages</li>
+        </ul>
+      </td>
+    </tr>
+
+    <!-- Le mot personnel -->
+    <tr>
+      <td style="padding:22px 32px 32px; font-family:Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#2f2f38;">
+        <p style="margin:0 0 14px;">
+          Essaie-le sans rien devoir. Si quelque chose cloche ou manque,
+          <strong>écris-moi</strong> : le logiciel est bâti à partir d'une page
+          blanche, je peux l'ajuster pour ta station.
+        </p>
+        <p style="margin:0;">
+          Marc Bert<br>
+          <a href="mailto:bingo@myprospire.app" style="color:#6b3fa0;">bingo@myprospire.app</a>
+        </p>
+      </td>
+    </tr>
+
+    <!-- Pied -->
+    <tr>
+      <td align="center" style="background:#f4f4f6; padding:20px 28px; font-family:Helvetica,Arial,sans-serif; font-size:12px; line-height:20px; color:#8a8a96;">
+        Bingo Studio — construit en Gaspésie, pour les bingos communautaires.<br>
+        Offert gratuitement aux télévisions communautaires autonomes du Québec.<br>
+        <a href="https://bingotca.github.io/bingo-studio/" style="color:#6b3fa0;">Le site</a>
+      </td>
+    </tr>
+
+  </table>
+
+</td></tr>
+</table>
+</body>
+</html>

@@ -76,9 +76,9 @@ Bouton **Paramètres**, en haut à droite. Tout part à l'antenne immédiatement
 | **Zone caméra** | La couleur d'incrustation — bleu pur par défaut, vert si ta régie key en vert. Masquable |
 | **Date et heure** | Heure du Québec, quelle que soit la machine. Masquable |
 | **Bandeau défilant** | Au choix : **tes messages** (un par ligne) **ou** un vrai **flux RSS**. Jamais les deux mélangés. Durée du passage réglable |
-| **Publicités** | Images téléversées, réduites en JPEG 1280×720. Délai entre les changements réglable. Une seule image reste fixe |
+| **Publicités** | Un **dossier** sur l'ordinateur : le logiciel y prend images et vidéos et les passe en boucle. Les images tiennent le délai réglé, les vidéos jouent jusqu'au bout. Format conseillé 1920 × 1080 |
 | **Sons** | Clochette, fanfare, musique, et les deux volumes |
-| **Fond de l'antenne** | Une **image** ou une **vidéo MP4 en boucle** par-dessus le dégradé, avec réglage de transparence. Sans média, le dégradé s'affiche seul |
+| **Fond de l'antenne** | Un fond est **livré avec le logiciel**, à 60 % de transparence. Remplaçable par une **image** ou une **vidéo MP4 en boucle** ; « Retirer le fond » rend le dégradé seul |
 | **Génériques** | Textes de début et de fin, **règlement du bingo**, **musiques** jouées en boucle, vitesse de défilement |
 | **Textes** | Titre, **un ou plusieurs téléphones** (côte à côte dans le même bloc), mention de commandite |
 | **Parties** | Nom, figure et lot de chaque partie de la session |
@@ -123,6 +123,27 @@ référence : une musique de 200 Ko déposée laisse la sauvegarde à 4 Ko.
 L'habillage appartient à la station, pas à la session : « Réinitialiser le
 jeu » efface les numéros et les gagnants, mais **garde le logo et les
 couleurs**.
+
+### Les publicités viennent d'un dossier
+
+La station choisit un dossier sur son ordinateur. Le logiciel y prend les
+images et les vidéos et les passe en boucle tant qu'on n'a pas repris
+l'antenne. Elle remplace ses pubs en **déposant des fichiers**, sans rouvrir le
+logiciel ni rien réimporter — réimporter une à une chaque semaine, c'est une
+corvée qu'on finit par ne plus faire.
+
+- Les **images** tiennent le nombre de secondes réglé.
+- Les **vidéos** jouent **jusqu'au bout** avant de passer à la suivante :
+  couper une pub payée au milieu, c'est fâcher le commanditaire. Elles sont
+  muettes — le son de l'antenne appartient au bingo.
+- L'**ordre suit les noms de fichiers**. Nommer `01-…`, `02-…` suffit à le
+  maîtriser.
+- Format conseillé **1920 × 1080**. Un fichier d'un autre format s'affiche en
+  entier sur fond noir plutôt que rogné : une pub tronquée, c'est un
+  commanditaire mécontent.
+
+Le serveur local sert ce dossier — et lui seul — sur `/pubs/`. Il ne retient
+que le nom de base : un `../../` dans l'adresse ne remonte nulle part.
 
 ## Envoyer l'antenne à la diffusion
 
@@ -186,6 +207,37 @@ le lot, réordonner avec ↑ ↓, supprimer.
 Les parties, les textes et l'habillage appartiennent à la **station**, pas à la
 session : « Réinitialiser le jeu » efface les numéros et les gagnants, mais tu
 retrouves ta formule telle quelle à la prochaine ouverture.
+
+## Vérifier une carte à l'antenne
+
+Bouton **Vérification**. Le carré d'incrustation disparaît et laisse la place à
+un bloc *Vérification de la carte*, au centre de l'écran, aux couleurs de
+l'ambiance de la station.
+
+Il **suit la frappe en direct** : le numéro se compose à l'écran pendant que
+l'opératrice le tape, puis la carte apparaît avec ses numéros déjà sortis et le
+verdict. C'est ce qui remplace la voix de l'animateur, qui n'a rien à dire
+pendant qu'on cherche.
+
+Une **musique part en même temps**, à trois fois le volume du fond sonore. Sans
+elle, le téléspectateur n'entendrait rien du tout pendant la recherche. Elle
+suspend le fond et le rend au retour.
+
+**Retour à l'antenne** referme le bloc et rend l'incrustation.
+
+### Plusieurs gagnants sur une même partie
+
+**Valider le gagnant** l'ajoute au bloc *Gagnants*. Le lot de la partie se
+divise entre tous ses gagnants et **se recalcule à chaque ajout** : le premier
+annoncé voit sa part diminuer quand un deuxième appelle. C'est la règle
+habituelle du bingo, et elle est écrite dans le règlement livré par défaut.
+
+Sans nom saisi, c'est le numéro de carte qui s'affiche. Une même carte validée
+deux fois est refusée — c'est un double clic, pas un deuxième gagnant.
+
+La liste se **resserre par paliers** à mesure qu'elle s'allonge. Un bingo peut
+faire quinze gagnants dans une soirée et le bloc a une hauteur fixe : dix noms
+un peu petits valent mieux que six gros et quatre invisibles.
 
 ## Vérifier une carte
 

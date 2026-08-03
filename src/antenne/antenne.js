@@ -114,11 +114,18 @@ function appliquerTheme(theme) {
 let signatureFond = "";
 let urlFond = null;
 
+const FOND_LIVRE = "/assets/fond-defaut.jpg";
+
 async function majFondMedia(reglages) {
   const fiche = reglages.video ?? reglages.image ?? null;
+  // Aucun média déposé : on retombe sur le fond livré avec le logiciel,
+  // sauf si la station l'a explicitement retiré.
+  const livre = !fiche && reglages.livre !== false;
+
   // Signature : on ne relit le fichier que s'il change réellement. Sans ça,
   // chaque boule tirée relancerait la vidéo depuis le début.
-  const signature = fiche ? `${fiche.cle}|${reglages.opacite}` : "";
+  const signature = fiche ? `${fiche.cle}|${reglages.opacite}`
+                  : livre ? `livre|${reglages.opacite}` : "";
   if (signature === signatureFond) return;
   signatureFond = signature;
 
@@ -128,6 +135,14 @@ async function majFondMedia(reglages) {
   img.hidden = true; video.hidden = true;
   video.removeAttribute("src");
   img.removeAttribute("src");
+
+  if (livre) {
+    img.src = FOND_LIVRE;
+    img.hidden = false;
+    boite.style.opacity = String(reglages.opacite);
+    boite.hidden = false;
+    return;
+  }
 
   if (!fiche) { boite.hidden = true; return; }
 

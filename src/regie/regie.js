@@ -421,6 +421,14 @@ function dessinerParametresTheme() {
   sons.reglerVolumes({ effets: t.sons.volumeEffets, musique: t.sons.volumeMusique });
 
   // Fond image ou vidéo
+  const fondPropre = t.fondMedia.image || t.fondMedia.video;
+  $("reg-fond-livre").textContent = fondPropre
+    ? "Ton média remplace le fond livré avec le logiciel."
+    : t.fondMedia.livre !== false
+      ? "Le fond livré avec le logiciel est affiché. Dépose le tien pour le remplacer."
+      : "Aucun fond — le dégradé s'affiche seul.";
+  $("btn-fond-livre").hidden = Boolean(fondPropre) || t.fondMedia.livre !== false;
+
   $("reg-fond-image-nom").textContent = t.fondMedia.image
     ? `${t.fondMedia.image.nom} · ${medias.formaterTaille(t.fondMedia.image.taille)}` : "Aucune image";
   $("reg-fond-video-nom").textContent = t.fondMedia.video
@@ -1237,12 +1245,20 @@ function brancherParametres() {
       const ancienne = theme().fondMedia[type];
       if (ancienne) await medias.retirer(ancienne.cle);
       theme().fondMedia[type] = await medias.deposer(`fond-${type}`, fichier);
+      // La station a mis le sien : le fond livré s'efface.
+      theme().fondMedia.livre = false;
       dessinerParametresTheme();
       dire(`${type === "video" ? "Vidéo" : "Image"} de fond en place.`, "ok");
       pousser();
     } catch (err) {
       dire(`Impossible d'enregistrer ce fichier (${err.message}).`, "erreur");
     }
+  };
+  $("btn-fond-livre").onclick = () => {
+    theme().fondMedia.livre = true;
+    dessinerParametresTheme();
+    dire("Fond livré remis en place.", "ok");
+    pousser();
   };
   $("reg-fond-image").onchange = deposerFond("image");
   $("reg-fond-video").onchange = deposerFond("video");
@@ -1253,8 +1269,11 @@ function brancherParametres() {
       if (fiche) await medias.retirer(fiche.cle);
       theme().fondMedia[type] = null;
     }
+    // « Retirer » veut dire retirer : sans ça, on retomberait sur le fond
+    // livré et le bouton n'aurait l'air de rien faire.
+    theme().fondMedia.livre = false;
     dessinerParametresTheme();
-    dire("Le fond revient au dégradé.", "ok");
+    dire("Le fond revient au dégradé seul.", "ok");
     pousser();
   };
   $("reg-fond-opacite").oninput = () => {

@@ -91,7 +91,11 @@ export function themeNeuf() {
     fondMedia: {
       image: null,           // fiche { cle, nom, type, taille }
       video: null,
-      opacite: 0.45          // 0 = invisible, 1 = couvre le dégradé
+      // Le logiciel est livré avec un fond, pour qu'une station branchée
+      // le dimanche matin ait déjà l'air de quelque chose. Dès qu'elle
+      // dépose le sien, `livre` passe à false et le fond fourni s'efface.
+      livre: true,
+      opacite: 0.60          // 0 = invisible, 1 = couvre le dégradé
     },
 
     // Génériques de début et de fin

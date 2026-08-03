@@ -74,6 +74,19 @@
         <button id="btn-son-regie" class="bouton">Son régie</button>
       </div>
       <p id="etat-antenne" class="aide">Le jeu est à l'antenne.</p>
+
+      <!-- Entracte : « on revient dans 5 minutes ». Le rebours occupe la
+           pause au lieu de laisser un écran muet, et remplit le temps mort
+           avec les pubs des commanditaires. -->
+      <div class="rebours-reglage">
+        <label for="reb-minutes">Entracte</label>
+        <input id="reb-minutes" type="number" min="1" max="60" step="1" value="5">
+        <span class="aide">minutes</span>
+        <button id="btn-rebours" class="bouton bouton-primaire">Lancer le rebours</button>
+      </div>
+      <label class="case-a-cocher"><input id="reb-pubs" type="checkbox" checked> Passer les publicités pendant l'entracte</label>
+      <label class="case-a-cocher"><input id="reb-gros" type="checkbox" checked> Afficher le rebours à l'antenne</label>
+      <p id="reb-etat" class="aide"></p>
     </section>
 
     <section class="bloc">
@@ -241,6 +254,31 @@
       <label class="reg-angle">Chaque <strong>image</strong> reste <span id="reg-pubs-secondes-val">8</span> s
         <input id="reg-pubs-secondes" type="range" min="2" max="60" step="1">
       </label>
+
+      <label>Le son pendant les publicités</label>
+      <div class="reg-choix">
+        <label class="case-a-cocher">
+          <input type="radio" name="pubs-son" value="videos" id="reg-pubs-son-videos">
+          <span>Le son des vidéos</span>
+        </label>
+        <label class="case-a-cocher">
+          <input type="radio" name="pubs-son" value="musique" id="reg-pubs-son-musique">
+          <span>Ma musique</span>
+        </label>
+        <label class="case-a-cocher">
+          <input type="radio" name="pubs-son" value="aucun" id="reg-pubs-son-aucun">
+          <span>Silence</span>
+        </label>
+      </div>
+      <div class="reg-medias">
+        <div>
+          <label class="bouton bouton-fichier">
+            Musique des pubs…
+            <input id="reg-pubs-musique" type="file" accept="audio/*" hidden>
+          </label>
+          <p id="reg-pubs-musique-nom" class="aide">Aucune musique</p>
+        </div>
+      </div>
       <p class="aide">Les vidéos, elles, jouent jusqu'au bout avant de passer à
          la suivante — couper une pub payée au milieu, c'est fâcher le
          commanditaire. Elles sont muettes : le son appartient au bingo.</p>
@@ -305,6 +343,24 @@
       <textarea id="reg-gen-fin" rows="3"></textarea>
       <label class="reg-angle">Durée d'un défilement : <span id="reg-gen-vitesse-val">60</span> s
         <input id="reg-gen-vitesse" type="range" min="15" max="240" step="5">
+      </label>
+
+      <h3 id="titre-rebours">Compte à rebours d'entracte</h3>
+      <p class="aide">Une musique <strong>choisie</strong>, pas tirée au hasard :
+         un compte à rebours veut une pièce qui monte. Elle entre en fondu au
+         départ et sort en fondu à l'arrivée à zéro.</p>
+      <div class="reg-medias">
+        <div>
+          <label class="bouton bouton-fichier">
+            Musique du rebours…
+            <input id="reg-rebours-musique" type="file" accept="audio/*" hidden>
+          </label>
+          <p id="reg-rebours-musique-nom" class="aide">Aucune musique</p>
+        </div>
+        <button id="btn-rebours-musique-retirer" class="bouton bouton-danger">Retirer</button>
+      </div>
+      <label class="reg-angle"><span>Volume du rebours : <span id="reg-rebours-volume-val">55</span> %</span>
+        <input id="reg-rebours-volume" type="range" min="0" max="100" step="5">
       </label>
 
       <h3 id="titre-impression">Imprimer les cartes</h3>

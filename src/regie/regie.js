@@ -404,6 +404,20 @@ function dessinerParametresTheme() {
   majEtatBandeau(t);
   majResumeExport();   // le poids du fichier change dès qu'un média est déposé
 
+  // Son des pubs et musique du rebours
+  const son = t.pubs.son ?? "videos";
+  $("reg-pubs-son-videos").checked = son === "videos";
+  $("reg-pubs-son-musique").checked = son === "musique";
+  $("reg-pubs-son-aucun").checked = son === "aucun";
+  $("reg-pubs-musique-nom").textContent = t.pubs.musique
+    ? `${t.pubs.musique.nom} · ${medias.formaterTaille(t.pubs.musique.taille)}`
+    : "Aucune musique";
+  $("reg-rebours-musique-nom").textContent = t.compteur?.musique
+    ? `${t.compteur.musique.nom} · ${medias.formaterTaille(t.compteur.musique.taille)}`
+    : "Aucune musique";
+  $("reg-rebours-volume").value = Math.round((t.compteur?.volume ?? 0.55) * 100);
+  $("reg-rebours-volume-val").textContent = Math.round((t.compteur?.volume ?? 0.55) * 100);
+
   // Pubs
   $("reg-pubs-secondes").value = t.pubs.secondes;
   $("reg-pubs-secondes-val").textContent = t.pubs.secondes;
@@ -1182,6 +1196,47 @@ function brancherParametres() {
   $("btn-rss-tester").onclick = chargerRss;
 
   // --- Pubs ---
+  for (const id of ["reg-pubs-son-videos", "reg-pubs-son-musique", "reg-pubs-son-aucun"]) {
+    $(id).onchange = () => {
+      theme().pubs.son = document.querySelector('input[name="pubs-son"]:checked')?.value ?? "videos";
+      pousserLeger();
+    };
+  }
+
+  // Une musique choisie pour les pubs, une autre pour le rebours. Elles
+  // vivent dans le magasin comme les autres médias.
+  const deposerMusique = (chemin, etiquette) => async (e) => {
+    const fichier = e.target.files?.[0];
+    e.target.value = "";
+    if (!fichier) return;
+    try {
+      const cible = chemin === "pubs" ? theme().pubs : theme().compteur;
+      if (cible.musique) await medias.retirer(cible.musique.cle);
+      cible.musique = await medias.deposer(`musique-${chemin}`, fichier);
+      dessinerParametresTheme();
+      dire(`${etiquette} en place.`, "ok");
+      pousser();
+    } catch (err) {
+      dire(`Impossible d'enregistrer ce fichier (${err.message}).`, "erreur");
+    }
+  };
+  $("reg-pubs-musique").onchange = deposerMusique("pubs", "Musique des publicités");
+  $("reg-rebours-musique").onchange = deposerMusique("rebours", "Musique du rebours");
+
+  $("btn-rebours-musique-retirer").onclick = async () => {
+    const m = theme().compteur?.musique;
+    if (m) await medias.retirer(m.cle);
+    theme().compteur.musique = null;
+    dessinerParametresTheme();
+    dire("Musique du rebours retirée.", "ok");
+    pousser();
+  };
+  $("reg-rebours-volume").oninput = () => {
+    theme().compteur.volume = Number($("reg-rebours-volume").value) / 100;
+    $("reg-rebours-volume-val").textContent = $("reg-rebours-volume").value;
+    pousserLeger();
+  };
+
   $("btn-pubs-dossier").onclick = () => choisirDossierPubs();
   $("btn-pubs-relire").onclick = () => relireDossierPubs();
   $("btn-pubs-oublier").onclick = () => {
@@ -1528,6 +1583,18 @@ function brancher() {
   $("verif-num").addEventListener("keydown", (e) => {
     if (e.key === "Enter") { e.preventDefault(); montrerCarte(); }
   });
+  $("btn-rebours").onclick = () => (resteRebours() ? arreterRebours() : lancerRebours());
+  for (const id of ["reb-pubs", "reb-gros"]) {
+    $(id).onchange = () => {
+      if (!resteRebours()) return;
+      etat.rebours.avecPubs = $("reb-pubs").checked;
+      etat.rebours.enGros = $("reb-gros").checked;
+      theme().pubs.actif = etat.rebours.avecPubs;
+      majEtatRebours();
+      pousser();
+    };
+  }
+
   $("btn-verification").onclick = ouvrirVerification;
   $("btn-retour-antenne").onclick = fermerVerification;
   $("btn-valider").onclick = validerGagnant;
@@ -1704,6 +1771,76 @@ function brancher() {
  * Il n'y a pas de voix d'animateur pendant une vérification : sans musique,
  * le téléspectateur n'entend rien du tout pendant que l'opératrice cherche.
  */
+// ---------------------------------------------------------------------
+//  Compte à rebours d'entracte
+// ---------------------------------------------------------------------
+
+let minuterieRebours = null;
+
+function resteRebours() {
+  const fin = etat.rebours?.finLe;
+  return fin ? Math.max(0, Math.ceil((fin - Date.now()) / 1000)) : 0;
+}
+
+function majEtatRebours() {
+  const s = resteRebours();
+  const ligne = $("reb-etat");
+  const bouton = $("btn-rebours");
+
+  if (!s) {
+    bouton.textContent = "Lancer le rebours";
+    bouton.classList.remove("bouton-danger");
+    bouton.classList.add("bouton-primaire");
+    ligne.textContent = "";
+    ligne.classList.remove("aide-alerte");
+    return;
+  }
+  bouton.textContent = "Arrêter le rebours";
+  bouton.classList.add("bouton-danger");
+  bouton.classList.remove("bouton-primaire");
+  ligne.textContent = `Entracte en cours — ${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")} restant.`
+    + (etat.rebours.avecPubs ? " Les pubs tournent." : "");
+  ligne.classList.add("aide-alerte");
+}
+
+function lancerRebours() {
+  const minutes = Math.min(60, Math.max(1, Number($("reb-minutes").value) || 5));
+  etat.rebours = {
+    minutes,
+    finLe: Date.now() + minutes * 60000,
+    avecPubs: $("reb-pubs").checked,
+    enGros: $("reb-gros").checked
+  };
+  // Les pubs partent avec le rebours si la case est cochée.
+  if (etat.rebours.avecPubs) theme().pubs.actif = true;
+  dire(`Entracte de ${minutes} minute${minutes > 1 ? "s" : ""} lancé.`, "ok");
+  pousser();
+  suivreRebours();
+}
+
+function arreterRebours(auto = false) {
+  clearInterval(minuterieRebours);
+  minuterieRebours = null;
+  const avecPubs = etat.rebours?.avecPubs;
+  etat.rebours = { ...etat.rebours, finLe: null };
+  // Fin de l'entracte : on rend l'antenne à l'incrustation, comme demandé.
+  if (avecPubs) theme().pubs.actif = false;
+  dire(auto ? "Entracte terminé — retour à l'antenne." : "Entracte interrompu.", "ok");
+  majEtatRebours();
+  pousser();
+}
+
+/** La régie surveille la fin pour rendre l'antenne toute seule. */
+function suivreRebours() {
+  clearInterval(minuterieRebours);
+  if (!resteRebours()) { majEtatRebours(); return; }
+  minuterieRebours = setInterval(() => {
+    if (!resteRebours()) arreterRebours(true);
+    else majEtatRebours();
+  }, 500);
+  majEtatRebours();
+}
+
 function ouvrirVerification() {
   etat.modeVerification = true;
   etat.verification = verification;
@@ -1853,6 +1990,13 @@ async function demarrer() {
   // il n'a jamais rien retenu. On le lui redit en silence, sinon « Passer aux
   // pubs » afficherait du noir sans que rien n'explique pourquoi.
   if (window.studio?.presente && theme().pubs.dossier) relireDossierPubs(true);
+
+  // Redémarrage en pleine pause : on reprend le décompte là où il en est,
+  // au lieu de laisser un entracte tourner sans que rien n'y mette fin.
+  $("reb-minutes").value = etat.rebours?.minutes ?? 5;
+  $("reb-pubs").checked = etat.rebours?.avecPubs !== false;
+  $("reb-gros").checked = etat.rebours?.enGros !== false;
+  suivreRebours();
 
   majApercu();
   dessinerVerification();

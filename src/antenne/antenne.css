@@ -259,6 +259,54 @@ body.transparent .scene::before, body.transparent .scene::after { display: none;
 }
 .camera { background: var(--chroma); }
 
+/* --- Compte à rebours d'entracte ---
+   Deux tailles, une seule règle qui change : « .grand ». En pastille, il se
+   pose par-dessus les pubs sans les manger. En grand, il occupe la zone
+   entière — la pause se termine, l'oeil doit revenir. */
+.rebours {
+  position: absolute; inset: 0;
+  display: flex; align-items: flex-end; justify-content: flex-end;
+  padding: 1.2vh 1vw;
+  pointer-events: none; z-index: 3;
+}
+.rebours-dedans {
+  display: flex; flex-direction: column; align-items: center; gap: 0.2vh;
+  background: color-mix(in srgb, var(--ambiance) 78%, #05020a);
+  border: 1px solid var(--accent);
+  border-radius: var(--rayon);
+  padding: 0.8vh 1.2vw;
+  box-shadow: 0 0.4vh 1.6vh rgba(0,0,0,.5);
+}
+.rebours-etiquette {
+  font-size: 1.4vh; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,.7);
+}
+.rebours-temps {
+  font-size: 3.4vh; font-weight: 800; color: var(--accent);
+  font-variant-numeric: tabular-nums; letter-spacing: 1px; line-height: 1;
+}
+
+/* Dernière minute : le rebours prend toute la place. */
+.rebours.grand {
+  align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--ambiance) 62%, #05020a);
+  border-radius: var(--rayon);
+}
+.rebours.grand .rebours-dedans {
+  background: none; border: 0; box-shadow: none; gap: 1vh;
+}
+.rebours.grand .rebours-etiquette { font-size: 2.6vh; letter-spacing: 4px; }
+.rebours.grand .rebours-temps {
+  font-size: 16vh; letter-spacing: 3px;
+  text-shadow: 0 0.6vh 2vh rgba(0,0,0,.55);
+}
+/* Les dix dernières secondes battent — sans clignoter au point de gêner. */
+.rebours.grand.presse .rebours-temps { animation: presse 1s ease-in-out infinite; }
+@keyframes presse { 50% { transform: scale(1.07); opacity: .8; } }
+
+/* La zone doit pouvoir porter le rebours en surimpression. */
+.zone-camera { position: relative; }
+
 /* --- Vérification d'une carte, en plein centre ---
    Elle prend exactement la place du carré d'incrustation : mêmes proportions,
    même cadre. Rien ne bouge autour, seul le contenu change — l'oeil du

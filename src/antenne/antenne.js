@@ -258,8 +258,9 @@ function majPubs(reglages, actives) {
       b.classList.remove("visible");
       video.src = fiche.url;
       video.classList.add("visible");
-      // Muette : le son de l'antenne appartient au bingo, pas aux pubs.
-      video.muted = true;
+      // Le son suit le réglage : celui des vidéos, ou rien si la station a
+      // choisi sa propre musique — deux sources en même temps, c'est illisible.
+      video.muted = reglages.son !== "videos";
       video.currentTime = 0;
       video.play().catch(() => {});
       // Une seule vidéo dans le dossier : on la reboucle plutôt que de
@@ -494,6 +495,127 @@ function dessinerVerification(v, actif) {
 }
 
 // ---------------------------------------------------------------------
+//  Musiques choisies : rebours et publicités
+//
+//  Elles viennent du magasin de médias, pas des pistes livrées : une station
+//  choisit sa musique, on ne la tire pas au sort. Entrée et sortie en fondu —
+//  une musique qui démarre à plein volume fait sursauter.
+// ---------------------------------------------------------------------
+
+function fondreVers(audio, cible, ms, aLaFin) {
+  const depart = audio.volume;
+  const debut = Date.now();
+  clearInterval(audio.__fondu);
+  audio.__fondu = setInterval(() => {
+    const k = Math.min(1, (Date.now() - debut) / ms);
+    try { audio.volume = Math.max(0, Math.min(1, depart + (cible - depart) * k)); }
+    catch { clearInterval(audio.__fondu); return; }
+    if (k >= 1) { clearInterval(audio.__fondu); aLaFin?.(); }
+  }, 50);
+}
+
+/** Un lecteur par usage : le rebours et les pubs ne se marchent pas dessus. */
+function lecteurChoisi(nom) {
+  let audio = null, cle = null, url = null;
+  return {
+    async regler(fiche, volume) {
+      const voulue = fiche?.cle ?? null;
+      if (voulue === cle) {
+        if (audio && voulue) fondreVers(audio, volume, 400);
+        return;
+      }
+      cle = voulue;
+
+      if (audio) {
+        const partante = audio;
+        const urlPartante = url;
+        audio = null; url = null;
+        fondreVers(partante, 0, 900, () => {
+          try { partante.pause(); } catch { /* déjà arrêtée */ }
+          medias.libererUrl(urlPartante);
+        });
+      }
+      if (!voulue) return;
+
+      url = await medias.urlDe(voulue);
+      if (!url) { cle = null; return; }
+      audio = new Audio(url);
+      audio.loop = true;
+      audio.volume = 0;
+      audio.play().catch(() => {});
+      fondreVers(audio, volume, 1200);
+    }
+  };
+}
+
+const musiqueRebours = lecteurChoisi("rebours");
+const musiquePubs = lecteurChoisi("pubs");
+
+// ---------------------------------------------------------------------
+//  Compte à rebours d'entracte
+//
+//  L'antenne ne reçoit qu'une HEURE DE FIN et recalcule le reste toutes les
+//  secondes. Deux avantages : la régie n'a pas à envoyer un message par
+//  seconde, et un rechargement en pleine pause retrouve le bon temps au lieu
+//  de repartir de zéro.
+// ---------------------------------------------------------------------
+
+let minuterieRebours = null;
+let dernierEtat = null;
+
+function secondesRestantes(rebours) {
+  if (!rebours?.finLe) return null;
+  return Math.max(0, Math.ceil((rebours.finLe - Date.now()) / 1000));
+}
+
+function enMinutesSecondes(s) {
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+}
+
+function majRebours(t, etat) {
+  const boite = $("rebours");
+  const reste = secondesRestantes(etat.rebours);
+  const actif = reste !== null && reste > 0 && etat.enOnde !== false;
+
+  boite.hidden = !actif || etat.rebours?.enGros === false;
+  if (!actif) {
+    clearInterval(minuterieRebours);
+    minuterieRebours = null;
+    return;
+  }
+
+  // ⚠️ On relit dernierEtat à chaque battement, jamais l'`etat` capturé au
+  // moment où la minuterie a été créée. Sinon un entracte modifié en cours de
+  // route — durée changée, pubs décochées — continuerait d'afficher l'ancien
+  // décompte : la minuterie n'est créée qu'une fois et garderait à jamais la
+  // première version de l'état.
+  const dessiner = () => {
+    const courant = dernierEtat ?? etat;
+    const s = secondesRestantes(courant.rebours);
+    if (s === null) return;
+    $("rebours-temps").textContent = enMinutesSecondes(s);
+
+    // Option C : en pastille tant que les pubs tournent, en grand dans la
+    // DERNIÈRE MINUTE. Sans pubs, il est en grand tout du long — il n'y a
+    // rien d'autre à regarder.
+    const avecPubs = courant.rebours.avecPubs && listeDesPubs(t.pubs).length > 0;
+    boite.classList.toggle("grand", !avecPubs || s <= 60);
+    boite.classList.toggle("presse", s <= 10);
+
+    if (s <= 0) {
+      clearInterval(minuterieRebours);
+      minuterieRebours = null;
+      // C'est la régie qui décide de la suite : elle seule tient l'état.
+      // L'antenne se contente de ne plus rien afficher.
+      boite.hidden = true;
+    }
+  };
+
+  dessiner();
+  if (!minuterieRebours) minuterieRebours = setInterval(dessiner, 250);
+}
+
+// ---------------------------------------------------------------------
 //  Bandeau défilant
 // ---------------------------------------------------------------------
 
@@ -712,6 +834,24 @@ function rendre(etat) {
   const enVerification = !coupe && etat.modeVerification === true;
   dessinerVerification(etat.verification, enVerification);
   if (enVerification) { $("camera").hidden = true; $("pubs").hidden = true; }
+
+  // Entracte. Sans pubs cochées, on cache aussi l'incrustation : l'écran
+  // bleu derrière un compte à rebours n'a aucun sens.
+  dernierEtat = etat;
+  majRebours(t, etat);
+
+  // Musique du rebours : seulement pendant l'entracte, et seulement si la
+  // station en a choisi une.
+  const enEntracte = !coupe && secondesRestantes(etat.rebours) > 0;
+  musiqueRebours.regler(enEntracte ? t.compteur?.musique : null, t.compteur?.volume ?? 0.55);
+
+  // Musique des pubs : seulement quand elles passent ET que la station a
+  // choisi « ma musique ». Jamais en même temps que celle du rebours.
+  const pubsAuson = !coupe && !enEntracte && t.pubs.actif
+    && t.pubs.son === "musique" && listeDesPubs(t.pubs).length > 0;
+  musiquePubs.regler(pubsAuson ? t.pubs.musique : null, t.sons.volumeMusique * 2);
+  const enRebours = !coupe && !enVerification && secondesRestantes(etat.rebours) > 0;
+  if (enRebours && !etat.rebours.avecPubs) $("camera").hidden = true;
 }
 
 // ---------------------------------------------------------------------

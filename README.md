@@ -51,6 +51,29 @@ vente chez les détaillants, appel immédiat, vérification en ondes, partage de
 lots, 18 ans et plus. À adapter : les montants, les délais et la licence sont
 propres à chaque organisme.
 
+## L'entracte
+
+Bloc **Contrôles antenne** : une durée en minutes, un bouton, deux cases.
+
+Un bingo télé a des pauses, et pendant ce temps l'écran ne dit rien. Un compte
+à rebours visible, c'est une pratique de vraie télé : le monde sait combien de
+temps attendre et ne change pas de poste.
+
+- **Passer les publicités pendant l'entracte** — la pause se remplit avec le
+  contenu des commanditaires. Un temps mort devient un temps payé.
+- **Afficher le rebours à l'antenne** — il apparaît en **pastille dans un
+  coin** tant que les pubs tournent, puis **en grand au centre dans la
+  dernière minute**. C'est ce que font les chaînes avant un retour de pause :
+  les commanditaires gardent leur temps d'antenne complet, et personne ne rate
+  la reprise.
+
+À zéro, les publicités s'arrêtent et l'incrustation revient toute seule.
+
+Le rebours retient une **heure de fin**, pas un nombre de secondes qui
+décroît. Les deux fenêtres calculent le reste chacune de leur côté : elles ne
+peuvent pas dériver, et un redémarrage en pleine pause retrouve le bon temps
+au lieu de repartir de zéro.
+
 ## Sons
 
 Trois sons : la **clochette** à chaque boule, la **fanfare** à l'annonce d'un
@@ -78,6 +101,8 @@ Bouton **Paramètres**, en haut à droite. Tout part à l'antenne immédiatement
 | **Bandeau défilant** | Au choix : **tes messages** (un par ligne) **ou** un vrai **flux RSS**. Jamais les deux mélangés. Durée du passage réglable |
 | **Publicités** | Un **dossier** sur l'ordinateur : le logiciel y prend images et vidéos et les passe en boucle. Les images tiennent le délai réglé, les vidéos jouent jusqu'au bout. Format conseillé 1920 × 1080 |
 | **Sons** | Clochette, fanfare, musique, et les deux volumes |
+| **Son des publicités** | Celui des vidéos, une musique à soi, ou le silence — réglé une fois pour toutes plutôt qu'à chaque diffusion |
+| **Musique du rebours** | Une pièce **choisie**, jamais tirée au hasard : un compte à rebours veut une musique qui monte. Entrée et sortie en fondu |
 | **Fond de l'antenne** | Un fond est **livré avec le logiciel**, à 60 % de transparence. Remplaçable par une **image** ou une **vidéo MP4 en boucle** ; « Retirer le fond » rend le dégradé seul |
 | **Génériques** | Textes de début et de fin, **règlement du bingo**, **musiques** jouées en boucle, vitesse de défilement |
 | **Textes** | Titre, **un ou plusieurs téléphones** (côte à côte dans le même bloc), mention de commandite |

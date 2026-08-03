@@ -66,6 +66,18 @@
         <video id="pub-video" class="pub-image" playsinline></video>
       </div>
 
+      <!-- Compte à rebours d'entracte. Deux tailles : en pastille dans un
+           coin tant que les pubs tournent, en grand au centre dans la
+           dernière minute — c'est ce que font les vraies chaînes avant un
+           retour de pause. Les commanditaires gardent leur temps d'antenne
+           complet, et personne ne rate la reprise. -->
+      <div id="rebours" class="rebours" hidden>
+        <div class="rebours-dedans">
+          <span class="rebours-etiquette">De retour dans</span>
+          <span id="rebours-temps" class="rebours-temps">0:00</span>
+        </div>
+      </div>
+
       <div id="bloc-verification" class="verif" hidden>
         <div class="verif-entete">
           <svg class="verif-fanion" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

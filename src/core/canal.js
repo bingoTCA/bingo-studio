@@ -74,7 +74,18 @@ export function themeNeuf() {
       dossier: null,         // dossier choisi par la station (Electron)
       fichiers: [],          // [{ nom, url, video }] relus depuis ce dossier
       images: [],            // ancien mode : data URLs téléversées une à une
-      secondes: 8            // durée d'une IMAGE ; une vidéo joue jusqu'au bout
+      secondes: 8,           // durée d'une IMAGE ; une vidéo joue jusqu'au bout
+      // Le son pendant les pubs : celui des vidéos, ou une musique à soi.
+      // Réglé une fois pour toutes ici plutôt qu'à chaque diffusion.
+      son: "videos",         // "videos" | "musique" | "aucun"
+      musique: null          // fiche du magasin, si son === "musique"
+    },
+
+    // Compte à rebours d'entracte : « on revient dans 5 minutes ».
+    compteur: {
+      musique: null,         // fiche du magasin — choisie, jamais au hasard :
+                             // un rebours veut une musique qui monte
+      volume: 0.55
     },
 
     // Sons — l'animateur annonce les numéros en direct, donc pas de voix
@@ -121,7 +132,7 @@ export function fusionnerTheme(sauve) {
   if (!sauve || typeof sauve !== "object") return base;
 
   const sortie = { ...base, ...sauve };
-  for (const groupe of ["bandeau", "pubs", "sons", "generique", "fondMedia"]) {
+  for (const groupe of ["bandeau", "pubs", "sons", "generique", "fondMedia", "compteur"]) {
     sortie[groupe] = { ...base[groupe], ...(sauve[groupe] ?? {}) };
   }
   return sortie;
@@ -162,6 +173,17 @@ export function etatNeuf() {
     annonce: null,        // { texte } affiché en grand sur l'antenne
     verification: null,   // carte en cours de vérification, suivie en direct
     modeVerification: false,  // le bloc de vérification remplace l'incrustation
+
+    // Compte à rebours. On retient l'HEURE DE FIN, pas les secondes qui
+    // restent : les deux fenêtres calculent le reste chacune de leur côté et
+    // ne peuvent pas dériver, et un rechargement en pleine pause retrouve le
+    // bon temps au lieu de repartir de zéro.
+    rebours: {
+      finLe: null,           // horodatage (ms) de la fin, ou null
+      minutes: 5,            // durée réglée, retenue d'une fois à l'autre
+      avecPubs: true,        // les pubs occupent la zone pendant l'entracte
+      enGros: true           // le rebours s'affiche dans la zone d'incrustation
+    },
     ecran: "jeu",         // "jeu" | "debut" | "fin" — générique à l'antenne
     horodatage: [],       // [{ numero, heure }] — journal pour le rapport
     gagnants: [],         // [{ partie, figure, carte, nom, lot, heure }]
@@ -216,6 +238,10 @@ export function restaurer() {
       fusionne.telephones = [etat.telephone.trim()];
     }
     delete fusionne.telephone;
+
+    // `rebours` est un sous-objet : un « ...etat » l'écraserait en entier si
+    // la session vient d'une version qui n'en avait qu'une partie.
+    fusionne.rebours = { ...etatNeuf().rebours, ...(etat.rebours ?? {}) };
 
     return fusionne;
   } catch {

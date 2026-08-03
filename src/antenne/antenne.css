@@ -140,15 +140,18 @@ body.transparent .scene::before, body.transparent .scene::after { display: none;
 /* Un ou plusieurs numéros, côte à côte dans le même bloc. */
 .telephones {
   justify-self: end;
-  display: flex; align-items: stretch; gap: 0.5vw;
+  display: flex; align-items: stretch; gap: 0.6vw;
   background: var(--bloc); border: 1px solid var(--trait);
   border-radius: var(--rayon);
-  padding: 0.6vh 1.2vw;
+  padding: 0.8vh 1.4vw;
 }
 .tel { display: flex; align-items: center; gap: 0.55vw; white-space: nowrap; }
 .tel + .tel { padding-left: 1vw; border-left: 1px solid var(--trait-doux); }
-.tel svg { width: 2.4vh; height: 2.4vh; flex-shrink: 0; color: var(--accent); }
-.tel span { font-size: 2.5vh; color: var(--accent); }
+/* Les téléphones grossis : c'est par eux qu'on appelle pour réclamer un
+   bingo, et une personne âgée doit pouvoir les lire de son fauteuil, de
+   l'autre bout du salon. C'est l'information la plus utile de l'écran. */
+.tel svg { width: 3.4vh; height: 3.4vh; flex-shrink: 0; color: var(--accent); }
+.tel span { font-size: 3.8vh; font-weight: 700; letter-spacing: 0.5px; color: var(--accent); }
 
 /* ===================== Haut : 3 zones ===================== */
 .haut {
@@ -173,7 +176,6 @@ body.transparent .scene::before, body.transparent .scene::after { display: none;
   display: flex; flex-direction: column;
   overflow: hidden;
 }
-.bloc-carte { position: absolute; inset: 0; align-items: center; }
 
 .bloc-titre {
   display: flex; align-items: center; justify-content: center; gap: 0.6vw;
@@ -199,6 +201,25 @@ body.transparent .scene::before, body.transparent .scene::after { display: none;
 .liste-gagnants .g-nom { font-size: 2.6vh; color: #fff; line-height: 1.1; }
 .liste-gagnants .g-detail { font-size: 1.8vh; color: var(--accent); }
 .liste-vide { border-style: dashed !important; color: rgba(255,255,255,.5) !important; }
+
+/* Paliers de resserrement. Un bingo peut faire dix ou quinze gagnants sur une
+   soirée, et le bloc a une hauteur fixe. Plutôt que de rogner les derniers
+   noms — ceux qu'on vient justement d'annoncer —, on réduit par paliers.
+   Dix noms un peu petits valent mieux que six gros et quatre invisibles. */
+.liste-gagnants.serre-1 { gap: 0.45vh; }
+.liste-gagnants.serre-1 li { padding: 0.5vh 0.7vw; }
+.liste-gagnants.serre-1 .g-nom    { font-size: 2.2vh; }
+.liste-gagnants.serre-1 .g-detail { font-size: 1.6vh; }
+
+.liste-gagnants.serre-2 { gap: 0.3vh; }
+.liste-gagnants.serre-2 li { padding: 0.35vh 0.6vw; }
+.liste-gagnants.serre-2 .g-nom    { font-size: 1.8vh; }
+.liste-gagnants.serre-2 .g-detail { font-size: 1.35vh; }
+
+.liste-gagnants.serre-3 { gap: 0.2vh; }
+.liste-gagnants.serre-3 li { padding: 0.25vh 0.5vw; }
+.liste-gagnants.serre-3 .g-nom    { font-size: 1.5vh; }
+.liste-gagnants.serre-3 .g-detail { font-size: 1.15vh; }
 
 /* --- Carte vérifiée ---
    Volontairement simple : 25 cases carrées strictement identiques, aucun
@@ -237,6 +258,81 @@ body.transparent .scene::before, body.transparent .scene::after { display: none;
   border-radius: var(--rayon);
 }
 .camera { background: var(--chroma); }
+
+/* --- Vérification d'une carte, en plein centre ---
+   Elle prend exactement la place du carré d'incrustation : mêmes proportions,
+   même cadre. Rien ne bouge autour, seul le contenu change — l'oeil du
+   téléspectateur n'a pas à se réorienter.
+
+   Les couleurs se déduisent toutes de l'ambiance choisie par la station,
+   comme le reste de l'écran. Une variante plus claire que les autres blocs
+   pour que ça se distingue : c'est le moment fort de la partie. */
+.verif {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  border: 2px solid var(--accent);
+  border-radius: var(--rayon);
+  background:
+    radial-gradient(120% 90% at 50% 0%,
+      color-mix(in srgb, var(--ambiance) 72%, #fff 6%) 0%,
+      color-mix(in srgb, var(--ambiance) 46%, #06030c) 100%);
+  box-shadow: 0 0 0 0.5vh color-mix(in srgb, var(--accent) 14%, transparent);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 1.2vh 1.4vw; overflow: hidden;
+}
+
+.verif-entete {
+  display: flex; align-items: center; justify-content: center; gap: 0.8vw;
+  color: var(--accent); flex-shrink: 0;
+}
+.verif-titre {
+  font-size: 2.4vh; letter-spacing: 3px; text-transform: uppercase; font-weight: 700;
+}
+/* Les fanions battent doucement — assez pour dire « c'est un moment », pas
+   assez pour distraire de la carte. */
+.verif-fanion {
+  width: 2.8vh; height: 2.8vh; flex-shrink: 0;
+  animation: fanion 2.4s ease-in-out infinite;
+}
+.verif-fanion:last-child { animation-delay: 1.2s; }
+@keyframes fanion {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: .85; }
+  50%      { transform: scale(1.18) rotate(-8deg); opacity: 1; }
+}
+
+.verif-numero {
+  display: flex; align-items: baseline; gap: 0.7vw;
+  margin: 0.5vh 0 0.9vh; flex-shrink: 0;
+}
+.verif-numero-etiquette {
+  font-size: 1.8vh; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,.65);
+}
+.verif-numero-valeur {
+  font-size: 4.6vh; font-weight: 800; letter-spacing: 2px; color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.verif-corps {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+/* En attente d'un numéro : un message plutôt qu'un trou noir. */
+.verif-attente {
+  font-size: 2.2vh; color: rgba(255,255,255,.55); text-align: center;
+}
+
+.verif-verdict {
+  flex-shrink: 0; margin-top: 0.8vh; text-align: center;
+  font-size: 2.6vh; font-weight: 700; letter-spacing: 1px;
+}
+.verif-verdict.gagnante {
+  color: #8ef08a;
+  animation: gagnante 1s ease-in-out infinite;
+}
+@keyframes gagnante { 50% { opacity: .55; } }
+.verif-verdict.pas-encore  { color: #fff; font-weight: 400; }
+.verif-verdict.introuvable { color: #ff9d9d; }
 
 /* --- Pubs : les mêmes dimensions, à la place du chroma --- */
 .pubs { position: relative; overflow: hidden; background: #000; }
@@ -290,9 +386,18 @@ body.transparent .scene::before, body.transparent .scene::after { display: none;
   -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 4vw, #000 calc(100% - 4vw), transparent 100%);
           mask-image: linear-gradient(90deg, transparent 0, #000 4vw, #000 calc(100% - 4vw), transparent 100%);
 }
+/* Défilement RÉELLEMENT continu. Auparavant, un « padding-left: 100% »
+   poussait le texte hors de l'écran à droite, et l'animation allait jusqu'à
+   -100 % : il fallait donc attendre que tout soit sorti à gauche ET qu'une
+   largeur d'écran de vide défile avant de revoir le premier message. Sur un
+   bandeau de deux messages, ça faisait de longs silences.
+
+   Maintenant : la piste contient DEUX copies identiques de la liste, et
+   l'animation ne va qu'à -50 %, c'est-à-dire exactement une copie. Au moment
+   où elle boucle, la seconde copie occupe déjà la place de la première —
+   la reprise est invisible. Le seul vide est l'écart normal entre messages. */
 .defilant-piste {
   display: inline-block; white-space: nowrap;
-  padding-left: 100%;
   font-size: 2.2vh; letter-spacing: 1.5px; color: #fff;
   line-height: 4.2vh;
   animation: defile linear infinite;
@@ -300,7 +405,7 @@ body.transparent .scene::before, body.transparent .scene::after { display: none;
 }
 .defilant-item { display: inline-block; margin-right: 6vw; }
 .defilant-item::before { content: "★"; color: var(--accent); margin-right: 1.2vw; }
-@keyframes defile { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+@keyframes defile { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 /* ===================== Centre : formes + tableau ===================== */
 .centre {
@@ -427,10 +532,14 @@ body.transparent .scene::before, body.transparent .scene::after { display: none;
   -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 88%, transparent 100%);
           mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 88%, transparent 100%);
 }
-/* La piste commence par une cale de la hauteur de la fenêtre : en la
-   remontant de 100 % de SA propre hauteur (cale + texte), le texte
-   traverse donc l'écran en entier, du bas vers le haut. Sans la cale,
-   il ne monterait que de sa propre hauteur et ne sortirait jamais. */
+/* Générique en boucle continue, sur le même principe que le bandeau : la
+   piste contient DEUX copies du texte, l'animation ne remonte que de 50 %.
+   Avant, il fallait attendre que tout le générique soit sorti par le haut
+   PUIS qu'un écran entier de vide passe avant de revoir le début — sur un
+   générique court, ça faisait un long écran noir en boucle.
+
+   La cale garde une hauteur d'écran : c'est elle qui sépare la fin d'une
+   copie du début de la suivante, et qui fait entrer le texte par le bas. */
 .gen-piste {
   position: absolute; left: 0; right: 0; top: 0;
   text-align: center; font-size: 3.6vh; line-height: 1.6;
@@ -448,4 +557,4 @@ body.transparent .scene::before, body.transparent .scene::after { display: none;
   color: rgba(255,255,255,.92);
 }
 .gen-piste .gen-etoiles { color: var(--accent); font-size: 3vh; margin: 3vh 0; }
-@keyframes remonte { from { transform: translateY(0); } to { transform: translateY(-100%); } }
+@keyframes remonte { from { transform: translateY(0); } to { transform: translateY(-50%); } }

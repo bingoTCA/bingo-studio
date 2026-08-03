@@ -48,25 +48,41 @@
         </ol>
       </div>
 
-      <!-- Recouvre le bloc gagnants quand l'opératrice montre une carte -->
-      <div id="bloc-carte" class="bloc-cadre bloc-carte" hidden>
-        <div class="bloc-titre">
-          <span>Carte <span id="carte-num">0000</span></span>
-        </div>
-        <div class="carte-zone">
-          <div id="carte-grille" class="carte-grille"></div>
-        </div>
-        <p id="carte-verdict" class="carte-verdict"></p>
-      </div>
     </div>
 
-    <!-- Zone d'incrustation : animateur + caméra du boulier,
-         ou publicités si l'opératrice bascule dessus. -->
+    <!-- Zone centrale. Trois occupants possibles, jamais deux à la fois :
+         l'incrustation caméra (animateur + boulier), les publicités, ou la
+         vérification d'une carte. Pendant une vérification, le carré
+         d'incrustation DISPARAÎT : toute l'attention doit aller à la carte,
+         et l'animateur n'a rien à dire pendant ce temps-là. -->
     <div class="zone-camera">
       <div id="camera" class="camera"></div>
       <div id="pubs" class="pubs" hidden>
         <img id="pub-a" class="pub-image" alt="">
         <img id="pub-b" class="pub-image" alt="">
+      </div>
+
+      <div id="bloc-verification" class="verif" hidden>
+        <div class="verif-entete">
+          <svg class="verif-fanion" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2.2l2.6 5.6 6.1.8-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 8.6l6.1-.8z"/>
+          </svg>
+          <span class="verif-titre">Vérification de la carte</span>
+          <svg class="verif-fanion" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2.2l2.6 5.6 6.1.8-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 8.6l6.1-.8z"/>
+          </svg>
+        </div>
+
+        <div class="verif-numero">
+          <span class="verif-numero-etiquette">Carte n°</span>
+          <span id="verif-numero" class="verif-numero-valeur">————</span>
+        </div>
+
+        <div id="verif-corps" class="verif-corps">
+          <div id="verif-grille" class="carte-grille"></div>
+        </div>
+
+        <p id="verif-verdict" class="verif-verdict"></p>
       </div>
     </div>
 

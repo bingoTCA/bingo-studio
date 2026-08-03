@@ -154,7 +154,8 @@ export function etatNeuf() {
     tirage: [],
     enOnde: true,
     annonce: null,        // { texte } affiché en grand sur l'antenne
-    verification: null,   // carte montrée à l'antenne, si l'animateur le veut
+    verification: null,   // carte en cours de vérification, suivie en direct
+    modeVerification: false,  // le bloc de vérification remplace l'incrustation
     ecran: "jeu",         // "jeu" | "debut" | "fin" — générique à l'antenne
     horodatage: [],       // [{ numero, heure }] — journal pour le rapport
     gagnants: [],         // [{ partie, figure, carte, nom, lot, heure }]

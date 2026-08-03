@@ -184,12 +184,25 @@ function retirerNumero(n) {
 
 function rafraichirVerification() {
   const brut = $("verif-num").value.trim();
-  if (brut === "") { verification = null; dessinerVerification(); return; }
+  if (brut === "") {
+    verification = null;
+    dessinerVerification();
+    // Champ vidé pendant une vérification : l'antenne doit se vider aussi,
+    // sinon la carte précédente reste affichée devant tout le monde.
+    if (etat.modeVerification) { etat.verification = null; pousserLeger(); }
+    return;
+  }
   verification = verifierCarte(catalogue, brut, etat.tirage, partieCourante().figure);
   dessinerVerification();
 
-  // Si la carte est déjà à l'antenne, on la garde à jour au fil des tirages.
-  if (etat.verification && etat.verification.numero === verification.numero) {
+  // Pendant une vérification, l'antenne suit la frappe en direct : le
+  // téléspectateur voit le numéro se composer, puis la carte apparaître.
+  // C'est ce qui remplace la voix de l'animateur.
+  if (etat.modeVerification) {
+    etat.verification = verification;
+    pousserLeger();
+  } else if (etat.verification && etat.verification.numero === verification.numero) {
+    // Hors vérification, on garde seulement à jour une carte déjà affichée.
     etat.verification = verification.statut === "INTROUVABLE" ? null : verification;
   }
 }
@@ -1418,9 +1431,10 @@ function brancher() {
   $("verif-num").addEventListener("keydown", (e) => {
     if (e.key === "Enter") { e.preventDefault(); montrerCarte(); }
   });
-  $("btn-montrer").onclick = montrerCarte;
-  $("btn-cacher").onclick = () => { etat.verification = null; pousser(); };
-  $("btn-annoncer").onclick = annoncerGagnant;
+  $("btn-verification").onclick = ouvrirVerification;
+  $("btn-retour-antenne").onclick = fermerVerification;
+  $("btn-valider").onclick = validerGagnant;
+  $("btn-cartes").onclick = () => ouvrirParametres("titre-impression");
 
   // --- parties ---
   $("partie-figure").onchange = () => {
@@ -1585,42 +1599,74 @@ function brancher() {
   });
 }
 
-function montrerCarte() {
-  if (!verification || verification.statut === "INTROUVABLE") {
-    dire("Saisis d'abord un numéro de carte valide.", "erreur");
-    return;
-  }
+/**
+ * Passe l'antenne en mode vérification : l'incrustation caméra disparaît et
+ * laisse la place au bloc de vérification, qui suit la saisie en direct.
+ *
+ * Une musique part en même temps, plus forte que le fond sonore habituel.
+ * Il n'y a pas de voix d'animateur pendant une vérification : sans musique,
+ * le téléspectateur n'entend rien du tout pendant que l'opératrice cherche.
+ */
+function ouvrirVerification() {
+  etat.modeVerification = true;
   etat.verification = verification;
-  dire(`Carte ${verification.numero} affichée à l'antenne.`, "ok");
+  dire("Vérification à l'antenne. Tape le numéro : il s'affiche en direct.", "ok");
   pousser();
 }
 
-function annoncerGagnant() {
+function fermerVerification() {
+  etat.modeVerification = false;
+  etat.verification = null;
+  dire("Retour à l'antenne.", "ok");
+  pousser();
+}
+
+function validerGagnant() {
   if (!verification || verification.statut !== "GAGNANTE") {
-    dire("Cette carte n'est pas gagnante — rien n'a été annoncé.", "erreur");
+    dire("Cette carte n'est pas gagnante — rien n'a été validé.", "erreur");
     return;
   }
+  // Un même numéro validé deux fois, c'est un double clic ou une carte déjà
+  // appelée. On refuse plutôt que de partager le lot avec un fantôme.
   const partie = partieCourante();
-  const lot = Number(partie.lot || 0);
+  if ((etat.gagnants ?? []).some((g) => g.carte === verification.numero && g.partie === partie.nom)) {
+    dire(`La carte ${verification.numero} est déjà gagnante de cette partie.`, "erreur");
+    return;
+  }
 
   const nom = $("verif-nom").value.trim();
+  const numero = verification.numero;   // relevé AVANT de vider la vérification
 
   etat.gagnants = etat.gagnants ?? [];
   etat.gagnants.push({
     partie: partie.nom, figure: partie.figure,
-    carte: verification.numero, nom, lot, heure: heureQuebec()
+    carte: numero, nom, lot: Number(partie.lot || 0), heure: heureQuebec()
   });
+
+  // Le lot se partage entre tous les gagnants de la partie, et se recalcule
+  // à chaque ajout. L'antenne fait le même calcul de son côté.
+  const memePartie = etat.gagnants.filter((g) => g.partie === partie.nom);
+  const part = Number(partie.lot || 0) / memePartie.length;
+
   etat.annonce = {
-    texte: `BINGO !\n${nom ? nom + "\n" : ""}Carte ${verification.numero}`
-      + (lot ? ` — ${lot.toLocaleString("fr-CA")} $` : "")
+    texte: `BINGO !\n${nom || `Carte ${numero}`}`
+      + (part ? `\n${part.toLocaleString("fr-CA", { maximumFractionDigits: 2 })} $` : "")
+      + (memePartie.length > 1 ? `\n(lot partagé à ${memePartie.length})` : "")
   };
   $("verif-nom").value = "";
-  etat.verification = verification;
-  dire(`Gagnant annoncé : carte ${verification.numero}. Reclique « Annoncer » pour retirer l'annonce.`, "ok");
+  $("verif-num").value = "";
+  verification = null;
+
+  dire(memePartie.length > 1
+    ? `Gagnant validé. Lot partagé à ${memePartie.length} — chacun ${part.toLocaleString("fr-CA", { maximumFractionDigits: 2 })} $.`
+    : `Gagnant validé : ${nom || `carte ${numero}`}.`, "ok");
+
+  rafraichirVerification();
   pousser();
 
-  // La grosse annonce s'efface d'elle-même après 12 s ; la carte reste.
-  setTimeout(() => { etat.annonce = null; pousser(); }, 12000);
+  // La grosse annonce s'efface d'elle-même ; le bloc de vérification reste,
+  // prêt pour le prochain appel — il y a souvent plusieurs gagnants.
+  setTimeout(() => { etat.annonce = null; pousser(); }, 10000);
 }
 
 async function ouvrirChoixEcran() {

@@ -16,6 +16,7 @@
     <span id="pastille-onde" class="pastille pastille-onde">En ondes</span>
     <button id="btn-pause" class="bouton">Couper l'antenne</button>
     <button id="btn-ecrans" class="bouton">Envoyer l'antenne…</button>
+    <button id="btn-cartes" class="bouton">Imprimer les cartes</button>
     <button id="btn-reglages" class="bouton">Paramètres</button>
   </div>
 </header>
@@ -50,10 +51,11 @@
     <label for="verif-nom">Nom du gagnant <span class="facultatif">facultatif</span></label>
     <input id="verif-nom" type="text" autocomplete="off" placeholder="Il s'affichera à l'antenne">
     <div class="verif-actions">
-      <button id="btn-montrer" class="bouton">Montrer à l'antenne</button>
-      <button id="btn-cacher" class="bouton">Retirer de l'antenne</button>
-      <button id="btn-annoncer" class="bouton bouton-primaire">Annoncer le gagnant</button>
+      <button id="btn-verification" class="bouton bouton-primaire">Vérification</button>
+      <button id="btn-retour-antenne" class="bouton">Retour à l'antenne</button>
+      <button id="btn-valider" class="bouton bouton-primaire">Valider le gagnant</button>
     </div>
+    <p id="verif-etat-antenne" class="aide"></p>
   </section>
 
   <!-- ============ DROITE : CONTRÔLES + PARTIE ============ -->

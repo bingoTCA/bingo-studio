@@ -307,12 +307,23 @@ function dessinerGagnants(gagnants) {
   liste.innerHTML = "";
   if (!gagnants?.length) {
     liste.innerHTML = '<li class="liste-vide">— en attente —</li>';
+    liste.className = "liste-gagnants";
     return;
   }
-  // Les plus récents en haut, au cas où la liste dépasse le bloc.
+
+  const parts = partsDeLot(gagnants);
+
+  // La liste doit tenir tout le bingo dans un bloc de hauteur fixe. Plutôt
+  // que de rogner les derniers noms, on resserre l'affichage par paliers :
+  // mieux vaut lire dix noms un peu petits que six gros et quatre invisibles.
+  const n = gagnants.length;
+  const serrage = n <= 4 ? "" : n <= 7 ? " serre-1" : n <= 11 ? " serre-2" : " serre-3";
+  liste.className = "liste-gagnants" + serrage;
+
+  // Les plus récents en haut : c'est celui qu'on vient d'annoncer qu'on cherche.
   for (const g of [...gagnants].reverse()) {
     const li = document.createElement("li");
-    const lot = Number(g.lot) || 0;
+    const part = parts.get(g);
 
     const nom = document.createElement("span");
     nom.className = "g-nom";
@@ -322,19 +333,75 @@ function dessinerGagnants(gagnants) {
     detail.className = "g-detail";
     detail.textContent = (g.nom?.trim() ? `Carte ${g.carte} · ` : "")
       + (FIGURES[g.figure]?.nom ?? g.figure)
-      + (lot ? ` · ${lot.toLocaleString("fr-CA")} $` : "");
+      + (part.montant ? ` · ${arrondiSou(part.montant)} $` : "")
+      + (part.nombre > 1 ? ` · partagé à ${part.nombre}` : "");
 
     li.append(nom, detail);
     liste.appendChild(li);
   }
 }
 
-function dessinerCarte(v) {
-  const boite = $("bloc-carte");
-  if (!v || v.statut === "INTROUVABLE") { boite.hidden = true; return; }
+/**
+ * Le lot d'une partie se divise entre tous ses gagnants, et se recalcule à
+ * chaque ajout : le premier annoncé voit sa part diminuer quand un deuxième
+ * appelle. C'est la règle habituelle du bingo, et elle est écrite dans le
+ * règlement livré par défaut.
+ */
+function partsDeLot(gagnants) {
+  const parPartie = new Map();
+  for (const g of gagnants) {
+    const cle = `${g.partie}|${g.figure}`;
+    if (!parPartie.has(cle)) parPartie.set(cle, []);
+    parPartie.get(cle).push(g);
+  }
+  const parts = new Map();
+  for (const groupe of parPartie.values()) {
+    // On prend le lot le plus élevé du groupe : si l'opératrice a corrigé le
+    // montant en cours de partie, c'est le bon qui fait foi.
+    const lot = Math.max(...groupe.map((g) => Number(g.lot) || 0));
+    for (const g of groupe) parts.set(g, { montant: lot / groupe.length, nombre: groupe.length });
+  }
+  return parts;
+}
 
-  $("carte-num").textContent = v.numero;
-  const grille = $("carte-grille");
+/** 33,33 $ plutôt que 33,333333 — et 100 $ reste 100 $, pas 100,00 $. */
+function arrondiSou(montant) {
+  const arrondi = Math.round(montant * 100) / 100;
+  return Number.isInteger(arrondi)
+    ? arrondi.toLocaleString("fr-CA")
+    : arrondi.toLocaleString("fr-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+/**
+ * Le bloc de vérification, au centre, à la place de l'incrustation caméra.
+ * Il suit la saisie de la régie en direct : le numéro s'affiche pendant qu'on
+ * le tape, puis la carte apparaît dès qu'elle existe.
+ */
+function dessinerVerification(v, actif) {
+  const boite = $("bloc-verification");
+  boite.hidden = !actif;
+  if (!actif) return;
+
+  const corps = $("verif-corps");
+  const verdict = $("verif-verdict");
+  $("verif-numero").textContent = v?.numero != null && String(v.numero) !== "" ? v.numero : "————";
+
+  // Rien de tapé encore, ou numéro incomplet : on le dit au lieu de laisser
+  // un trou noir au milieu de l'écran.
+  if (!v || v.statut === "INTROUVABLE") {
+    corps.innerHTML = '<p class="verif-attente">En attente du numéro de carte…</p>';
+    verdict.textContent = v?.statut === "INTROUVABLE" && v.numero
+      ? `Aucune carte ${v.numero} dans la base`
+      : "";
+    verdict.className = "verif-verdict" + (v?.statut === "INTROUVABLE" && v.numero ? " introuvable" : "");
+    return;
+  }
+
+  let grille = $("verif-grille");
+  if (!grille) {
+    corps.innerHTML = '<div id="verif-grille" class="carte-grille"></div>';
+    grille = $("verif-grille");
+  }
   grille.innerHTML = "";
 
   // Pas de surlignage de la figure à l'antenne : le téléspectateur suit
@@ -350,15 +417,13 @@ function dessinerCarte(v) {
     }
   }
 
-  const verdict = $("carte-verdict");
   if (v.statut === "GAGNANTE") {
-    verdict.textContent = "Carte gagnante";
-    verdict.className = "carte-verdict gagnante";
+    verdict.textContent = "★  CARTE GAGNANTE  ★";
+    verdict.className = "verif-verdict gagnante";
   } else {
     verdict.textContent = v.restants === 1 ? "Il reste 1 case" : `Il reste ${v.restants} cases`;
-    verdict.className = "carte-verdict pas-encore";
+    verdict.className = "verif-verdict pas-encore";
   }
-  boite.hidden = false;
 }
 
 // ---------------------------------------------------------------------
@@ -416,28 +481,34 @@ function majGenerique(t, etat) {
   const piste = $("gen-piste");
   piste.innerHTML = "";
 
-  // Cale de la hauteur de l'écran : le texte entre par le bas.
+  // On monte le générique dans un bloc, puis on en met DEUX copies dans la
+  // piste : l'animation ne remonte que de 50 %, donc au moment de boucler la
+  // seconde copie est déjà en place et la reprise ne se voit pas.
+  const bloc = document.createElement("div");
+
+  // Cale de la hauteur de l'écran : le texte entre par le bas, et elle
+  // sépare la fin d'une copie du début de la suivante.
   const cale = document.createElement("div");
   cale.className = "gen-cale";
-  piste.appendChild(cale);
+  bloc.appendChild(cale);
 
   const section = (titre) => {
     const el = document.createElement("p");
     el.className = "gen-section";
     el.textContent = titre;
-    piste.appendChild(el);
+    bloc.appendChild(el);
   };
   const ligne = (texte) => {
     const el = document.createElement("p");
     el.className = "gen-ligne";
     el.textContent = texte;
-    piste.appendChild(el);
+    bloc.appendChild(el);
   };
   const etoiles = () => {
     const el = document.createElement("p");
     el.className = "gen-etoiles";
     el.textContent = "★ ★ ★";
-    piste.appendChild(el);
+    bloc.appendChild(el);
   };
 
   etoiles();
@@ -451,11 +522,11 @@ function majGenerique(t, etat) {
     }
     if (t.generique.reglementActif && t.generique.reglement?.trim()) {
       section("Règlement");
-      for (const bloc of t.generique.reglement.split(/\n\s*\n/)) {
+      for (const paragraphe of t.generique.reglement.split(/\n\s*\n/)) {
         const el = document.createElement("p");
         el.className = "gen-reglement";
-        el.textContent = bloc.trim();
-        if (el.textContent) piste.appendChild(el);
+        el.textContent = paragraphe.trim();
+        if (el.textContent) bloc.appendChild(el);
       }
     }
   } else {
@@ -471,6 +542,9 @@ function majGenerique(t, etat) {
   const tels = (etat.telephones ?? []).filter(Boolean);
   if (tels.length) { section("Pour nous joindre"); for (const n of tels) ligne(n); }
   etoiles();
+
+  piste.appendChild(bloc);
+  piste.appendChild(bloc.cloneNode(true));
 
   piste.style.animationDuration = `${Math.max(15, Number(t.generique.vitesse) || 60)}s`;
 }
@@ -505,9 +579,14 @@ function majSons(t, etat) {
   if (annonce && !annonceEnCours && t.sons.fanfare) sons.fanfare();
   annonceEnCours = annonce;
 
-  const musiqueVoulue = t.sons.musique && etat.ecran === "jeu";
+  // La musique d'attente prime sur le fond sonore : pendant une
+  // vérification, c'est elle qui doit s'entendre.
+  const attente = etat.modeVerification === true && etat.ecran === "jeu";
+  if (attente !== sons.attenteEnCours()) sons.musiqueAttente(attente, t.sons.volumeMusique);
+
+  const musiqueVoulue = t.sons.musique && etat.ecran === "jeu" && !attente;
   if (musiqueVoulue && !sons.musiqueEnCours()) sons.demarrerMusique();
-  if (!musiqueVoulue && sons.musiqueEnCours()) sons.arreterMusique();
+  if (!musiqueVoulue && sons.musiqueEnCours() && !attente) sons.arreterMusique();
 }
 
 // ---------------------------------------------------------------------
@@ -561,7 +640,11 @@ function rendre(etat) {
   } else {
     $("annonce").hidden = true;
   }
-  dessinerCarte(coupe ? null : etat.verification);
+  // Vérification : elle prend la place de l'incrustation caméra, jamais en
+  // plus. Antenne coupée, on ne montre rien.
+  const enVerification = !coupe && etat.modeVerification === true;
+  dessinerVerification(etat.verification, enVerification);
+  if (enVerification) { $("camera").hidden = true; $("pubs").hidden = true; }
 }
 
 // ---------------------------------------------------------------------

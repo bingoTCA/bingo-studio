@@ -88,7 +88,7 @@ function appliquerTheme(theme) {
 
   // Pubs OU caméra : jamais les deux. Les pubs prennent exactement la place
   // du carré d'incrustation, mêmes dimensions.
-  const pubs = t.pubs.actif && t.pubs.images.length > 0;
+  const pubs = t.pubs.actif && listeDesPubs(t.pubs).length > 0;
   $("camera").hidden = pubs || !t.chromaVisible;
   $("pubs").hidden = !pubs;
   majPubs(t.pubs, pubs);
@@ -189,40 +189,92 @@ let minuteriePubs = null;
 let signaturePubs = "";
 let couchePubActive = 0;
 
+/**
+ * La liste à passer en boucle. Un dossier choisi par la station l'emporte
+ * sur les images téléversées une à une : c'est le mode qu'on encourage, et
+ * une station qui vient de choisir un dossier ne veut plus voir les vieilles.
+ */
+function listeDesPubs(reglages) {
+  if (reglages.fichiers?.length) return reglages.fichiers;
+  return (reglages.images ?? []).map((url) => ({ url, video: false, nom: "" }));
+}
+
+/**
+ * Rotation des publicités, à la place du carré d'incrustation.
+ *
+ * Les IMAGES tiennent le nombre de secondes réglé. Les VIDÉOS jouent jusqu'au
+ * bout puis passent à la suivante — couper une pub vidéo au milieu, c'est
+ * fâcher le commanditaire qui l'a payée. La boucle tourne tant qu'on n'a pas
+ * repris l'antenne.
+ */
 function majPubs(reglages, actives) {
-  // Signature : on ne relance la rotation que si les images ou le délai
+  const liste = actives ? listeDesPubs(reglages) : [];
+
+  // Signature : on ne relance la rotation que si le contenu ou le délai
   // changent. Sinon chaque boule tirée ferait repartir le diaporama.
-  const signature = actives
-    ? `${reglages.secondes}|${reglages.images.length}|${reglages.images.map((i) => i.length).join(",")}`
+  const signature = liste.length
+    ? `${reglages.secondes}|${liste.map((f) => f.url).join("|")}`
     : "";
   if (signature === signaturePubs) return;
   signaturePubs = signature;
 
-  clearInterval(minuteriePubs);
+  clearTimeout(minuteriePubs);
   minuteriePubs = null;
-  const a = $("pub-a"), b = $("pub-b");
-  if (!actives) { a.classList.remove("visible"); b.classList.remove("visible"); return; }
 
-  const images = reglages.images;
+  const a = $("pub-a"), b = $("pub-b"), video = $("pub-video");
+  const toutCacher = () => {
+    a.classList.remove("visible");
+    b.classList.remove("visible");
+    video.classList.remove("visible");
+  };
+  video.onended = null;
+  try { video.pause(); } catch { /* pas encore chargée */ }
+
+  if (!liste.length) { toutCacher(); video.removeAttribute("src"); return; }
+
   let index = 0;
   couchePubActive = 0;
-  a.src = images[0];
-  a.classList.add("visible");
-  b.classList.remove("visible");
 
-  // Une seule image : elle reste affichée, sans minuterie.
-  if (images.length < 2) return;
+  const passer = () => {
+    const fiche = liste[index];
 
-  const delai = Math.max(1, Number(reglages.secondes) || 8) * 1000;
-  minuteriePubs = setInterval(() => {
-    index = (index + 1) % images.length;
-    const entrante = couchePubActive === 0 ? b : a;
-    const sortante = couchePubActive === 0 ? a : b;
-    entrante.src = images[index];
+    if (fiche.video) {
+      a.classList.remove("visible");
+      b.classList.remove("visible");
+      video.src = fiche.url;
+      video.classList.add("visible");
+      // Muette : le son de l'antenne appartient au bingo, pas aux pubs.
+      video.muted = true;
+      video.currentTime = 0;
+      video.play().catch(() => {});
+      // Une seule vidéo dans le dossier : on la reboucle plutôt que de
+      // laisser un écran figé sur sa dernière image.
+      video.onended = () => { if (liste.length === 1) { video.currentTime = 0; video.play().catch(() => {}); } else suivante(); };
+      // Filet : si la vidéo est illisible, on ne reste pas coincé dessus.
+      video.onerror = () => { if (liste.length > 1) suivante(); };
+      return;
+    }
+
+    video.classList.remove("visible");
+    try { video.pause(); } catch { /* rien en cours */ }
+    const entrante = couchePubActive === 0 ? a : b;
+    const sortante = couchePubActive === 0 ? b : a;
+    entrante.src = fiche.url;
     entrante.classList.add("visible");
     sortante.classList.remove("visible");
     couchePubActive = 1 - couchePubActive;
-  }, delai);
+
+    if (liste.length < 2) return;   // une seule image : elle reste
+    minuteriePubs = setTimeout(suivante, Math.max(1, Number(reglages.secondes) || 8) * 1000);
+  };
+
+  const suivante = () => {
+    clearTimeout(minuteriePubs);
+    index = (index + 1) % liste.length;
+    passer();
+  };
+
+  passer();
 }
 
 // ---------------------------------------------------------------------

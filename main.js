@@ -14,7 +14,8 @@ const { app, BrowserWindow, screen, ipcMain, shell, dialog } = require("electron
 const { writeFileSync, unlinkSync } = require("node:fs");
 const { pathToFileURL } = require("node:url");
 const path = require("path");
-const { demarrer } = require("./src/server");
+const { demarrer, reglerDossierPubs } = require("./src/server");
+const { readdirSync } = require("node:fs");
 
 // L'antenne joue des sons sans que personne ne clique dedans — elle est
 // posée sur un écran de diffusion. Sans ça, Chromium refuserait de lire.
@@ -161,6 +162,62 @@ ipcMain.handle("enregistrer-fichier", async (_e, { texte, nomSuggere, titre, ext
   try {
     writeFileSync(cible.filePath, texte, "utf8");
     return { chemin: cible.filePath };
+  } catch (err) {
+    return { erreur: err.message };
+  }
+});
+
+/**
+ * Choisir le dossier des publicités, et lire ce qu'il contient.
+ *
+ * Pourquoi un dossier plutôt qu'un téléversement fichier par fichier : la
+ * station remplace ses pubs chaque semaine. Déposer les nouveaux fichiers
+ * dans un dossier et rien changer dans le logiciel, c'est un geste ; les
+ * réimporter un à un, c'est une corvée qu'on finit par ne plus faire.
+ */
+const EXT_PUBS = [".jpg", ".jpeg", ".png", ".webp", ".gif", ".mp4", ".webm", ".mov", ".m4v"];
+const EXT_VIDEO = [".mp4", ".webm", ".mov", ".m4v"];
+
+function lireDossierPubs(dossier) {
+  // Ordre alphabétique : c'est le seul ordre qu'une station peut maîtriser
+  // en renommant ses fichiers « 01-… », « 02-… ».
+  const noms = readdirSync(dossier, { withFileTypes: true })
+    .filter((e) => e.isFile() && EXT_PUBS.includes(path.extname(e.name).toLowerCase()))
+    .map((e) => e.name)
+    .sort((a, b) => a.localeCompare(b, "fr-CA", { numeric: true }));
+
+  return noms.map((nom) => ({
+    nom,
+    video: EXT_VIDEO.includes(path.extname(nom).toLowerCase()),
+    url: "/pubs/" + encodeURIComponent(nom)
+  }));
+}
+
+ipcMain.handle("choisir-dossier-pubs", async () => {
+  const choix = await dialog.showOpenDialog(fenetreRegie, {
+    title: "Choisir le dossier des publicités",
+    properties: ["openDirectory"],
+    buttonLabel: "Utiliser ce dossier"
+  });
+  if (choix.canceled || !choix.filePaths?.[0]) return { annule: true };
+
+  const dossier = choix.filePaths[0];
+  try {
+    const fichiers = lireDossierPubs(dossier);
+    reglerDossierPubs(dossier);
+    return { dossier, fichiers };
+  } catch (err) {
+    return { erreur: err.message };
+  }
+});
+
+/** Relire le dossier — la station y a déposé de nouveaux fichiers. */
+ipcMain.handle("relire-dossier-pubs", (_e, dossier) => {
+  if (!dossier) return { fichiers: [] };
+  try {
+    const fichiers = lireDossierPubs(dossier);
+    reglerDossierPubs(dossier);
+    return { dossier, fichiers };
   } catch (err) {
     return { erreur: err.message };
   }

@@ -215,6 +215,21 @@
 
       <h3 id="titre-pubs">Publicités</h3>
       <p class="aide">Elles remplacent le carré d'incrustation. Bascule en direct avec « Passer aux pubs ».</p>
+      <p class="aide">Le plus simple : garde un dossier sur ton ordinateur et
+         dépose tes images et tes vidéos dedans. Le logiciel les passe en boucle
+         dans l'ordre des noms de fichiers — nomme-les <em>01-…</em>, <em>02-…</em>
+         pour choisir l'ordre. Format conseillé : <strong>1920 × 1080</strong>.
+         Rien à réimporter quand tu changes tes pubs.</p>
+      <div class="reg-logo-actions">
+        <button id="btn-pubs-dossier" class="bouton bouton-primaire">Choisir un dossier…</button>
+        <button id="btn-pubs-relire" class="bouton">Relire le dossier</button>
+        <button id="btn-pubs-oublier" class="bouton bouton-danger">Oublier le dossier</button>
+      </div>
+      <p id="reg-pubs-dossier" class="aide"></p>
+      <div id="reg-pubs-fichiers-liste" class="reg-liste-simple"></div>
+
+      <p class="aide" style="margin-top:14px">Sans dossier — par exemple hors de
+         l'application — tu peux encore téléverser des images une à une.</p>
       <div class="reg-logo-actions">
         <label class="bouton bouton-fichier">
           Ajouter des images…
@@ -222,9 +237,13 @@
         </label>
       </div>
       <div id="reg-pubs-liste" class="reg-pubs-liste"></div>
-      <label class="reg-angle">Changement toutes les <span id="reg-pubs-secondes-val">8</span> s
+
+      <label class="reg-angle">Chaque <strong>image</strong> reste <span id="reg-pubs-secondes-val">8</span> s
         <input id="reg-pubs-secondes" type="range" min="2" max="60" step="1">
       </label>
+      <p class="aide">Les vidéos, elles, jouent jusqu'au bout avant de passer à
+         la suivante — couper une pub payée au milieu, c'est fâcher le
+         commanditaire. Elles sont muettes : le son appartient au bingo.</p>
 
       <h3>Sons</h3>
       <label class="case-a-cocher"><input id="reg-son-ding" type="checkbox"> Clochette à chaque boule</label>

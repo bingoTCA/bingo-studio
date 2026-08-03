@@ -23,8 +23,25 @@ const TYPES = {
   ".jpg": "image/jpeg",
   ".svg": "image/svg+xml",
   ".mp3": "audio/mpeg",
-  ".woff2": "font/woff2"
+  ".woff2": "font/woff2",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".gif": "image/gif",
+  ".mp4": "video/mp4",
+  ".webm": "video/webm",
+  ".mov": "video/quicktime",
+  ".m4v": "video/x-m4v"
 };
+
+/**
+ * Dossier de publicités choisi par la station. Il est HORS de l'application
+ * — c'est tout l'intérêt : la station dépose ses fichiers où elle veut et
+ * les remplace sans rouvrir le logiciel. Le serveur accepte donc, à titre
+ * d'exception au garde-fou habituel, de servir des fichiers de ce dossier
+ * précis, et de lui seul.
+ */
+let dossierPubs = null;
+function reglerDossierPubs(chemin) { dossierPubs = chemin ? path.resolve(chemin) : null; }
 
 const ROUTES = {
   "/": "src/regie/regie.html",
@@ -103,6 +120,17 @@ function repondreFichier(racine, req, res) {
     return;
   }
 
+  // Fichier du dossier de publicités. On ne prend QUE le nom de base : un
+  // « ../../ » glissé dans l'adresse ne peut pas remonter ailleurs.
+  if (chemin.startsWith("/pubs/")) {
+    if (!dossierPubs) { res.writeHead(404).end("Aucun dossier de publicités"); return; }
+    const nom = path.basename(decodeURIComponent(chemin.slice("/pubs/".length)));
+    const fichier = path.join(dossierPubs, nom);
+    if (path.dirname(fichier) !== dossierPubs) { res.writeHead(403).end("Accès refusé"); return; }
+    servir(fichier, res, req);
+    return;
+  }
+
   const relatif = ROUTES[chemin] || chemin.replace(/^\/+/, "");
   const fichier = path.resolve(racine, relatif);
 
@@ -112,17 +140,50 @@ function repondreFichier(racine, req, res) {
     return;
   }
 
-  fs.readFile(fichier, (err, contenu) => {
-    if (err) {
+  servir(fichier, res, req);
+}
+
+/**
+ * Envoie un fichier, avec gestion des plages d'octets. Sans elle, une vidéo
+ * ne peut ni démarrer au milieu ni se recharger proprement : le lecteur du
+ * navigateur exige de pouvoir demander un morceau précis.
+ */
+function servir(fichier, res, req) {
+  fs.stat(fichier, (err, info) => {
+    if (err || !info.isFile()) {
       res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-      res.end("Introuvable : " + chemin);
+      res.end("Introuvable");
       return;
     }
+    const type = TYPES[path.extname(fichier).toLowerCase()] || "application/octet-stream";
+    const plage = req?.headers?.range;
+
+    if (plage && /^bytes=\d*-\d*$/.test(plage)) {
+      const [debutBrut, finBrut] = plage.replace("bytes=", "").split("-");
+      const debut = debutBrut ? Number(debutBrut) : 0;
+      const fin = finBrut ? Math.min(Number(finBrut), info.size - 1) : info.size - 1;
+      if (debut >= info.size || debut > fin) {
+        res.writeHead(416, { "Content-Range": `bytes */${info.size}` }).end();
+        return;
+      }
+      res.writeHead(206, {
+        "Content-Type": type,
+        "Content-Range": `bytes ${debut}-${fin}/${info.size}`,
+        "Accept-Ranges": "bytes",
+        "Content-Length": fin - debut + 1,
+        "Cache-Control": "no-store"
+      });
+      fs.createReadStream(fichier, { start: debut, end: fin }).pipe(res);
+      return;
+    }
+
     res.writeHead(200, {
-      "Content-Type": TYPES[path.extname(fichier).toLowerCase()] || "application/octet-stream",
+      "Content-Type": type,
+      "Content-Length": info.size,
+      "Accept-Ranges": "bytes",
       "Cache-Control": "no-store"
     });
-    res.end(contenu);
+    fs.createReadStream(fichier).pipe(res);
   });
 }
 
@@ -154,4 +215,4 @@ function demarrer(racine, portSouhaite = 7777, essais = 10) {
   });
 }
 
-module.exports = { demarrer };
+module.exports = { demarrer, reglerDossierPubs };

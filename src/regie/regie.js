@@ -408,6 +408,7 @@ function dessinerParametresTheme() {
   $("reg-pubs-secondes").value = t.pubs.secondes;
   $("reg-pubs-secondes-val").textContent = t.pubs.secondes;
   dessinerListePubs();
+  dessinerDossierPubs();
 
   // Sons
   $("reg-son-ding").checked = t.sons.ding;
@@ -498,6 +499,73 @@ function dessinerMusiques() {
     rang.append(nom, sup);
     boite.appendChild(rang);
   });
+}
+
+/**
+ * L'état du dossier de publicités : où il est, ce qu'il contient.
+ * On affiche les noms de fichiers pour que la station vérifie d'un coup d'oeil
+ * que le logiciel voit bien ce qu'elle vient d'y déposer.
+ */
+function dessinerDossierPubs() {
+  const p = theme().pubs;
+  const ligne = $("reg-pubs-dossier");
+  const liste = $("reg-pubs-fichiers-liste");
+  liste.innerHTML = "";
+
+  const dansElectron = Boolean(window.studio?.presente);
+  for (const id of ["btn-pubs-dossier", "btn-pubs-relire", "btn-pubs-oublier"]) {
+    $(id).disabled = !dansElectron;
+  }
+  if (!dansElectron) {
+    ligne.textContent = "Le choix d'un dossier n'existe que dans l'application installée.";
+    return;
+  }
+
+  if (!p.dossier) {
+    ligne.textContent = "Aucun dossier choisi.";
+    ligne.classList.remove("aide-alerte");
+    return;
+  }
+
+  const n = p.fichiers?.length ?? 0;
+  ligne.textContent = `${p.dossier} — ${n} fichier${n > 1 ? "s" : ""}.`;
+  // Un dossier vide n'est pas une erreur, mais il faut le dire : sinon
+  // « Passer aux pubs » ne fera rien et personne ne saura pourquoi.
+  ligne.classList.toggle("aide-alerte", n === 0);
+  if (!n) { ligne.textContent += " Rien à passer — dépose des images ou des vidéos dedans, puis « Relire »."; return; }
+
+  for (const f of p.fichiers) {
+    const el = document.createElement("div");
+    el.className = "reg-nom-fichier";
+    el.textContent = (f.video ? "🎬 " : "🖼 ") + f.nom;
+    liste.appendChild(el);
+  }
+}
+
+async function choisirDossierPubs() {
+  const r = await window.studio.choisirDossierPubs();
+  if (r?.annule) return;
+  if (r?.erreur) { dire(`Dossier illisible : ${r.erreur}`, "erreur"); return; }
+  theme().pubs.dossier = r.dossier;
+  theme().pubs.fichiers = r.fichiers;
+  dessinerDossierPubs();
+  dire(`${r.fichiers.length} fichier(s) trouvé(s) dans le dossier.`, r.fichiers.length ? "ok" : "erreur");
+  pousser();
+}
+
+async function relireDossierPubs(silencieux = false) {
+  const dossier = theme().pubs.dossier;
+  if (!dossier) { if (!silencieux) dire("Aucun dossier choisi.", "erreur"); return; }
+  const r = await window.studio.relireDossierPubs(dossier);
+  if (r?.erreur) {
+    // Le dossier a pu être déplacé, renommé, ou vivre sur une clé USB retirée.
+    if (!silencieux) dire(`Dossier introuvable : ${r.erreur}`, "erreur");
+    return;
+  }
+  theme().pubs.fichiers = r.fichiers;
+  dessinerDossierPubs();
+  if (!silencieux) dire(`${r.fichiers.length} fichier(s) dans le dossier.`, "ok");
+  pousser();
 }
 
 function dessinerListePubs() {
@@ -1106,6 +1174,16 @@ function brancherParametres() {
   $("btn-rss-tester").onclick = chargerRss;
 
   // --- Pubs ---
+  $("btn-pubs-dossier").onclick = () => choisirDossierPubs();
+  $("btn-pubs-relire").onclick = () => relireDossierPubs();
+  $("btn-pubs-oublier").onclick = () => {
+    theme().pubs.dossier = null;
+    theme().pubs.fichiers = [];
+    dessinerDossierPubs();
+    dire("Dossier oublié.", "ok");
+    pousser();
+  };
+
   $("reg-pubs-fichiers").onchange = async (e) => {
     const fichiers = [...(e.target.files ?? [])];
     e.target.value = "";
@@ -1751,6 +1829,11 @@ async function demarrer() {
     dire("Catalogue de cartes introuvable — la vérification est indisponible.", "erreur");
     $("verif-num").disabled = true;
   }
+
+  // Au redémarrage, le serveur ne sait plus où est le dossier de publicités :
+  // il n'a jamais rien retenu. On le lui redit en silence, sinon « Passer aux
+  // pubs » afficherait du noir sans que rien n'explique pourquoi.
+  if (window.studio?.presente && theme().pubs.dossier) relireDossierPubs(true);
 
   majApercu();
   dessinerVerification();

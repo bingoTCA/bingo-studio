@@ -18,5 +18,7 @@ contextBridge.exposeInMainWorld("studio", {
   ouvrirDansNavigateur: (url) => ipcRenderer.invoke("ouvrir-dans-navigateur", url),
   choisirFichierPdf: (charge) => ipcRenderer.invoke("choisir-fichier-pdf", charge),
   rendreFeuillesPdf: (charge) => ipcRenderer.invoke("rendre-feuilles-pdf", charge),
-  enregistrerFichier: (charge) => ipcRenderer.invoke("enregistrer-fichier", charge)
+  enregistrerFichier: (charge) => ipcRenderer.invoke("enregistrer-fichier", charge),
+  choisirDossierPubs: () => ipcRenderer.invoke("choisir-dossier-pubs"),
+  relireDossierPubs: (dossier) => ipcRenderer.invoke("relire-dossier-pubs", dossier)
 });

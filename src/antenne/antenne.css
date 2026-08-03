@@ -342,6 +342,11 @@ body.transparent .scene::before, body.transparent .scene::after { display: none;
   opacity: 0; transition: opacity 600ms ease;
 }
 .pub-image.visible { opacity: 1; }
+/* Les fichiers d'une station ne sont pas toujours au format de la zone.
+   « contain » les affiche en entier sur fond noir plutôt que de les rogner :
+   une pub tronquée, c'est un commanditaire mécontent. Le 1080p 16/9 tombe
+   pile ; le reste s'y loge proprement. */
+video.pub-image { object-fit: contain; background: #000; }
 
 /* --- Dernier numéro --- */
 .bloc-droite { display: flex; flex-direction: column; gap: 1vh; min-width: 0; }

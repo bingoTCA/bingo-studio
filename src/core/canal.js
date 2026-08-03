@@ -71,8 +71,10 @@ export function themeNeuf() {
     // Publicités à la place du carré d'incrustation
     pubs: {
       actif: false,
-      images: [],            // data URLs ; une seule image = image fixe
-      secondes: 8
+      dossier: null,         // dossier choisi par la station (Electron)
+      fichiers: [],          // [{ nom, url, video }] relus depuis ce dossier
+      images: [],            // ancien mode : data URLs téléversées une à une
+      secondes: 8            // durée d'une IMAGE ; une vidéo joue jusqu'au bout
     },
 
     // Sons — l'animateur annonce les numéros en direct, donc pas de voix

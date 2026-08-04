@@ -83,13 +83,14 @@ app.whenReady().then(async () => {
   await regie.loadURL(`http://127.0.0.1:${PORT}/regie`);
   await attendre(700);
 
-  // Une carte vérifiée à l'écran, pour montrer la fonction phare.
+  // Une carte vérifiée dans la régie, pour montrer la fonction phare. On ne
+  // passe PAS l'antenne en mode vérification : la capture de l'antenne doit
+  // montrer l'écran de jeu ordinaire, avec son incrustation caméra.
   await regie.webContents.executeJavaScript(`
     (() => {
       const v = document.getElementById("verif-num");
       v.value = "4321";
       v.dispatchEvent(new Event("input", { bubbles: true }));
-      document.getElementById("btn-montrer").click();
       window.scrollTo(0, 0);
       return true;
     })();

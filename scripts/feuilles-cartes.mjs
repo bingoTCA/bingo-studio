@@ -39,6 +39,7 @@ Monteur de feuilles de bingo
   --graine=TEXTE    graine de répartition — À NOTER           (défaut "feuilles")
   --format=NOM      Letter, Legal ou A4                        (défaut Letter)
   --couleur=#HEX    couleur des blocs B-I-N-G-O                  (défaut noir)
+  --controle=NUM    numéro de contrôle du lot, en rouge dans le bandeau
   --sortie=CHEMIN   fichier HTML produit
   --pdf             produit aussi le PDF (via Electron, déjà installé)
 `);
@@ -79,6 +80,7 @@ try {
     graine: GRAINE,
     format: FORMAT,
     couleur: COULEUR,
+    controle: args.controle ? String(args.controle) : "",
     droits: manifeste.droits
   });
 } catch (err) {

@@ -401,6 +401,22 @@ découpée en feuilles. Un acheteur ne peut pas deviner ce qu'il aura, et les
 grilles voisines ne se retrouvent pas dans la même main. À graine égale la
 répartition est identique — un lot perdu se réimprime à l'identique.
 
+### Ce que porte chaque carte
+
+Calqué sur les cartes réellement en circulation au Québec, photographiées et
+comparées :
+
+| Élément | Où | Quoi |
+|---|---|---|
+| **Numéro de contrôle** | en rouge, au centre du bandeau B-I-N-G-O | **le même sur tout le tirage** — il identifie le lot mis en circulation, et change à chaque nouvelle série, comme la couleur du papier |
+| **Numéro de la face** | dans la case centrale, sous « GRATUIT », et répété en bas à droite | propre à chaque carte. Deux endroits, parce qu'en fin de partie le centre disparaît sous les jetons |
+
+L'article 72 exige les deux, plus la mention « gratuit » au centre.
+
+⚠️ **Qui attribue ces numéros, et selon quelle règle, n'est pas tranché** : une
+demande d'avis est en cours auprès de la Régie. Le logiciel imprime ce que la
+station lui donne ; il ne gère aucun registre d'attribution.
+
 **Seuls les blocs B-I-N-G-O prennent la couleur.** Le papier reste blanc et les
 carreaux noir sur blanc : c'est ce qui s'imprime le mieux, coûte le moins cher
 en encre et se lit de plus loin. L'encre des lettres bascule toute seule entre

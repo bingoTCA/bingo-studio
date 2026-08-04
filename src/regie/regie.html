@@ -368,6 +368,12 @@
          sont éparpillés : une feuille ne porte jamais 1-2-3. Seuls les blocs
          B-I-N-G-O prennent ta couleur ; le reste est noir sur blanc, pour que
          l'impression reste lisible et bon marché.</p>
+      <p class="aide">Le <strong>numéro de contrôle</strong> s'imprime en rouge
+         au milieu du bandeau, identique sur toutes les cartes du lot. C'est lui
+         qui identifie la série mise en circulation — change-le à chaque
+         nouveau tirage, comme la couleur du papier. Le <strong>numéro de la
+         face</strong>, lui, s'imprime tout seul dans la case du centre et en
+         bas à droite.</p>
       <div class="reg-impression">
         <label>Grilles par feuille
           <select id="imp-par-feuille"></select>
@@ -383,6 +389,10 @@
         </label>
         <label>Couleur des blocs BINGO
           <input id="imp-couleur" type="color" value="#000000">
+        </label>
+        <label>Numéro de contrôle
+          <input id="imp-controle" type="text" maxlength="12" placeholder="174246"
+                 autocomplete="off">
         </label>
       </div>
       <p id="imp-resume" class="aide"></p>

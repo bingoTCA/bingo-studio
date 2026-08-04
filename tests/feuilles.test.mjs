@@ -172,3 +172,45 @@ test("une mention de droits contenant du HTML est échappée, pas exécutée", (
   assert.doesNotMatch(html, /<script>alert/);
   assert.match(html, /&lt;script&gt;/);
 });
+
+// ---------------------------------------------------------------------
+//  Les deux numéros exigés par l'article 72
+// ---------------------------------------------------------------------
+
+test("chaque face porte son numéro au centre ET en bas", () => {
+  const { html } = monterHtml(catalogue(3), { parFeuille: 3 });
+  // Le numéro 2 doit apparaître deux fois par face : case centrale et pied.
+  assert.match(html, /class="libre-num">2</, "manque au centre");
+  assert.match(html, /class="serie">2</, "manque en bas");
+});
+
+test("la case centrale porte la mention exigée par l'article 72", () => {
+  const { html } = monterHtml(catalogue(1), { parFeuille: 1 });
+  assert.match(html, /GRATUIT/, "« gratuit » ou mention équivalente est obligatoire");
+});
+
+test("le numéro de contrôle est le même sur TOUTES les faces du tirage", () => {
+  const { html } = monterHtml(catalogue(12), { parFeuille: 6, controle: "174246" });
+  // 12 faces = 12 occurrences, pas une de plus ni de moins.
+  assert.equal(html.split(">174246<").length - 1, 12);
+});
+
+test("sans numéro de contrôle, aucun cartouche vide n'est imprimé", () => {
+  const { html } = monterHtml(catalogue(3), { parFeuille: 3 });
+  assert.doesNotMatch(html, /class="controle"/);
+});
+
+test("un numéro de contrôle contenant du HTML est échappé", () => {
+  const { html } = monterHtml(catalogue(1), { parFeuille: 1, controle: '<b>x</b>' });
+  assert.doesNotMatch(html, /class="controle"><b>/);
+  assert.match(html, /&lt;b&gt;/);
+});
+
+test("le cartouche du contrôle passe APRÈS la règle des blocs", () => {
+  // Défaut vécu : « .entete span » (0,1,1) écrasait « .controle » (0,1,0),
+  // et le numéro sortait noir sur fond coloré au lieu de rouge sur blanc.
+  const { html } = monterHtml(catalogue(1), { parFeuille: 1, controle: "1", couleur: "#f08a70" });
+  assert.ok(html.indexOf(".entete .controle") > html.indexOf(".entete span"),
+    "la règle du cartouche doit venir après celle des blocs pour l'emporter");
+  assert.match(html, /\.entete \.controle \{[^}]*color: #d0021b/);
+});

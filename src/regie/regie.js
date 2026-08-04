@@ -733,6 +733,7 @@ function optionsImpression() {
     de: Number($("imp-de").value) || nums[0],
     a: Number($("imp-a").value) || nums.at(-1),
     couleur: $("imp-couleur").value,
+    controle: $("imp-controle").value.trim(),
     graine: "feuilles",
     droits: manifesteCartes.droits
   };
@@ -841,7 +842,8 @@ async function produireFeuilles(enPdf) {
     // On demande la destination D'ABORD : la jauge n'a pas à tourner pendant
     // qu'une boîte système attend une réponse.
     const cible = await window.studio.choisirFichierPdf({
-      nomSuggere: `feuilles-${o.parFeuille}-grilles-${o.de}-a-${o.a}.pdf`
+      nomSuggere: `feuilles-${o.parFeuille}-grilles-${o.de}-a-${o.a}`
+                + `${o.controle ? `-controle-${o.controle}` : ""}.pdf`
     });
     if (cible?.annule) { dire("Enregistrement annulé.", ""); return; }
     if (cible?.erreur || !cible?.chemin) { dire("Destination impossible à ouvrir.", "erreur"); return; }
@@ -901,7 +903,7 @@ function brancherImpression() {
     $("imp-format").appendChild(o);
   }
 
-  for (const id of ["imp-par-feuille", "imp-format", "imp-de", "imp-a"]) {
+  for (const id of ["imp-par-feuille", "imp-format", "imp-de", "imp-a", "imp-controle"]) {
     $(id).oninput = majResumeImpression;
     $(id).onchange = majResumeImpression;
   }

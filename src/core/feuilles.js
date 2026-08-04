@@ -82,6 +82,12 @@ export function monterHtml(catalogue, options = {}) {
   const encre = encreLisible(couleurBlocs);
   const droits = options.droits ?? "";
 
+  // Numéro de contrôle : commun à TOUT le tirage, imprimé en rouge dans le
+  // bandeau B-I-N-G-O. C'est lui qui identifie le lot mis en circulation —
+  // sur les cartes réelles il est le même sur les six faces d'une feuille et
+  // sur toutes les feuilles d'un livret, et il change d'une semaine à l'autre.
+  const controle = String(options.controle ?? "").trim();
+
   if (!DISPOSITIONS[parFeuille]) throw new Error(`Disposition inconnue : ${parFeuille} grilles par feuille`);
   if (!FORMATS[format]) throw new Error(`Format inconnu : ${format}`);
 
@@ -95,13 +101,23 @@ export function monterHtml(catalogue, options = {}) {
     for (let r = 0; r < 5; r++) {
       for (let c = 0; c < 5; c++) {
         const n = g[r][c];
-        cases += n === 0 ? '<div class="case libre">★</div>' : `<div class="case">${n}</div>`;
+        // La case centrale porte la mention « gratuit » exigée par l'article
+        // 72, ET le numéro de la face — comme sur les cartes en circulation.
+        // Deux endroits valent mieux qu'un : la case du centre reste lisible
+        // quand le bas de la carte est déjà couvert de jetons.
+        cases += n === 0
+          ? `<div class="case libre"><span class="libre-mot">GRATUIT</span>`
+            + `<span class="libre-num">${numero}</span></div>`
+          : `<div class="case">${n}</div>`;
       }
     }
     return `<div class="grille">
-      <div class="entete"><span>B</span><span>I</span><span>N</span><span>G</span><span>O</span></div>
+      <div class="entete">
+        <span>B</span><span>I</span><span>N</span><span>G</span><span>O</span>
+        ${controle ? `<span class="controle">${echapper(controle)}</span>` : ""}
+      </div>
       <div class="cases">${cases}</div>
-      <div class="serie">N° ${numero}</div>
+      <div class="serie">${numero}</div>
     </div>`;
   };
 
@@ -152,8 +168,13 @@ export function monterHtml(catalogue, options = {}) {
     min-height: 0; min-width: 0;
   }
   .grille.vide { border-style: dashed; border-color: #bbb; }
-  /* Les blocs B-I-N-G-O : le SEUL endroit coloré de la feuille. */
+  /* Les blocs B-I-N-G-O : le SEUL endroit coloré de la feuille.
+     Le numéro de contrôle se pose PAR-DESSUS, centré, dans un cartouche
+     blanc — exactement comme sur les cartes du commerce, où il masque le
+     bloc du N. C'est le seul élément rouge de la feuille : il doit sauter
+     aux yeux quand on vérifie qu'un joueur a bien les cartes de la semaine. */
   .entete {
+    position: relative;
     display: grid; grid-template-columns: repeat(5, 1fr);
     gap: 0.6mm; margin-bottom: 0.6mm;
   }
@@ -165,6 +186,16 @@ export function monterHtml(catalogue, options = {}) {
     line-height: 1; letter-spacing: 0.3mm;
     padding: ${parFeuille >= 9 ? "0.8" : "1.2"}mm 0;
   }
+  .entete .controle {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff; color: #d0021b;
+    font-weight: 800; font-size: ${parFeuille >= 9 ? 2.6 : parFeuille >= 6 ? 3.2 : 4}mm;
+    letter-spacing: 0.4mm; line-height: 1;
+    padding: 0.5mm 1.6mm; border-radius: 0.6mm;
+    white-space: nowrap; display: block;
+    border: 0.2mm solid rgba(0,0,0,.15);
+  }
   .cases {
     flex: 1; display: grid;
     grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(5, 1fr);
@@ -175,7 +206,22 @@ export function monterHtml(catalogue, options = {}) {
     border: 0.3mm solid #444; border-radius: 1mm;
     font-weight: 700; font-size: ${tailleCase}mm; color: #000;
   }
-  .case.libre { background: #e8e8e8; }
+  /* Case centrale : la mention exigée par l'article 72, et le numéro de la
+     face. Le mot est petit, le numéro lisible — c'est lui qu'on cherche. */
+  .case.libre {
+    background: #e8e8e8;
+    flex-direction: column; gap: 0.2mm;
+  }
+  .libre-mot {
+    font-size: ${parFeuille >= 9 ? 1.6 : parFeuille >= 6 ? 2 : 2.6}mm;
+    font-weight: 700; letter-spacing: 0.2mm; color: #555;
+  }
+  .libre-num {
+    font-size: ${parFeuille >= 9 ? 2.6 : parFeuille >= 6 ? 3.4 : 4.4}mm;
+    font-weight: 800; color: #000; line-height: 1;
+  }
+  /* Le numéro de la face, répété en bas à droite comme sur les vraies
+     cartes : au centre il disparaît sous les jetons en fin de partie. */
   .serie {
     text-align: right; font-size: ${tailleSerie}mm;
     color: #000; font-weight: 700; padding-top: 0.8mm; letter-spacing: 0.2mm;

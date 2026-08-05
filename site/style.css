@@ -286,6 +286,39 @@ code {
   padding: 1px 6px;
 }
 
+/* ---------- Loi 25 : bandeau et cadre en attente ----------
+   Le bandeau se pose en bas, ne masque rien d'essentiel et se referme d'un
+   clic. Il n'y a pas de croix « fermer sans choisir » : un choix non fait
+   laisserait le formulaire inerte sans que personne comprenne pourquoi. */
+.loi25 {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
+  background: rgba(14,6,24,.97);
+  border-top: 1px solid rgba(255,215,0,.35);
+  box-shadow: 0 -10px 40px rgba(0,0,0,.5);
+  padding: 18px 20px;
+}
+.loi25-dedans {
+  max-width: 1100px; margin: 0 auto;
+  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+}
+.loi25-texte { flex: 1; min-width: 300px; font-size: 15px; line-height: 24px; color: var(--texte-doux); }
+.loi25-texte strong { color: var(--jaune); }
+.loi25-boutons { display: flex; gap: 10px; flex-shrink: 0; }
+@media (max-width: 620px) { .loi25-boutons { width: 100%; } .loi25-boutons .bouton { flex: 1; text-align: center; } }
+
+/* Le cadre du formulaire tant qu'on n'a pas consenti : une invitation
+   claire plutôt qu'un trou blanc ou, pire, un cadre chargé en douce. */
+.cadre-inscription.cadre-en-attente {
+  background: rgba(255,255,255,.04);
+  border: 1px dashed rgba(255,215,0,.35);
+  box-shadow: none;
+}
+.cadre-invite { padding: 34px 30px; max-width: 640px; }
+.cadre-invite p { color: var(--texte-doux); margin-bottom: 14px; line-height: 25px; }
+.cadre-invite strong { color: var(--texte); }
+.cadre-invite .bouton { margin: 6px 0 14px; }
+.cadre-invite .petit { margin-bottom: 0; }
+
 /* ---------- « Contactez Marc », un peu partout ----------
    Un projet donné par une seule personne se vend par la personne, pas par le
    logiciel. Une station qui hésite écrira plus volontiers qu'elle ne

@@ -245,11 +245,10 @@
            Après l'envoi, Brevo redirige le cadre vers telecharger/ ; cette
            page-là se charge de sortir du cadre (voir son script en bas).
            ================================================================ -->
-      <div class="cadre-inscription">
-        <iframe
-          src="https://d37cf71c.sibforms.com/serve/MUIFABNqFg0la_YHhXG9PD7spLY72e7-uTZy6el7Qg2yYerzy16LuA8-oeFUVbsVhrVx-rcXVcuuYe0FDbn1OtxzhWJf0qtB20dLN8ZeYsa2idNfVeqeg-wSgDshgeVtAufVJ0WfGIJxJ3kt7H8gXwKc7WfciyRFOd1CCJom1XeXq57_ki9Cj68DDIV_DLO-U2eH8Ij_NiayIjfWNw=="
-          title="Formulaire d'inscription pour recevoir le lien de téléchargement"
-          loading="lazy"></iframe>
+      <div class="cadre-inscription" data-src="https://d37cf71c.sibforms.com/serve/MUIFABNqFg0la_YHhXG9PD7spLY72e7-uTZy6el7Qg2yYerzy16LuA8-oeFUVbsVhrVx-rcXVcuuYe0FDbn1OtxzhWJf0qtB20dLN8ZeYsa2idNfVeqeg-wSgDshgeVtAufVJ0WfGIJxJ3kt7H8gXwKc7WfciyRFOd1CCJom1XeXq57_ki9Cj68DDIV_DLO-U2eH8Ij_NiayIjfWNw==">
+        <!-- Pas de src : c'est loi25.js qui charge le cadre, et seulement
+             après consentement. Tant qu'on n'a rien accepté, aucune requête
+             ne part vers Brevo. -->
       </div>
 
       <!-- Pas de raccourci vers la page de téléchargement ici : on passe par
@@ -658,7 +657,10 @@
       Pour télécharger, signaler un pépin, proposer une amélioration, ou
       demander une version sur mesure pour ta station.
     </p>
-    <p class="petit"><a href="https://github.com/bingoTCA/bingo-studio" target="_blank" rel="noopener">Le code source sur GitHub</a></p>
+    <p class="petit">
+      <a href="confidentialite/">Renseignements personnels</a> ·
+      <a href="https://github.com/bingoTCA/bingo-studio" target="_blank" rel="noopener">Le code source sur GitHub</a>
+    </p>
   </div>
 </footer>
 
@@ -693,5 +695,6 @@
   })();
 
 </script>
+<script src="loi25.js"></script>
 </body>
 </html>

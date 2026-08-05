@@ -11,6 +11,7 @@
     "dist:win": "electron-builder --win",
     "cartes": "node scripts/generer-cartes.mjs",
     "feuilles": "node scripts/feuilles-cartes.mjs",
+    "csv": "node scripts/cartes-en-csv.mjs",
     "sceller": "node scripts/sceller-base.mjs",
     "captures": "electron scripts/captures.cjs",
     "diapos": "electron scripts/diapos.cjs && python3 scripts/annoter.py"

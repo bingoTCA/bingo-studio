@@ -6,3 +6,4 @@ data/feuilles-*.pdf
 data/cartes-nouvelles.*
 data/cartes-precedentes.json
 captures/
+data/echantillon-*

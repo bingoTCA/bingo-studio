@@ -417,14 +417,50 @@ video.pub-image { object-fit: contain; background: #000; }
   stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
 }
 .dn-affichage { display: flex; flex-direction: column; align-items: center; line-height: 1; }
-.dn-lettre { font-size: 7vh; }
-.dn-numero { font-size: 19vh; font-weight: 900; line-height: .86; }
+.dn-lettre { font-size: 6vh; }
+.dn-numero { font-size: 15vh; font-weight: 900; line-height: .86; }
 .dn-compteur {
   width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.2vh;
   padding-top: 0.6vh; border-top: 1px solid rgba(0,0,0,.18);
 }
 .dn-cpt-lib { font-size: 2.2vh; letter-spacing: 2.5px; text-transform: uppercase; opacity: .7; }
 .dn-cpt-val { font-size: 4.6vh; font-weight: 900; line-height: 1.05; }
+
+/* ---------- Les trois numéros d'avant ----------
+   Sous le bloc blanc, pas dedans : le blanc doit rester réservé au numéro
+   qu'on vient de tirer. Ces trois-là se lisent au second regard, et leur
+   taille dit leur rang — le plus récent d'abord, en tête de liste. */
+.dn-avant {
+  flex: none;
+  border: 1px solid var(--trait); border-radius: var(--rayon);
+  background: color-mix(in srgb, var(--ambiance) 60%, transparent);
+  padding: 0.8vh 0.8vw;
+  text-align: center;
+}
+.dn-avant-lib {
+  font-size: 1.7vh; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,.7); margin-bottom: 0.6vh;
+}
+.dn-avant-liste {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; justify-content: center; gap: 0.6vw;
+}
+.dn-avant-liste li {
+  flex: 1; min-width: 0;
+  border-radius: calc(var(--rayon) * .6);
+  background: rgba(0,0,0,.34);
+  padding: 0.5vh 0;
+  font-size: 4.6vh; font-weight: 900; line-height: 1.1;
+  color: #fff;
+}
+.dn-avant-liste li .dn-avant-lettre {
+  display: block; font-size: 1.9vh; font-weight: 700;
+  letter-spacing: 1px; color: var(--accent); line-height: 1;
+}
+/* La case vide en début d'émission : présente, pour que le bloc ne change
+   pas de taille dès la quatrième boule. */
+.dn-avant-liste li.vide { color: rgba(255,255,255,.28); }
+
 .restants { font-size: 1.8vh; text-align: center; color: rgba(255,255,255,.75); }
 .restants span { color: var(--accent); }
 

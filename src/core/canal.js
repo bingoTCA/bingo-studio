@@ -155,6 +155,25 @@ export function messagesDuBandeau(theme, etat = {}) {
   return source.map((m) => String(m).trim()).filter(Boolean);
 }
 
+/**
+ * Les publicités prêtes à passer.
+ *
+ * Un dossier choisi par la station l'emporte sur les images téléversées
+ * une à une : c'est le mode qu'on encourage, et une station qui vient de
+ * choisir un dossier ne veut plus voir les vieilles.
+ *
+ * Défini ICI, une seule fois, parce que la régie et l'antenne doivent
+ * compter les mêmes. Quand chacune comptait de son côté, la régie ne
+ * regardait que les images téléversées : une station avec un dossier
+ * plein cliquait « Passer aux pubs » et se faisait renvoyer aux réglages
+ * avec « Ajoute d'abord des images » — la fonction était inatteignable
+ * par son propre bouton.
+ */
+export function pubsDisponibles(pubs) {
+  if (pubs?.fichiers?.length) return pubs.fichiers;
+  return (pubs?.images ?? []).map((url) => ({ url, video: false, nom: "" }));
+}
+
 /** État d'une session neuve. */
 export function etatNeuf() {
   return {

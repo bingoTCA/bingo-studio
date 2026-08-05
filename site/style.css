@@ -497,9 +497,12 @@ code {
   display: flex; align-items: center; justify-content: space-between;
   gap: 16px; margin-top: 14px; flex-wrap: wrap;
 }
-.diapo-points { display: flex; gap: 9px; }
+/* Les points rétrécissent au lieu de déborder : à dix écrans sur un
+   téléphone, une largeur fixe sortait du cadre. */
+.diapo-points { display: flex; gap: 8px; flex: 1 1 200px; justify-content: flex-end; }
 .diapo-point {
-  width: 34px; height: 6px; padding: 0; border: 0; border-radius: 99px;
+  flex: 0 1 34px; min-width: 12px; height: 6px;
+  padding: 0; border: 0; border-radius: 99px;
   background: rgba(255,255,255,.22); cursor: pointer;
   transition: background .25s;
 }

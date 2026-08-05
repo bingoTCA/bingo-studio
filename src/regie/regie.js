@@ -12,7 +12,7 @@ import {
 } from "../core/bingo.js";
 import {
   creerCanal, diffuser, etatNeuf, themeNeuf, sauvegarder, restaurer,
-  messagesDuBandeau
+  messagesDuBandeau, pubsDisponibles
 } from "../core/canal.js";
 import * as sons from "../core/sons.js";
 import * as medias from "../core/medias.js";
@@ -675,7 +675,8 @@ function reduireImage(fichier, maxL, maxH, format = "image/png") {
 
 function dessinerControles() {
   const t = theme();
-  const pubsPretes = t.pubs.images.length > 0;
+  const pubs = pubsDisponibles(t.pubs);
+  const pubsPretes = pubs.length > 0;
 
   $("btn-gen-debut").classList.toggle("actif", etat.ecran === "debut");
   $("btn-gen-fin").classList.toggle("actif", etat.ecran === "fin");
@@ -686,9 +687,9 @@ function dessinerControles() {
 
   const quoi = etat.ecran === "debut" ? "Le générique de début tourne."
     : etat.ecran === "fin" ? "Le générique de fin tourne."
-    : t.pubs.actif ? `Les pubs sont à l'antenne (${t.pubs.images.length} image${t.pubs.images.length > 1 ? "s" : ""}).`
+    : t.pubs.actif ? `Les pubs sont à l'antenne (${pubs.length} fichier${pubs.length > 1 ? "s" : ""}).`
     : "Le jeu est à l'antenne.";
-  $("etat-antenne").textContent = pubsPretes ? quoi : quoi + " Aucune image de pub chargée.";
+  $("etat-antenne").textContent = pubsPretes ? quoi : quoi + " Aucune publicité chargée.";
 }
 
 /**
@@ -1108,9 +1109,11 @@ function brancherControles() {
     // Le bouton n'est jamais désactivé : un bouton grisé avale le clic et
     // l'opératrice croit que le logiciel ne répond pas. On l'emmène plutôt
     // là où il faut agir.
-    if (!theme().pubs.images.length) {
+    // On compte le dossier ET les images téléversées : une station qui a
+    // choisi un dossier plein se faisait renvoyer ici pour rien.
+    if (!pubsDisponibles(theme().pubs).length) {
       ouvrirParametres("titre-pubs");
-      dire("Ajoute d'abord des images de pub, ici.", "erreur");
+      dire("Choisis d'abord un dossier de publicités, ici.", "erreur");
       return;
     }
     theme().pubs.actif = !theme().pubs.actif;

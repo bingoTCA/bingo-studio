@@ -63,6 +63,31 @@ REPERES = {
         {"zones": ["rebours"], "texte": "L'entracte se compte tout seul",
          "centre": (0.51, 0.545)},
     ],
+    "6-pubs.png": [
+        {"zones": ["pub"], "texte": "Tes commanditaires prennent la place de la caméra",
+         "centre": (0.51, 0.615)},
+    ],
+    "7-generique.png": [
+        # La zone couvre tout l'écran : un cadre autour de l'image entière
+        # n'apprendrait rien. L'étiquette seule suffit.
+        {"zones": ["generique"], "texte": "Tes prix et ton règlement, avant la première boule",
+         "centre": (0.50, 0.93), "cadre": False},
+    ],
+    "8-ecrans.png": [
+        {"zones": ["modale"], "texte": "L'antenne part en plein écran sur ta sortie de diffusion",
+         "centre": (0.50, 0.735)},
+    ],
+    "9-couleurs.png": [
+        # Assez à droite pour que la flèche ne barre pas les deux autres
+        # pastilles — ce sont elles qu'on veut donner envie de toucher.
+        {"zones": ["couleurs"], "texte": "Une couleur, et tout l'habillage suit",
+         "centre": (0.535, 0.208), "fleche": True},
+    ],
+    "10-impression.png": [
+        {"zones": ["hautGauche", "hautDroite", "bas"],
+         "texte": "Le format, la tranche de cartes, la couleur, le contrôle",
+         "centre": (0.50, 0.625)},
+    ],
 }
 
 
@@ -154,7 +179,8 @@ def main():
                 print(f"  {nom} : zone(s) introuvable(s) — {', '.join(manquantes)}")
                 continue
             boite = union(boites)
-            cadre(d, boite, echelle)
+            if r.get("cadre", True):
+                cadre(d, boite, echelle)
             pose = etiquette(d, r["texte"], r["centre"], img, echelle)
             if r.get("fleche"):
                 fleche(d, pose, boite, echelle)

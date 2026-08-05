@@ -5,7 +5,8 @@
 // =====================================================================
 
 import { COLONNES, rangee, lettre, FIGURES } from "../core/bingo.js";
-import { creerCanal, reclamerEtat, etatNeuf, fusionnerTheme, messagesDuBandeau } from "../core/canal.js";
+import { creerCanal, reclamerEtat, etatNeuf, fusionnerTheme, messagesDuBandeau,
+         pubsDisponibles } from "../core/canal.js";
 import * as sons from "../core/sons.js";
 import * as medias from "../core/medias.js";
 
@@ -204,14 +205,37 @@ let minuteriePubs = null;
 let signaturePubs = "";
 let couchePubActive = 0;
 
+/** La liste à passer en boucle — la même que compte la régie. */
+const listeDesPubs = pubsDisponibles;
+
 /**
- * La liste à passer en boucle. Un dossier choisi par la station l'emporte
- * sur les images téléversées une à une : c'est le mode qu'on encourage, et
- * une station qui vient de choisir un dossier ne veut plus voir les vieilles.
+ * Les trois numéros d'avant, sous le bloc blanc.
+ *
+ * Un joueur qui lève les yeux une seconde trop tard a raté le sien. Le
+ * tableau le lui dira, mais il faut le chercher parmi soixante-quinze
+ * cases pendant que l'animateur enchaîne. Ici, il est encore là.
+ *
+ * Trois cases toujours présentes, même vides : sinon le bloc changerait
+ * de taille aux trois premières boules et pousserait tout le reste.
  */
-function listeDesPubs(reglages) {
-  if (reglages.fichiers?.length) return reglages.fichiers;
-  return (reglages.images ?? []).map((url) => ({ url, video: false, nom: "" }));
+function majTroisAvant(tirage) {
+  const liste = $("dn-avant-liste");
+  // On saute le dernier (il est déjà en gros au-dessus) et on prend les
+  // trois qui le précèdent, du plus récent au plus ancien.
+  const trois = tirage.slice(Math.max(0, tirage.length - 4), tirage.length - 1).reverse();
+
+  liste.innerHTML = "";
+  for (let i = 0; i < 3; i++) {
+    const n = trois[i];
+    const li = document.createElement("li");
+    if (n === undefined) {
+      li.className = "vide";
+      li.textContent = "—";
+    } else {
+      li.innerHTML = `<span class="dn-avant-lettre">${lettre(n)}</span>${n}`;
+    }
+    liste.appendChild(li);
+  }
 }
 
 /**
@@ -812,6 +836,7 @@ function rendre(etat) {
   $("dn-numero").textContent = dernier === null ? "—" : dernier;
   $("dn-compte").textContent = etat.tirage.length;
   $("dn-restants").textContent = 75 - etat.tirage.length;
+  majTroisAvant(etat.tirage);
 
   majBandeau(t, etat);
   majGenerique(t, etat);

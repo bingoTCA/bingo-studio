@@ -18,7 +18,7 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const { writeFileSync, mkdirSync } = require("node:fs");
 const { join } = require("node:path");
-const { demarrer } = require("../src/server");
+const { demarrer, reglerDossierPubs } = require("../src/server");
 
 const RACINE = join(__dirname, "..");
 // Les captures brutes restent HORS de `site/` : ce dossier est publié tel
@@ -123,6 +123,36 @@ async function releverZones(fenetre, zones) {
   return fenetre.webContents.executeJavaScript(code);
 }
 
+/**
+ * Amène une section des Paramètres en haut de la fenêtre.
+ *
+ * On cherche le conteneur qui défile VRAIMENT plutôt que de le supposer :
+ * selon la hauteur de la fenêtre, ce peut être `.param-corps` ou le
+ * document lui-même.
+ */
+async function allerAuReglage(fenetre, titre) {
+  const r = await fenetre.webContents.executeJavaScript(`
+    (() => {
+      // Les Paramètres existent dans le DOM même fermés : sans cette
+      // vérification, on défilait dans un panneau caché et on
+      // photographiait la régie sans que rien ne le signale.
+      if (document.getElementById("bloc-reglages").hidden) return { ouvert: false };
+      const cible = [...document.querySelectorAll(".param-corps h3")]
+        .find((h) => h.textContent.trim().startsWith(${JSON.stringify(titre)}));
+      if (!cible) return { ouvert: true, trouve: false };
+      let boite = cible.parentElement;
+      while (boite && boite.scrollHeight <= boite.clientHeight) boite = boite.parentElement;
+      const quoi = boite || document.scrollingElement;
+      quoi.scrollTop += cible.getBoundingClientRect().top - quoi.getBoundingClientRect().top - 18;
+      return { ouvert: true, trouve: true, position: Math.round(quoi.scrollTop) };
+    })();
+  `);
+  if (!r.ouvert) throw new Error("les Paramètres ne sont pas ouverts");
+  if (!r.trouve) throw new Error(`section « ${titre} » introuvable dans les Paramètres`);
+  await attendre(450);
+  return r;
+}
+
 async function photographier(fenetre, nom, zones) {
   const image = await fenetre.webContents.capturePage();
   writeFileSync(join(SORTIE, nom), image.toPNG());
@@ -136,8 +166,50 @@ async function photographier(fenetre, nom, zones) {
 // ces réponses, la promesse est rejetée et la régie s'arrête AVANT d'avoir
 // restauré la session : on photographiait alors un écran par défaut.
 ipcMain.handle("adresse-antenne", () => `http://127.0.0.1:${PORT}/antenne`);
-ipcMain.handle("ecrans", () => []);
-ipcMain.handle("relire-dossier-pubs", () => ({ fichiers: [] }));
+
+// La régie relit son dossier de pubs au démarrage. Un bouchon qui renvoie
+// une liste vide effacerait celle qu'on vient de poser — c'est ce qui
+// laissait la zone bleue à l'écran au lieu de la publicité.
+ipcMain.handle("relire-dossier-pubs", () => ({
+  fichiers: [{ nom: "pub-exemple.png", url: "/pubs/pub-exemple.png", video: false }]
+}));
+
+// Les écrans d'une vraie régie : le poste de l'opératrice, et la sortie
+// qui part vers la chaîne de diffusion. La machine qui monte les captures
+// n'en a souvent qu'un — on décrit donc la situation ordinaire d'une
+// station plutôt que celle de mon bureau.
+ipcMain.handle("ecrans", () => [
+  { id: 1, nom: "Écran de la régie", largeur: 1920, hauteur: 1080, principal: true },
+  { id: 2, nom: "Sortie diffusion — HDMI 2", largeur: 1920, hauteur: 1080, principal: false }
+]);
+
+/** Une pub d'exemple, dessinée ici : pas de faux commanditaire inventé. */
+async function fabriquerPubExemple(dossier) {
+  mkdirSync(dossier, { recursive: true });
+  const html = `<!doctype html><meta charset="utf-8"><style>
+    html,body{margin:0;height:100%;font-family:Helvetica,Arial,sans-serif}
+    body{display:grid;place-items:center;background:#10121a;color:#fff}
+    .cadre{width:1640px;height:800px;border:6px dashed rgba(255,255,255,.35);
+      border-radius:28px;display:grid;place-content:center;text-align:center;gap:26px}
+    .grand{font-size:104px;font-weight:700;letter-spacing:-1px}
+    .petit{font-size:40px;color:#ffd700}
+    .note{font-size:29px;color:rgba(255,255,255,.6);line-height:1.5}
+  </style><div class="cadre">
+    <div class="grand">VOTRE PUBLICITÉ ICI</div>
+    <div class="petit">1920 × 1080 pixels</div>
+    <div class="note">Dépose tes images et tes vidéos dans un dossier.<br>
+      JPG, PNG, MP4 — le logiciel les fait tourner tout seul.</div>
+  </div>`;
+  const f = new BrowserWindow({ width: 1920, height: 1080, show: false,
+    webPreferences: { offscreen: true } });
+  await f.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(html));
+  await new Promise((r) => setTimeout(r, 500));
+  const image = await f.webContents.capturePage();
+  const chemin = join(dossier, "pub-exemple.png");
+  writeFileSync(chemin, image.toPNG());
+  f.destroy();
+  return chemin;
+}
 
 app.whenReady().then(async () => {
   mkdirSync(SORTIE, { recursive: true });
@@ -246,6 +318,70 @@ app.whenReady().then(async () => {
   await regie.webContents.executeJavaScript(
     `document.getElementById("btn-rebours").click(); true;`
   );
+  await attendre(600);
+
+  // --- 6. Les publicités à la place de la caméra ----------------------
+  const dossierPubs = join(RACINE, "captures/pubs");
+  await fabriquerPubExemple(dossierPubs);
+  reglerDossierPubs(dossierPubs);
+  await regie.webContents.executeJavaScript(`
+    (() => {
+      const brut = localStorage.getItem("bingo-studio-session");
+      const e = JSON.parse(brut);
+      e.theme.pubs.dossier = ${JSON.stringify(dossierPubs)};
+      e.theme.pubs.fichiers = [{ nom: "pub-exemple.png", url: "/pubs/pub-exemple.png", video: false }];
+      localStorage.setItem("bingo-studio-session", JSON.stringify(e));
+      return true;
+    })();
+  `);
+  await regie.loadURL(`http://127.0.0.1:${PORT}/regie`);
+  await attendre(900);
+  await regie.webContents.executeJavaScript(
+    `document.getElementById("btn-pubs").click(); true;`
+  );
+  await attendre(1400);
+  await photographier(antenne, "6-pubs.png", { pub: "#pubs" });
+  await regie.webContents.executeJavaScript(
+    `document.getElementById("btn-pubs").click(); true;`
+  );
+
+  // --- 7. Le générique de début ---------------------------------------
+  await regie.webContents.executeJavaScript(
+    `document.getElementById("btn-gen-debut").click(); true;`
+  );
+  await attendre(1500);
+  await photographier(antenne, "7-generique.png", { generique: "#generique" });
+  await regie.webContents.executeJavaScript(
+    `document.getElementById("btn-gen-stop").click(); true;`
+  );
+  await attendre(500);
+
+  // --- 8. Où envoyer l'antenne ----------------------------------------
+  await regie.webContents.executeJavaScript(
+    `document.getElementById("btn-ecrans").click(); true;`
+  );
+  await attendre(900);
+  await photographier(regie, "8-ecrans.png", { modale: "#choix-ecran .modale-boite" });
+  await regie.webContents.executeJavaScript(
+    `document.getElementById("btn-fermer-ecrans").click(); true;`
+  );
+  await attendre(400);
+
+  // --- 9 et 10. Deux sections des Paramètres ---------------------------
+  await regie.webContents.executeJavaScript(
+    `document.getElementById("btn-reglages").click(); true;`
+  );
+  await attendre(900);
+
+  await allerAuReglage(regie, "Couleurs");
+  await photographier(regie, "9-couleurs.png", { couleurs: "#reg-ambiance" });
+
+  await allerAuReglage(regie, "Imprimer les cartes");
+  await photographier(regie, "10-impression.png", {
+    // Les quatre coins du bloc de champs : le cadre doit les englober
+    // tous, sinon il ne montre qu'une colonne.
+    hautGauche: "#imp-par-feuille", hautDroite: "#imp-couleur", bas: "#imp-controle"
+  });
 
   writeFileSync(join(SORTIE, "reperes.json"), JSON.stringify(reperes, null, 2));
   console.log(`\nDossier → ${SORTIE}`);

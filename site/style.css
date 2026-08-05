@@ -431,3 +431,111 @@ code {
   .etapes li { padding-left: 52px; }
   .etapes li::before { width: 36px; height: 36px; font-size: 19px; }
 }
+
+/* =====================================================================
+   Le diaporama de l'accueil
+   ---------------------------------------------------------------------
+   Cinq écrans empilés au même endroit par la grille : le bloc prend la
+   hauteur du plus grand, sans hauteur fixe à deviner. On ne fait varier
+   que l'opacité — une transition sur « display » n'existe pas, et une
+   sur « height » ferait sauter toute la page à chaque changement.
+   ===================================================================== */
+
+.diaporama { margin: 0 0 34px; max-width: 940px; }
+
+.diapo-ecran {
+  position: relative;
+  border-radius: 14px;
+  border: 1px solid var(--bord);
+  background: #000;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,.55);
+}
+
+.diapo-pellicule { display: grid; list-style: none; }
+.diapo {
+  grid-area: 1 / 1;                /* tout le monde au même endroit */
+  opacity: 0; visibility: hidden;
+  transition: opacity .55s ease, visibility 0s .55s;
+}
+.diapo[data-actif] { opacity: 1; visibility: visible; transition: opacity .55s ease; }
+@media (prefers-reduced-motion: reduce) { .diapo { transition: none; } }
+
+.diapo img {
+  display: block; width: 100%; height: auto;
+  aspect-ratio: 16 / 9; object-fit: cover;
+  background: #120a1e;
+}
+
+/* Le texte vit sous l'image, dans le même bloc : il change avec elle. */
+.diapo-mot { padding: 20px 22px 22px; background: rgba(255,255,255,.045); }
+.diapo-titre {
+  font-family: Impact, "Arial Narrow", Arial, sans-serif;
+  font-weight: 400; letter-spacing: .4px; line-height: 1.15;
+  font-size: clamp(19px, 2.5vw, 25px);
+  color: var(--jaune); margin-bottom: 7px;
+}
+.diapo-texte { font-size: 16px; color: var(--texte-doux); max-width: 62ch; }
+
+/* ---------- Les flèches ---------- */
+.diapo-fleche {
+  position: absolute; top: 0; bottom: 0; width: 62px;
+  display: flex; align-items: center; justify-content: center;
+  border: 0; cursor: pointer; color: #fff;
+  background: linear-gradient(90deg, rgba(0,0,0,.55), transparent);
+  opacity: 0; transition: opacity .25s;
+}
+.diapo-avant { left: 0; }
+.diapo-apres { right: 0; background: linear-gradient(270deg, rgba(0,0,0,.55), transparent); }
+.diapo-fleche svg { width: 30px; height: 30px; stroke-width: 2.4; }
+.diapo-ecran:hover .diapo-fleche, .diapo-fleche:focus-visible { opacity: 1; }
+/* Sur écran tactile il n'y a pas de survol : les flèches restent visibles. */
+@media (hover: none) { .diapo-fleche { opacity: .85; } }
+
+/* ---------- La barre du dessous ---------- */
+.diapo-barre {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; margin-top: 14px; flex-wrap: wrap;
+}
+.diapo-points { display: flex; gap: 9px; }
+.diapo-point {
+  width: 34px; height: 6px; padding: 0; border: 0; border-radius: 99px;
+  background: rgba(255,255,255,.22); cursor: pointer;
+  transition: background .25s;
+}
+.diapo-point:hover { background: rgba(255,255,255,.42); }
+.diapo-point[aria-selected="true"] { background: var(--jaune); }
+
+.diapo-pause {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: transparent; border: 0; padding: 4px 2px; cursor: pointer;
+  color: var(--texte-doux); font: inherit; font-size: 14px;
+}
+.diapo-pause:hover { color: #fff; }
+/* Deux barres = en marche (le bouton arrête) ; un triangle = à l'arrêt. */
+.diapo-pause-icone {
+  width: 11px; height: 12px; flex: none;
+  border-left: 3px solid currentColor; border-right: 3px solid currentColor;
+}
+.diapo-pause[aria-pressed="true"] .diapo-pause-icone {
+  border: 0; width: 0; height: 0;
+  border-top: 6px solid transparent; border-bottom: 6px solid transparent;
+  border-left: 11px solid currentColor;
+}
+
+/* Sans JavaScript : pas de commandes qui ne répondent à rien. */
+.diaporama.sans-js .diapo-fleche,
+.diaporama.sans-js .diapo-barre { display: none; }
+
+@media (max-width: 620px) {
+  .diapo-mot { padding: 16px 16px 18px; }
+  .diapo-texte { font-size: 15px; }
+  /* Le libellé disparaît à l'œil mais RESTE dans la page : avec
+     « display: none », le bouton n'aurait plus de nom du tout pour un
+     lecteur d'écran — un bouton muet sur téléphone. */
+  .diapo-pause-mot {
+    position: absolute; width: 1px; height: 1px;
+    margin: -1px; padding: 0; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap;
+  }
+}

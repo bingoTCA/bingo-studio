@@ -9,7 +9,7 @@
 //    npm run captures
 // =====================================================================
 
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const { writeFileSync, mkdirSync } = require("node:fs");
 const { join } = require("node:path");
 const { demarrer } = require("../src/server");
@@ -64,6 +64,13 @@ async function photographier(fenetre, nom) {
   console.log(`  ${nom.padEnd(22)} ${width} × ${height}`);
 }
 
+// Les fenêtres interrogent le processus principal dès leur démarrage.
+// Sans ces réponses, la promesse est rejetée et la régie s'arrête avant
+// d'avoir restauré la session : on photographierait un écran par défaut.
+ipcMain.handle("adresse-antenne", () => `http://127.0.0.1:${PORT}/antenne`);
+ipcMain.handle("ecrans", () => []);
+ipcMain.handle("relire-dossier-pubs", () => ({ fichiers: [] }));
+
 app.whenReady().then(async () => {
   mkdirSync(SORTIE, { recursive: true });
   const { serveur } = await demarrer(RACINE, PORT);
@@ -76,12 +83,25 @@ app.whenReady().then(async () => {
   await regie.loadURL(`http://127.0.0.1:${PORT}/regie`);
 
   // On installe la session de démonstration, puis on recharge pour que la
-  // régie la restaure et la diffuse.
+  // régie la restaure et la diffuse. La pause avant l'écriture n'est pas
+  // du confort : sans elle, la régie finit de démarrer et enregistre sa
+  // session neuve PAR-DESSUS la nôtre — on photographie alors un écran
+  // vide en croyant tenir la démonstration.
+  await attendre(700);
   await regie.webContents.executeJavaScript(
     `localStorage.setItem("bingo-studio-session", ${JSON.stringify(JSON.stringify(DEMO))}); true;`
   );
   await regie.loadURL(`http://127.0.0.1:${PORT}/regie`);
   await attendre(700);
+
+  // Garde-fou : si la session n'a pas pris, tout le reste photographie du
+  // vide sans que rien ne le signale.
+  const tires = await regie.webContents.executeJavaScript(
+    `document.getElementById("compte-tires").textContent`
+  );
+  if (String(tires) !== String(DEMO.tirage.length)) {
+    throw new Error(`session non restaurée : ${tires} numéros au lieu de ${DEMO.tirage.length}`);
+  }
 
   // Une carte vérifiée dans la régie, pour montrer la fonction phare. On ne
   // passe PAS l'antenne en mode vérification : la capture de l'antenne doit

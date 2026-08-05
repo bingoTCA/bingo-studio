@@ -43,6 +43,91 @@
         <strong>un habillage de vraie télé</strong> et
         <strong>une carte vérifiée avant que la personne raccroche</strong>.
       </p>
+
+      <!-- ====================== Le diaporama ======================
+           Cinq écrans du logiciel, pris pour de vrai — pas des maquettes.
+           Les cadres rouges sont tracés par `scripts/annoter.py`, à partir
+           des positions relevées dans le DOM au moment de la capture.
+
+           Sans JavaScript, la classe « sans-js » reste : la première
+           image et son texte s'affichent seuls, sans commandes mortes.
+           Les images 2 à 5 attendent dans « data-src » — l'accueil ne
+           télécharge que ce qu'il montre. -->
+      <div class="diaporama sans-js" id="diaporama"
+           role="group" aria-roledescription="diaporama"
+           aria-label="Bingo Studio en cinq écrans">
+
+        <div class="diapo-ecran">
+          <ul class="diapo-pellicule">
+
+            <li class="diapo" data-actif>
+              <img src="images/diapo/1-antenne-jeu.webp" width="1600" height="900"
+                   alt="L'écran d'antenne : le tableau de 1 à 75 avec les numéros sortis en rouge,
+                        la liste des gagnants, les prix à gagner, et la zone bleue où s'incruste l'animateur.">
+              <div class="diapo-mot">
+                <p class="diapo-titre">Ton bingo a l'air d'une vraie émission.</p>
+                <p class="diapo-texte">Le tableau, la figure à faire, les lots, l'heure&nbsp;: tout
+                  reste à l'écran. Ton animateur s'incruste sur le fond bleu, comme d'habitude.</p>
+              </div>
+            </li>
+
+            <li class="diapo">
+              <img data-src="images/diapo/2-regie.webp" width="1600" height="895" alt="">
+              <div class="diapo-mot">
+                <p class="diapo-titre">Toi, tu cliques. Le logiciel ne tire rien.</p>
+                <p class="diapo-texte">Ton boulier reste seul maître du hasard. Tu cliques le numéro
+                  qui sort, il apparaît à l'antenne dans la seconde.</p>
+              </div>
+            </li>
+
+            <li class="diapo">
+              <img data-src="images/diapo/3-verification.webp" width="1600" height="900" alt="">
+              <div class="diapo-mot">
+                <p class="diapo-titre">Elle a gagné&nbsp;? Tout le monde le voit en même temps.</p>
+                <p class="diapo-texte">Tu tapes le numéro de série et la carte s'affiche à l'antenne,
+                  les numéros déjà sortis marqués. Plus personne ne t'attend au bout du fil.</p>
+              </div>
+            </li>
+
+            <li class="diapo">
+              <img data-src="images/diapo/4-gagnants.webp" width="1600" height="900" alt="">
+              <div class="diapo-mot">
+                <p class="diapo-titre">Deux gagnants sur la même figure&nbsp;? Le lot se divise tout seul.</p>
+                <p class="diapo-texte">Les noms restent affichés jusqu'à la fin de l'émission.
+                  Fini le calcul mental en ondes.</p>
+              </div>
+            </li>
+
+            <li class="diapo">
+              <img data-src="images/diapo/5-entracte.webp" width="1600" height="900" alt="">
+              <div class="diapo-mot">
+                <p class="diapo-titre">L'entracte ne fait plus d'écran mort.</p>
+                <p class="diapo-texte">Tu lances le rebours, il passe tes publicités et ramène
+                  le jeu à l'heure dite.</p>
+              </div>
+            </li>
+
+          </ul>
+
+          <button class="diapo-fleche diapo-avant" type="button" aria-label="Écran précédent">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg>
+          </button>
+          <button class="diapo-fleche diapo-apres" type="button" aria-label="Écran suivant">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+          </button>
+        </div>
+
+        <div class="diapo-barre">
+          <!-- Le défilement s'arrête au survol et au clavier, mais ça ne
+               suffit pas : il faut un vrai bouton pour l'arrêter. -->
+          <button class="diapo-pause" type="button" aria-pressed="false">
+            <span class="diapo-pause-icone" aria-hidden="true"></span>
+            <span class="diapo-pause-mot">Arrêter le défilement</span>
+          </button>
+          <div class="diapo-points"></div>
+        </div>
+      </div>
+
       <div class="boutons">
         <a class="bouton bouton-fort" href="#telecharger">Obtenir le logiciel — gratuit</a>
         <a class="bouton" href="#emploi">Voir comment ça marche</a>
@@ -696,5 +781,6 @@
 
 </script>
 <script src="loi25.js"></script>
+<script src="diaporama.js"></script>
 </body>
 </html>

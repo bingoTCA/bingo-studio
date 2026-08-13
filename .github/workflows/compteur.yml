@@ -82,27 +82,57 @@ jobs:
 
       - name: Compter aussi les téléchargements publics
         id: sorties
+        # Ce chiffre-là n'est même pas affiché sur le site : il n'a aucun
+        # droit de faire tomber l'ouvrage. Il l'a fait une fois — l'appel
+        # partait sans jeton, GitHub a répondu « rate limit exceeded », et
+        # jq s'est étranglé sur un objet d'erreur au lieu d'une liste. Le
+        # nombre d'inscriptions était pourtant DÉJÀ relevé : il n'a jamais
+        # été écrit, et le compteur du site est resté sur la veille.
+        continue-on-error: true
+        env:
+          # Le jeton fourni par Actions : 1 000 appels par heure au lieu de
+          # 60 partagés entre toutes les machines de GitHub.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Gratuit et sans clé : GitHub publie le compte de téléchargements
-          # de chaque fichier de version. Utile à Marc même si le site
-          # n'affiche pas ce chiffre-là.
-          total=$(curl -s -H "accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${{ github.repository }}/releases" \
-            | jq '[.[].assets[].download_count] | add // 0')
+          reponse=$(curl -s -w '\n%{http_code}' \
+            -H "accept: application/vnd.github+json" \
+            -H "authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/releases?per_page=100")
+          code=$(printf '%s' "$reponse" | tail -n1)
+          corps=$(printf '%s' "$reponse" | sed '$d')
+
+          if [ "$code" != "200" ]; then
+            echo "GitHub a répondu $code — on laisse ce chiffre de côté."
+            echo "total=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # « if type == array » : sans ce garde-fou, un corps d'erreur fait
+          # sortir jq en échec, et bash -e emporte toute la tâche avec lui.
+          total=$(printf '%s' "$corps" \
+            | jq 'if type == "array" then ([.[].assets[]?.download_count] | add // 0) else empty end' \
+            2>/dev/null || true)
           case "$total" in
-            ''|*[!0-9]*) total=0 ;;
+            ''|*[!0-9]*) echo "Compte illisible — on laisse ce chiffre de côté."
+                         echo "total=" >> "$GITHUB_OUTPUT"; exit 0 ;;
           esac
+
           echo "total=$total" >> "$GITHUB_OUTPUT"
           echo "Téléchargements : $total"
 
       - name: Écrire le fichier lu par le site
         if: steps.brevo.outputs.ok == 'oui'
+        env:
+          # Vide si GitHub n'a pas répondu : le compteur d'inscriptions,
+          # lui, doit s'écrire quand même. C'est le seul des deux que la
+          # page affiche.
+          TELECHARGEMENTS: ${{ steps.sorties.outputs.total || 0 }}
         run: |
           mkdir -p site/donnees
           cat > site/donnees/compteur.json <<FIN
           {
             "inscriptions": ${{ steps.brevo.outputs.nombre }},
-            "telechargements": ${{ steps.sorties.outputs.total }},
+            "telechargements": ${TELECHARGEMENTS:-0},
             "releve": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           }
           FIN

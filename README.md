@@ -333,7 +333,9 @@ des gagnants à perdre.
 
 Bingo Studio est **compatible avec les cartes papier Arrow Games** (gamme
 Capitol™, distribuées au Québec par Bingo Vézina). La base contient les séries
-numérisées page par page à partir des cartables des télévisions communautaires :
+numérisées page par page à partir des classeurs de vérification (cartables) des
+télévisions communautaires — les feuillets qui servent à vérifier les cartes
+gagnantes :
 
 | Série | Dans le logiciel |
 |---|---|
@@ -359,7 +361,7 @@ la carte est fausse. Sa série n'est simplement pas encore numérisée.
 
 ### Ajouter une série
 
-Une télé scanne son cartable et envoie le PDF ; on le lit (chaîne OCR du
+Une télé scanne son classeur de vérification et envoie le PDF ; on le lit (chaîne OCR du
 projet BINGO 1.0 v2, dossier `ocr_arrow/`), puis on installe le CSV complet :
 
 ```bash

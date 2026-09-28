@@ -3,12 +3,13 @@
 //
 //  La base de Bingo Studio, ce sont les séries de cartes papier que les
 //  télévisions communautaires utilisent déjà — numérisées page par page
-//  à partir des cartables. Ce script prend le CSV issu de cette
+//  à partir des classeurs de vérification (cartables) : les feuillets qui
+//  servent à vérifier les cartes gagnantes, pas les cartes des joueurs. Ce script prend le CSV issu de cette
 //  numérisation, le contrôle carte par carte, l'installe dans
 //  data/cartes.json et le scelle.
 //
 //  Il servira chaque fois qu'une série s'ajoute : une télé scanne son
-//  cartable, on lit le PDF, on relance ce script sur le CSV complet.
+//  classeur de vérification, on lit le PDF, on relance ce script sur le CSV complet.
 //
 //  Format accepté : une ligne par carte, la carte lue colonne par colonne.
 //    carte,B1..B5,I1..I5,N1,N2,N4,N5,G1..G5,O1..O5     (N3 absent : case libre)
@@ -143,7 +144,7 @@ if (direct) {
 
   const nums = Object.keys(catalogue).map(Number).sort((a, b) => a - b);
   const manifeste = {
-    source: String(args.source ?? "Séries de cartes papier Arrow, numérisées à partir des cartables des télévisions communautaires"),
+    source: String(args.source ?? "Séries de cartes papier Arrow, numérisées à partir des classeurs de vérification (cartables) des télévisions communautaires"),
     usage: "Vérification en ondes des cartes déjà achetées chez un fournisseur licencié. Le logiciel n'imprime pas de cartes.",
     tranches: t,
     premier: nums[0],

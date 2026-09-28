@@ -245,26 +245,6 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
 }
 .etapes h3 { margin-bottom: 4px; }
 
-/* ---------- Les trois temps de la contribution ---------- */
-.etapes-contribution {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
-  gap: 24px; margin: 30px 0 32px;
-}
-.etapes-contribution > div {
-  background: linear-gradient(180deg, rgba(74,31,122,.34) 0%, rgba(26,18,38,.34) 100%);
-  border: 1px solid var(--bord); border-radius: 14px;
-  padding: 22px 22px 24px;
-}
-.etapes-contribution .numero {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 34px; height: 34px; border-radius: 50%;
-  background: var(--jaune); color: #2a1456;
-  font-family: Impact, "Arial Narrow", Arial, sans-serif; font-size: 19px;
-  margin-bottom: 12px;
-}
-.etapes-contribution h3 { font-size: 19px; margin-bottom: 8px; }
-.etapes-contribution p { font-size: 15.5px; color: var(--texte-doux); line-height: 1.6; }
-
 /* Sous-titre de section : un h3 qui ouvre un bloc, pas une carte. Il lui faut
    de l'air au-dessus, qu'un h3 de carte n'a pas besoin d'avoir. */
 .sous-titre { margin-top: 44px; }
@@ -577,3 +557,6 @@ code {
 /* Les deux captures de BINGO Habillage TV, côte à côte. */
 .habillage-captures { margin: 8px 0 26px; }
 .habillage-captures .apercu { margin-bottom: 0; }
+
+/* Deux petites notes sous les boutons de contribution : un peu d'air entre elles. */
+#contribution .petit + .petit { margin-top: 10px; }

@@ -4,8 +4,9 @@
 //  Les autres tests vérifient que la base est cohérente. Celui-ci vérifie
 //  qu'elle est VRAIE : six cartes relevées à l'œil sur une feuille papier
 //  Capitol™ 1-9000 (Arrow, distribution Bingo Vézina), photographiée —
-//  voir site/images/feuille-capitol.webp. Même feuille, même boîte que
-//  celles qu'une télé communautaire a en main.
+//  TVCE/photos3/IMG_8942.jpg. La photo n'est pas sur le site, exprès :
+//  les télés ont des feuilles de 3 ou 6 cartes, de couleurs variées, et
+//  une seule image laisserait croire que seules celles-là sont reconnues.
 //
 //  Si une réinstallation de la base décale une série, transpose une
 //  colonne ou mélange deux numéros, ces six cartes le disent — avant les

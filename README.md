@@ -386,6 +386,11 @@ qui. Le manifeste, lui, est publié — on voit ce que contient la base sans la
 diffuser. Pour construire le logiciel, installer d'abord la base avec
 `importer-base.mjs`.
 
+Si `data/cartes.json` disparaît (une opération Git qui repasse par le commit
+où il a quitté le dépôt peut l'emporter — c'est arrivé à la 1.4.0), relance
+l'import sur le CSV source : l'empreinte doit retomber exactement sur celle
+du manifeste, et `npm test` le vérifie.
+
 ### L'impression des cartes est mise de côté
 
 Bingo Studio a d'abord livré sa propre base de 50 000 cartes générées par

@@ -544,7 +544,7 @@ code {
 }
 
 /* =====================================================================
-   La base de cartes : les séries, l'étiquette de la boîte, l'achat
+   La base de cartes : les séries, l'achat, l'appel aux cartables
    ===================================================================== */
 
 /* Une ligne par série : son nom, une jauge, où elle en est. La jauge dit
@@ -566,41 +566,6 @@ code {
 @media (max-width: 620px) {
   .serie-ligne { grid-template-columns: 1fr; }
   .serie-etat { grid-column: 1; }
-}
-
-/* L'étiquette décodée, à côté de la photo de la boîte. */
-.etiquette {
-  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-  gap: 26px; align-items: start; margin: 18px 0 26px;
-}
-.etiquette-carte { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); }
-.etiquette-photo { margin: 0; }
-.etiquette-photo img {
-  display: block; width: 100%; height: auto;
-  border-radius: 12px; border: 1px solid var(--bord);
-}
-.etiquette-photo figcaption { margin-top: 8px; font-size: 14px; color: var(--texte-doux); }
-.etiquette-lecture { margin: 0; display: grid; gap: 10px; }
-.etiquette-lecture div {
-  display: grid; grid-template-columns: 9.5em 1fr; gap: 12px;
-  padding-bottom: 10px; border-bottom: 1px solid var(--bord);
-}
-.etiquette-lecture dt {
-  font-family: "Courier New", Courier, monospace; font-weight: 700;
-  color: #fff; letter-spacing: .5px;
-}
-.etiquette-lecture dd { margin: 0; font-size: 15px; color: var(--texte-doux); }
-.etiquette-carte h3 { margin-top: 0; }
-.etiquette-carte p + p { margin-top: 12px; }
-.verifie {
-  margin-top: 18px !important; padding: 12px 16px; border-radius: 10px;
-  border: 1px solid rgba(90, 200, 120, .45); background: rgba(90, 200, 120, .09);
-  font-size: 15px;
-}
-@media (max-width: 720px) {
-  .etiquette, .etiquette-carte { grid-template-columns: 1fr; }
-  .etiquette-carte .etiquette-photo { max-width: 420px; }
-  .etiquette-lecture div { grid-template-columns: 1fr; gap: 2px; }
 }
 
 /* Dans ces blocs, le gras reste dans la phrase : la règle générale de

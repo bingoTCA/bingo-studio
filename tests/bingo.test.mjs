@@ -45,33 +45,42 @@ test("rangee() donne les 15 numéros de chaque colonne", () => {
 //  Catalogue
 // ---------------------------------------------------------------------
 
-// Les tests valident la base RÉELLEMENT installée, sans figer son nombre de
-// cartes : tu peux générer la tienne (scripts/generer-cartes.mjs) sans les
-// réécrire.
+// Les tests valident la base RÉELLEMENT installée — les séries papier
+// numérisées — sans figer son nombre de cartes : elle grandit à chaque
+// série ajoutée, et ces tests n'ont pas à être réécrits pour autant.
 const NUMEROS = Object.keys(catalogue).map(Number).sort((a, b) => a - b);
+const cheminManifeste = join(ici, "../data/cartes.manifeste.json");
+const manifeste = existsSync(cheminManifeste)
+  ? JSON.parse(readFileSync(cheminManifeste, "utf8"))
+  : null;
 
 test("la base scellée n'a pas bougé d'un octet", () => {
-  const chemin = join(ici, "../data/cartes.manifeste.json");
-  if (!existsSync(chemin)) {
-    assert.fail("data/cartes.manifeste.json est absent — lance : node scripts/sceller-base.mjs");
+  if (!manifeste) {
+    assert.fail("data/cartes.manifeste.json est absent — lance : node scripts/importer-base.mjs --csv=…");
   }
-  const m = JSON.parse(readFileSync(chemin, "utf8"));
   const empreinte = "sha256:" + createHash("sha256").update(brutCatalogue).digest("hex");
 
-  assert.equal(empreinte, m.empreinte,
+  assert.equal(empreinte, manifeste.empreinte,
     "L'empreinte de data/cartes.json ne correspond plus au manifeste.\n"
-    + "   La base a été modifiée. Si c'est voulu, resceller ; sinon, restaurer.");
-  assert.equal(NUMEROS.length, m.nombre);
-  assert.equal(NUMEROS[0], m.premier);
-  assert.equal(NUMEROS.at(-1), m.dernier);
+    + "   La base a été modifiée. Si c'est voulu, la réinstaller ; sinon, la restaurer.");
+  assert.equal(NUMEROS.length, manifeste.nombre);
+  assert.equal(NUMEROS[0], manifeste.premier);
+  assert.equal(NUMEROS.at(-1), manifeste.dernier);
 });
 
-test("le catalogue est numéroté sans trou", () => {
+// La base a des trous, et c'est normal : ce sont les séries pas encore
+// numérisées (9 001 à 27 000, par exemple). Ce qu'on exige, c'est que
+// chaque tranche ANNONCÉE soit complète — une carte manquante au milieu
+// d'une série qu'on dit intégrée, c'est une vérification qui échoue en
+// ondes avec la bonne carte dans la main de la personne.
+test("chaque tranche annoncée est complète, et rien n'existe en dehors", () => {
   assert.ok(NUMEROS.length > 0, "le catalogue est vide");
-  for (let i = NUMEROS[0]; i <= NUMEROS.at(-1); i++) {
-    assert.ok(catalogue[String(i)], `carte ${i} manquante`);
+  let attendues = 0;
+  for (const [de, a] of manifeste.tranches) {
+    for (let i = de; i <= a; i++) assert.ok(catalogue[String(i)], `carte ${i} manquante dans la tranche ${de}–${a}`);
+    attendues += a - de + 1;
   }
-  assert.equal(NUMEROS.length, NUMEROS.at(-1) - NUMEROS[0] + 1);
+  assert.equal(NUMEROS.length, attendues, "des cartes existent hors des tranches annoncées");
 });
 
 test("chaque carte est une grille 5x5 avec la case libre au centre", () => {
@@ -105,12 +114,10 @@ test("chaque carte porte bien 24 numéros", () => {
   }
 });
 
-// Défaut connu de la base d'origine A09036 (ligne 9043 du CSV) : la carte
-// 9042 porte le 58 deux fois en colonne G. Elle n'a donc que 23 numéros
-// distincts et complète la carte pleine une boule plus tôt que les autres.
-// On le tolère s'il est là, mais on refuse tout NOUVEAU doublon — et une
-// base générée par scripts/generer-cartes.mjs n'en a aucun.
-const DOUBLONS_TOLERES = new Set([9042]);
+// Un numéro répété sur une carte PAPIER existe (la carte 9042 de l'ancienne
+// base A09036 portait le 58 deux fois). L'import les relève dans le
+// manifeste ; on tolère ceux-là, et on refuse tout doublon non déclaré.
+const DOUBLONS_TOLERES = new Set(manifeste?.doublonsConnus ?? []);
 
 test("aucune carte ne contient deux fois le même numéro", () => {
   const trouves = [];

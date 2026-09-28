@@ -1,11 +1,21 @@
 {
-  "detenteur": "Bingo Studio — base offerte aux télévisions communautaires autonomes",
-  "droits": "Cartes libres de droits pour les télévisions communautaires autonomes · Bingo Studio",
-  "graine": "bingo-studio 2026",
+  "source": "Séries de cartes papier Arrow, numérisées à partir des cartables des télévisions communautaires",
+  "usage": "Vérification en ondes des cartes déjà achetées chez un fournisseur licencié. Le logiciel n'imprime pas de cartes.",
+  "tranches": [
+    [
+      1,
+      9000
+    ],
+    [
+      27001,
+      34200
+    ]
+  ],
   "premier": 1,
-  "dernier": 50000,
-  "nombre": 50000,
-  "empreinte": "sha256:a606efb66267278bbacae13c75646f08d799ce2bd6a2f368b9f00baaa7d3bd46",
-  "scelleLe": "2026-08-02",
-  "note": "Ne pas modifier data/cartes.json. Toute retouche invalide l'empreinte et fait échouer npm test. Pour changer de base : régénérer avec la graine, puis resceller."
+  "dernier": 34200,
+  "nombre": 16200,
+  "doublonsConnus": [],
+  "empreinte": "sha256:656278bfc90c91180936508f97457007ebf515f4823b63235407be473057e934",
+  "scelleLe": "2026-09-28",
+  "note": "Ne pas modifier data/cartes.json à la main : npm test refuse toute base dont l'empreinte ne correspond plus. Pour ajouter une série : relancer scripts/importer-base.mjs sur le CSV complet."
 }

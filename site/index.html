@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bingo Studio communautaire — la régie de bingo des télévisions communautaires autonomes du Québec</title>
-<meta name="description" content="Logiciel gratuit de régie de bingo pour les télévisions communautaires autonomes du Québec. Base de 50 000 cartes libre de droits, préparation des cartes en PDF, habillage à l'antenne, vérification en direct. Tout tourne sur ta machine, hors ligne.">
+<meta name="description" content="Logiciel gratuit de régie de bingo pour les télévisions communautaires autonomes du Québec. Compatible avec les cartes papier Arrow Games : vérification en direct — les séries 1 à 9 000 et 27 001 à 34 200 sont déjà dans le logiciel —, habillage à l'antenne. Tout tourne sur ta machine, hors ligne.">
 <meta property="og:title" content="Bingo Studio communautaire">
 <meta property="og:description" content="Offert gratuitement aux télévisions communautaires autonomes du Québec.">
 <meta property="og:locale" content="fr_CA">
@@ -45,17 +45,17 @@
       </p>
 
       <!-- ====================== Le diaporama ======================
-           Dix écrans du logiciel, pris pour de vrai — pas des maquettes.
+           Neuf écrans du logiciel, pris pour de vrai — pas des maquettes.
            Les cadres rouges sont tracés par `scripts/annoter.py`, à partir
            des positions relevées dans le DOM au moment de la capture.
 
            Sans JavaScript, la classe « sans-js » reste : la première
            image et son texte s'affichent seuls, sans commandes mortes.
-           Les images 2 à 10 attendent dans « data-src » — l'accueil ne
+           Les images 2 à 9 attendent dans « data-src » — l'accueil ne
            télécharge que ce qu'il montre, et prépare la suivante. -->
       <div class="diaporama sans-js" id="diaporama"
            role="group" aria-roledescription="diaporama"
-           aria-label="Bingo Studio en dix écrans">
+           aria-label="Bingo Studio en neuf écrans">
 
         <div class="diapo-ecran">
           <ul class="diapo-pellicule">
@@ -147,15 +147,6 @@
               </div>
             </li>
 
-            <li class="diapo">
-              <img data-src="images/diapo/10-impression.webp" width="1600" height="895" alt="">
-              <div class="diapo-mot">
-                <p class="diapo-titre">Les feuilles à donner à ton imprimeur, montées ici.</p>
-                <p class="diapo-texte">Trois ou six carreaux, de quelle carte à quelle carte,
-                  la couleur des blocs, ton numéro de contrôle. Le PDF sort prêt à envoyer.</p>
-              </div>
-            </li>
-
           </ul>
 
           <button class="diapo-fleche diapo-avant" type="button" aria-label="Écran précédent">
@@ -223,13 +214,13 @@
         </li>
         <li>
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M7 9V3.5h10V9"/>
-            <path d="M5 9h14a2 2 0 0 1 2 2v5h-4"/>
-            <path d="M5 16H3v-5a2 2 0 0 1 2-2"/>
-            <rect x="7" y="13.5" width="10" height="7" rx="1"/>
+            <rect x="4" y="3.5" width="14" height="17" rx="1.5"/>
+            <path d="M8 3.5v17"/>
+            <path d="M11 8h4M11 11.5h4M11 15h2.5"/>
+            <path d="M18 6.5h2v14.5H7.5"/>
           </svg>
-          <strong>Tes cartes imprimables</strong>
-          <span>De 1 à 18 grilles par feuille, séries éparpillées, fichier prêt pour ton fournisseur</span>
+          <strong>Tes cartes Arrow Games, déjà dedans</strong>
+          <span>Les séries papier des télés communautaires, numérisées — rien à saisir</span>
         </li>
         <li>
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -249,32 +240,36 @@
       <p class="intro">
         Le but de cette plateforme n'est pas de te vendre un service dont tu
         dépendrais ensuite. C'est de mettre <strong>ton bingo entre tes
-        mains</strong> : ta base de cartes, tes impressions, tes couleurs, tes
-        parties. Sans abonnement, sans compte à ouvrir, sans appeler personne.
+        mains</strong> : ton habillage, tes parties, ta vérification en ondes.
+        Sans abonnement, sans compte à ouvrir, sans appeler personne.
       </p>
 
       <div class="grille-paire">
         <article class="carte">
-          <h3>Tes cartes t'appartiennent</h3>
+          <h3>Tes cartes, telles quelles</h3>
           <p>
-            La base de 50 000 cartes est livrée avec le logiciel et
-            <strong>libre de droits</strong> pour les télévisions
-            communautaires autonomes. Elle n'appartient à aucun fournisseur :
-            tu n'as personne à qui demander la permission de t'en servir, ni
-            de licence à renouveler pour continuer.
+            Tu continues de commander tes livrets chez ton fournisseur, comme
+            avant. Rien ne change sur le plancher ni en salle : ce sont les
+            mêmes cartes papier, les mêmes séries.
+          </p>
+          <p>
+            Ce qui change, c'est qu'elles sont <strong>déjà dans le
+            logiciel</strong>. Les séries Arrow Games utilisées par les télévisions
+            communautaires y sont numérisées : tu tapes un numéro de série, la
+            carte apparaît. Rien à saisir, rien à préparer.
           </p>
         </article>
         <article class="carte">
-          <h3>Tu prépares tes cartes</h3>
+          <h3>Fini le cartable en ondes</h3>
           <p>
-            C'est toi qui décides de leur contenu : la tranche de la base, le
-            nombre de grilles par feuille, le format, les couleurs. Le logiciel
-            produit le fichier prêt pour la production.
+            La vérification à la main — tourner les pages du cartable, trouver
+            la bonne carte, relire les numéros un à un pendant que tout le
+            monde attend — se fait maintenant <strong>en une seconde, à
+            l'écran</strong>, devant tout le monde.
           </p>
           <p>
-            Tu le remets ensuite à ton fournisseur. Aujourd'hui, une station
-            prend la série que son fournisseur lui vend ; là, elle arrive avec
-            la sienne.
+            Le cartable reste à portée de main pour les séries qui ne sont pas
+            encore numérisées. Et ça, ça avance à chaque mise à jour.
           </p>
         </article>
         <article class="carte">
@@ -335,7 +330,7 @@
       <!-- Version publiée : à changer ici et dans site/telecharger/index.html
            à chaque nouvelle sortie. -->
       <p class="surtitre" style="margin-bottom:18px">
-        Version 1.3.1 · Mac et Windows · 5 août 2026
+        Version 1.4.0 · Mac et Windows · 27 septembre 2026
       </p>
       <!-- Compteur d'inscriptions. Rempli par .github/workflows/compteur.yml,
            qui interroge Brevo quatre fois par jour. Reste caché tant que le
@@ -443,17 +438,12 @@
              communautaire a sa formule.</p>
         </li>
         <li>
-          <h3>Imprime tes cartes</h3>
-          <p>Paramètres → <strong>Imprimer les cartes</strong>. Tu choisis le
-             nombre de grilles par feuille, le format, la tranche de la base et
-             la teinte du papier ; le logiciel produit le <strong>PDF</strong>
-             à remettre à ton fournisseur. Ça se fait une fois, longtemps d'avance.</p>
-        </li>
-        <li>
           <h3>Anime</h3>
           <p>Chaque boule sortie du boulier, un clic. Un appel arrive : tu tapes
-             le numéro de carte, le verdict s'affiche, tu peux montrer la carte
-             à l'antenne et annoncer le gagnant.</p>
+             le <strong>numéro de série</strong> de la carte, le verdict
+             s'affiche, tu montres la carte à l'antenne et tu annonces le
+             gagnant. Si sa série n'est pas encore dans la base, le logiciel te
+             le dit tout de suite : tu la vérifies au cartable, comme avant.</p>
         </li>
         <li>
           <h3>Produis ton rapport</h3>
@@ -465,150 +455,159 @@
     </div>
   </section>
 
-  <!-- ============================ Les cartes ============================ -->
+  <!-- ============================ La base de cartes ============================
+       Les chiffres de cette section sont CONTRÔLÉS par tests/site.test.mjs :
+       pour chaque série, « data-integrees » doit égaler le nombre de cartes
+       réellement présentes dans data/cartes.json. Ajouter une série au
+       logiciel sans mettre cette page à jour fait échouer npm test — le
+       site ne peut pas annoncer autre chose que ce que le logiciel contient. -->
   <section id="cartes" class="bande bande-sombre">
     <div class="dedans">
-      <h2>Les cartes</h2>
-      <div class="grille-deux">
-        <article class="carte">
-          <h3>Une base fixe, pour toujours</h3>
-          <p>
-            Le logiciel est livré avec une base de <strong>50 000 cartes,
-            numérotées de 1 à 50 000</strong>. Elle est
-            <strong>libre de droits</strong> pour les télévisions communautaires
-            autonomes — elle ne dépend d'aucun fournisseur. De quoi tenir des
-            années sans jamais réutiliser une configuration.
-          </p>
-          <p>
-            Cette base <strong>ne changera jamais</strong>. La carte n° 4321
-            portera les mêmes 24 numéros dans dix ans qu'aujourd'hui, sur toutes
-            les machines et dans toutes les stations. C'est indispensable : tes
-            cartes papier vivent des années en salle, et une base qui bouge
-            rendrait fausses toutes celles déjà vendues.
-          </p>
-          <p>
-            Ce n'est pas une promesse, c'est vérifié à chaque mise à jour. Le
-            fichier porte une <strong>empreinte numérique</strong> et un test
-            refuse de passer si un seul octet a bougé.
-          </p>
-        </article>
-        <article class="carte">
-          <h3>Imprimer</h3>
-          <p>
-            La <strong>préparation</strong> se fait dans le logiciel — il n'y a
-            rien à téléverser ici, rien à commander : ta base voyage avec
-            l'application, et c'est elle qui produit le <strong>PDF prêt pour
-            la production</strong>, que tu remets à ton fournisseur.
-          </p>
-          <p>
-            De 1 à 18 grilles par feuille, en Letter, Legal ou A4. Surtout, tu
-            choisis <strong>de quel numéro à quel numéro</strong> — et c'est toi
-            qui décides du rythme : les cartes 1 à 300 pour le bingo de
-            dimanche, 301 à 600 la semaine d'après, ou toute la base d'un seul
-            coup pour ne commander qu'une fois par année. Dans
-            tous les cas, le résumé te dit d'avance combien de feuilles
-            sortiront, combien de temps ça prendra et ce que pèsera le fichier.
-          </p>
-          <p>
-            <strong>Tes couleurs</strong> : les blocs B-I-N-G-O prennent la
-            teinte de ton choix, une par série si tu veux les distinguer d'un
-            coup d'œil. Le reste reste noir sur blanc — ça s'imprime mieux, ça
-            coûte bien moins cher en encre, et ça se lit de loin.
-          </p>
-          <p>
-            Les numéros de série sont <strong>éparpillés</strong> sur
-            l'ensemble du tirage : une feuille ne porte jamais 1-2-3. Personne
-            ne peut deviner ce qu'il achète, et les grilles voisines ne se
-            retrouvent pas dans la même main. À graine égale, la répartition
-            est identique : un lot perdu se réimprime à l'identique.
-          </p>
-        </article>
-      </div>
-
-      <figure class="apercu">
-        <img src="images/impression.png" alt="Le panneau d'impression dans les Paramètres : grilles par feuille, format, tranche de cartes, couleur des blocs BINGO, et le bouton Produire le PDF." width="1600" height="570" loading="lazy">
-        <figcaption>
-          <strong>Où ça se trouve</strong> — dans la régie, bouton
-          <em>Paramètres</em>, section <em>Imprimer les cartes</em>. Tu règles,
-          le résumé te dit d'avance combien de feuilles sortiront, puis
-          <em>Produire le PDF</em> te demande où l'enregistrer. Le fichier est
-          prêt à remettre tel quel.
-        </figcaption>
-      </figure>
-
-      <h3 class="sous-titre">D'où viennent ces numéros de série ?</h3>
+      <h2>La base de cartes</h2>
       <p class="intro">
-        <strong>De nulle part, et c'est voulu.</strong> Ils n'ont été achetés,
-        copiés ni repris à personne. Ils ne viennent d'aucun fournisseur de
-        cartes de bingo — ni Bingo Vézina, ni aucun autre. Ils ont été
-        <strong>fabriqués par un programme, pour ce logiciel</strong>, et ils
-        n'appartiennent à aucune compagnie.
+        Bingo Studio est <strong>compatible avec les cartes papier Arrow
+        Games</strong> — celles que les télévisions communautaires du Québec
+        commandent déjà chez Bingo Vézina. Pour vérifier une carte, le logiciel
+        doit connaître ses 24 numéros : les séries ont été numérisées page par
+        page à partir des cartables, et la base voyage dans l'application.
+        Aucune connexion, aucune saisie de ta part.
       </p>
 
-      <div class="grille-deux">
+      <ul class="series">
+        <li class="serie-ligne" data-de="1" data-a="9000" data-integrees="9000">
+          <span class="serie-nom">1&nbsp;→&nbsp;9&nbsp;000</span>
+          <span class="serie-jauge" aria-hidden="true"><i style="width:100%"></i></span>
+          <span class="serie-etat"><strong>Intégrée</strong> · 9&nbsp;000 cartes, éprouvées en ondes depuis des années</span>
+        </li>
+        <li class="serie-ligne" data-de="27001" data-a="36000" data-integrees="7200">
+          <span class="serie-nom">27&nbsp;001&nbsp;→&nbsp;36&nbsp;000</span>
+          <span class="serie-jauge" aria-hidden="true"><i style="width:80%"></i></span>
+          <span class="serie-etat"><strong>En cours</strong> · 27&nbsp;001 à 34&nbsp;200 déjà dedans, lues et contre-vérifiées</span>
+        </li>
+        <li class="serie-ligne" data-de="45001" data-a="54000" data-integrees="0">
+          <span class="serie-nom">45&nbsp;001&nbsp;→&nbsp;54&nbsp;000</span>
+          <span class="serie-jauge" aria-hidden="true"><i style="width:0%"></i></span>
+          <span class="serie-etat"><strong>Bientôt</strong> · en numérisation</span>
+        </li>
+      </ul>
+      <p class="petit">
+        <strong>16&nbsp;200 cartes</strong> dans la version actuelle. Bientôt
+        <strong>27&nbsp;000</strong>, avec les trois séries complètes — chaque
+        mise à jour en ajoute.
+      </p>
+
+      <h3 class="sous-titre">Tes cartes sont-elles compatibles ? Regarde l'étiquette de ta boîte</h3>
+      <div class="etiquette">
+        <figure class="etiquette-photo">
+          <img src="images/boite-capitol.webp" width="1200" height="675" loading="lazy"
+               alt="Une boîte de cartes de bingo. L'étiquette indique : 6V2, 1-9000, CAPITOL, ORANGE BDR LOOSE, SHEETS 1500, REORDER FROM BINGO VEZINA, 5143292332.">
+          <figcaption>Une boîte de la série Capitol™ 1-9000, telle qu'elle arrive de chez Bingo Vézina.</figcaption>
+        </figure>
+        <dl class="etiquette-lecture">
+          <div><dt>CAPITOL™</dt><dd>La gamme de cartes Arrow.</dd></div>
+          <div><dt>1-9000</dt><dd>La série : les numéros de série des cartes de la boîte. C'est <strong>ce chiffre-là</strong> qui dit si le logiciel connaît tes cartes.</dd></div>
+          <div><dt>6V2</dt><dd>Six cartes par feuille.</dd></div>
+          <div><dt>ORANGE BDR</dt><dd>La couleur du papier.</dd></div>
+          <div><dt>SHEETS 1500</dt><dd>1 500 feuilles dans la boîte.</dd></div>
+          <div><dt>REORDER FROM BINGO VEZINA</dt><dd>Où la commander de nouveau.</dd></div>
+        </dl>
+      </div>
+
+      <div class="etiquette etiquette-carte">
+        <figure class="etiquette-photo">
+          <img src="images/feuille-capitol.webp" width="900" height="1282" loading="lazy"
+               alt="Une feuille de six cartes Capitol orange. Chaque carte porte son numéro de série dans la case FREE et en bas à droite, et le numéro de contrôle 242165 en rouge dans le bandeau B-I-N-G-O.">
+        </figure>
+        <div>
+          <h3>Sur la carte elle-même</h3>
+          <p>
+            Le <strong>numéro de série</strong> est imprimé deux fois : dans la
+            case <em>FREE</em> du centre, et en bas à droite. C'est lui que tu
+            tapes dans la régie.
+          </p>
+          <p>
+            Le nombre rouge dans le bandeau B-I-N-G-O, c'est le
+            <strong>numéro de contrôle</strong> du lot. Le logiciel n'en a pas
+            besoin pour vérifier la carte.
+          </p>
+          <p>
+            Sous le bandeau, en tout petit : <em>« © Arrow Intl. »</em>.
+          </p>
+          <p class="verifie">
+            ✓ Les six cartes de cette feuille — 1509, 1634, 1759, 1884, 2009 et
+            2134 — ont été comparées à la base du logiciel :
+            <strong>144 cases sur 144 identiques</strong>. Ce contrôle est
+            refait automatiquement à chaque mise à jour.
+          </p>
+        </div>
+      </div>
+
+      <div class="contact-bloc achat-cartes">
+        <div>
+          <strong>Où commander tes cartes</strong>
+          <p>
+            <strong>Bingo Vézina</strong> — Arrow Games<br>
+            8440, boulevard du Golf, Anjou (Québec)<br>
+            <a href="tel:+15143292332">514 329-2332</a> · sans frais
+            <a href="tel:+18003618197">1 800 361-8197</a>
+          </p>
+          <p class="petit">
+            Bingo Studio n'est ni vendu ni commandité par Arrow Games : c'est
+            simplement là que se commandent les cartes que le logiciel connaît.
+          </p>
+        </div>
+        <a class="bouton bouton-fort" href="https://www.arrowgames.com/" target="_blank" rel="noopener">Arrow Games / Bingo Vézina</a>
+      </div>
+
+      <div class="grille-deux" style="margin-top:30px">
         <article class="carte">
-          <h3>Comment elles sont fabriquées</h3>
+          <h3>Une fois, avant ton premier bingo</h3>
           <p>
-            Un générateur de nombres pseudo-aléatoires part d'un mot de départ —
-            une <strong>graine</strong>, ici la phrase <code>bingo studio
-            2026</code>. Cette graine est transformée en un nombre de départ,
-            puis un algorithme court en tire une suite de nombres. La même
-            graine redonne toujours exactement la même suite : c'est ce qui rend
-            la base reproductible.
-          </p>
-          <p>
-            Pour chaque carte, on pioche dans cette suite : 5 numéros parmi 1-15
-            pour la colonne B, 5 parmi 16-30 pour le I, 4 parmi 31-45 pour le N
-            (la case du centre est libre), 5 parmi 46-60 pour le G, 5 parmi
-            61-75 pour le O. Chaque carte est ensuite vérifiée — 24 numéros tous
-            différents, chaque colonne dans sa plage — et comparée à toutes les
-            précédentes pour qu'aucune ne se répète.
-          </p>
-          <p>
-            Il existe environ <strong>5,5 × 10<sup>26</sup></strong> cartes de
-            bingo différentes. Nos 50 000 sont une goutte dans cet océan : deux
-            cartes identiques sont impossibles en pratique.
-          </p>
-        </article>
-        <article class="carte">
-          <h3>Ce que ça implique pour toi</h3>
-          <p>
-            <strong>Personne ne peut te réclamer de droits</strong> sur ces
-            configurations. Elles n'appartiennent à aucune compagnie : il n'y a
-            ni licence à renouveler, ni fournisseur dont dépendrait ta capacité
-            à continuer.
-          </p>
-          <p>
-            <strong>En revanche, ces numéros ne valent que pour ce
-            logiciel.</strong> Le n° 4321 d'ici n'a rien à voir avec le n° 4321
-            d'un autre fournisseur — ce sont deux grilles de numéros
-            complètement différentes qui portent le même chiffre par hasard.
+            Prends une carte de tes livrets, tape son numéro de série, et
+            compare les 24 numéros à l'écran avec ceux du papier.
+            <strong>S'ils sont identiques, c'est ta série</strong> — tu peux
+            te fier au verdict.
           </p>
           <p class="mise-en-garde">
-            ⚠️ <strong>N'utilise jamais ce logiciel pour vérifier des cartes
-            achetées ailleurs.</strong> Il afficherait une grille qui n'est pas
-            celle que la personne a en main, et donnerait un mauvais verdict en
-            ondes. Les cartes que tu vérifies doivent venir du PDF produit par
-            le logiciel — c'est tout.
+            ⚠️ <strong>S'ils diffèrent</strong>, ta télé utilise une autre série
+            qui porte les mêmes numéros. Ne te fie pas au verdict :
+            <a href="mailto:marcbert@mailo.com?subject=Bingo%20Studio%20—%20ma%20série%20ne%20correspond%20pas">écris-moi</a>,
+            et vérifie au cartable en attendant.
+          </p>
+        </article>
+        <article class="carte">
+          <h3>Une carte qui n'est pas encore dedans</h3>
+          <p>
+            Le logiciel ne devine jamais. Si le numéro tapé n'est pas encore
+            numérisé, la régie te le dit tout de suite, et l'antenne affiche
+            <em>« vérification au cartable »</em> — rien qui laisse croire
+            que la carte est fausse.
+          </p>
+          <p>
+            Tu la vérifies à la main, comme tu l'as toujours fait. Et la
+            prochaine mise à jour la connaîtra peut-être.
           </p>
         </article>
       </div>
 
-      <div class="boutons" style="margin-top:28px">
-        <a class="bouton bouton-fort" href="preparer-les-cartes/">Le guide détaillé : préparer tes cartes</a>
+      <div class="contact-bloc appel-cartables">
+        <div>
+          <strong>Ta télé a d'autres séries dans ses cartables ?</strong>
+          <p>
+            <strong>Scanne-les et envoie-nous le PDF.</strong> On les lit, on
+            les contre-vérifie, et on les ajoute au logiciel — gratuitement,
+            avec grand plaisir, pour que ça profite à toutes les télés
+            communautaires.
+          </p>
+          <p class="petit">
+            Une imprimante qui numérise en PDF suffit : des pages entières,
+            bien droites, avec le titre de la série en haut. Si le fichier est
+            trop lourd pour un courriel, écris-moi d'abord et on trouvera un
+            moyen de te l'envoyer.
+          </p>
+        </div>
+        <a class="bouton bouton-fort" href="mailto:marcbert@mailo.com?subject=Bingo%20Studio%20—%20une%20série%20de%20cartes%20à%20ajouter">Envoyer mes pages</a>
       </div>
-      <p class="petit">
-        Les réglages un par un, les deux numéros du règlement, et ce qu'il faut
-        remettre à ton fournisseur. Avec les captures d'écran.
-      </p>
-
-      <p class="intro" style="margin-top:32px">
-        <strong>Besoin de plus de 50 000 numéros de série ?</strong>
-        C'est déjà large — mais si ta station en écoule davantage, ou veut
-        repartir sur une série neuve, écris-moi et je produis une base à ta
-        taille. Elle sera scellée comme celle-ci, et elle ne bougera plus jamais
-        non plus. <a href="#surmesure">Me joindre</a>.
-      </p>
     </div>
   </section>
 
@@ -634,33 +633,19 @@
           automatique.
         </p>
 
-        <h3 class="sous-titre">Le format des cartes</h3>
-        <p>
-          Les <em>Règles sur les bingos</em> (RLRQ c. L-6, r. 5, art. 72)
-          fixent la carte ordinaire : six rangées dont la première forme le mot
-          BINGO, cinq colonnes, 25 cases dont 24 numérotées de 1 à 75, une case
-          centrale gratuite, <strong>un numéro de contrôle et un numéro de
-          série</strong>.
-        </p>
-        <p>
-          En revanche, plusieurs choses ne sont <strong>pas</strong> imposées,
-          contrairement à ce qu'on croit souvent : ni le nombre de faces par
-          feuille, ni les dimensions du papier, ni son grammage, sa teinte ou
-          son contenu recyclé. Ce sont des usages commerciaux, pas des
-          obligations.
-        </p>
-
-        <h3 class="sous-titre">Ton approvisionnement en cartes</h3>
+        <h3 class="sous-titre">Tes cartes viennent de ton fournisseur, comme avant</h3>
         <p class="mise-en-garde">
           ⚠️ <strong>Un titulaire de licence de bingo-média doit s'approvisionner
           en cartes chez un titulaire de licence de fournisseur en bingo, et
           seules ces cartes peuvent être utilisées.</strong> Bingo Studio ne
-          change rien à cette obligation : il prépare le fichier, ton
-          fournisseur produit les cartes.
+          change rien à cette obligation, et n'y touche pas : il
+          <strong>n'imprime pas de cartes et n'en fournit pas</strong>. Il
+          affiche, le temps d'une vérification, les numéros d'une carte que la
+          personne a déjà achetée.
         </p>
         <p>
           La Régie publie la liste des fournisseurs licenciés. Vérifie que le
-          tien y figure avant de commander —
+          tien y figure —
           <a href="https://www.racj.gouv.qc.ca/" target="_blank" rel="noopener">registres
           publics de la RACJ</a>.
         </p>
@@ -668,18 +653,15 @@
         <h3 class="sous-titre">Où en est notre démarche</h3>
         <p>
           Nous avons soumis à la Régie une <strong>demande d'avis</strong> sur
-          l'encadrement de ce logiciel : le statut de l'éditeur, la façon dont
-          un fournisseur licencié peut produire des cartes à partir d'un fichier
-          remis par le titulaire, l'attribution des numéros de contrôle et de
-          série, et la confirmation que l'outil de vérification ne constitue pas
-          un bingo virtuel.
+          l'encadrement de ce logiciel. Depuis, le logiciel a cessé de préparer
+          des cartes : il ne reste qu'une question qui te concerne, la
+          confirmation que l'outil de vérification ne constitue pas un bingo
+          virtuel.
         </p>
         <p>
           <strong>Tant que la Régie ne s'est pas prononcée, nous n'affirmons
-          rien sur ces points.</strong> Bingo Studio est un outil de production
-          d'habillage et de vérification ; l'impression et la vente des cartes
-          demeurent la responsabilité du titulaire et de son fournisseur
-          licencié. Nous publierons la réponse ici dès que nous l'aurons.
+          rien sur ce point.</strong> Nous publierons sa réponse ici dès que
+          nous l'aurons.
         </p>
         <p class="petit">
           Chaque organisme demeure responsable d'obtenir et de respecter sa
@@ -698,6 +680,13 @@
       <p class="intro">
         Bingo Studio ne se vend pas. Aucune licence, aucun abonnement, aucune
         fonction bloquée : tu as le logiciel en entier, pour toujours.
+      </p>
+      <p class="intro">
+        En ce moment, <strong>on travaille fort à numériser les cartes
+        papier</strong>, page par page, pour nourrir la base du logiciel. Ta
+        télé en a d'autres dans ses cartables ?
+        <a href="#cartes">Scanne-les et envoie-nous le PDF</a> : on les ajoute,
+        pour toutes les télés.
       </p>
 
       <div class="etapes-contribution">
@@ -756,8 +745,7 @@
           incrustation, pubs, génériques. Mais chaque télé communautaire a ses
           habitudes, et il arrive qu'on ait besoin de plus : une formule de
           jeu particulière, un habillage aux couleurs de la station, une
-          intégration à votre chaîne technique, une reprise de vos propres
-          cartes.
+          intégration à votre chaîne technique.
         </p>
         <p>
           <strong>Ça, ça se discute.</strong> Écris-moi et on regarde ce dont
@@ -779,9 +767,9 @@
     <p><strong>Bingo Studio</strong> — construit en Gaspésie, pour les bingos communautaires.</p>
     <p class="petit">
       © <span id="annee">2026</span> Marc Bert. Logiciel offert gratuitement.
-      La base de 50 000 configurations de cartes est <strong>libre de droits
-      pour les télévisions communautaires autonomes</strong>. L'impression et la
-      vente des cartes demeurent régies par les Règles sur les bingos.
+      La base de cartes reprend les séries papier Arrow Games pour la seule
+      vérification en ondes ; le logiciel n'imprime pas de cartes. Leur
+      fourniture et leur vente demeurent régies par les Règles sur les bingos.
     </p>
     <p class="pied-contact">
       <strong>Contactez Marc</strong> —

@@ -207,18 +207,27 @@ function rafraichirVerification() {
   }
 }
 
-// Le nombre de cartes se lit dans la base chargée, il n'est écrit nulle part
-// en dur : quiconque génère sa propre base voit ses vrais chiffres.
+// Le nombre de cartes et les séries se lisent dans la base chargée, rien
+// n'est écrit en dur : chaque série numérisée qui s'ajoute apparaît ici
+// d'elle-même.
 function numerosCatalogue() {
   return Object.keys(catalogue).map(Number).sort((a, b) => a - b);
 }
+
+/** Les séries présentes, « 1–9 000 · 27 001–34 200 ». */
+function seriesCatalogue() {
+  const t = [];
+  for (const n of numerosCatalogue()) {
+    const d = t.at(-1);
+    if (d && n === d[1] + 1) d[1] = n; else t.push([n, n]);
+  }
+  const f = (n) => n.toLocaleString("fr-CA");
+  return t.map(([a, b]) => `${f(a)}–${f(b)}`).join(" · ");
+}
+
 function descriptionCatalogue() {
   const n = Object.keys(catalogue).length;
-  return n ? `Catalogue de ${n.toLocaleString("fr-CA")} cartes` : "Catalogue non chargé";
-}
-function bornesCatalogue() {
-  const nums = numerosCatalogue();
-  return nums.length ? `${nums[0]} à ${nums.at(-1)}` : "aucune carte";
+  return n ? `${n.toLocaleString("fr-CA")} cartes · séries ${seriesCatalogue()}` : "Catalogue non chargé";
 }
 
 function dessinerVerification() {
@@ -238,7 +247,10 @@ function dessinerVerification() {
   }
 
   if (verification.statut === "INTROUVABLE") {
-    verdict.textContent = `Carte ${verification.numero || "?"} inexistante (${bornesCatalogue()})`;
+    // « Inexistante » serait faux : la carte existe sur le papier, c'est sa
+    // série qui n'est pas encore numérisée. L'opératrice doit le savoir
+    // tout de suite — et savoir quoi faire : le cartable, comme avant.
+    verdict.textContent = `Carte ${verification.numero || "?"} pas dans la base — vérifie au cartable (séries ${seriesCatalogue()})`;
     verdict.className = "verdict introuvable";
     for (let i = 0; i < 25; i++) {
       const el = document.createElement("div");
@@ -1977,7 +1989,7 @@ async function demarrer() {
     // Le champ de vérification se règle sur la base RÉELLEMENT chargée. En dur
     // à 4 chiffres, il aurait avalé le « 4 » de la carte 12345 sans un bruit :
     // l'opératrice aurait lu « introuvable » en ondes, avec la bonne carte en
-    // main. Une station qui génère sa propre base est couverte aussi.
+    // main. Chaque série qui s'ajoute à la base est couverte d'elle-même.
     const chiffres = String(nums.at(-1)).length;
     $("verif-num").maxLength = chiffres;
     $("verif-num").placeholder = "0".repeat(chiffres);

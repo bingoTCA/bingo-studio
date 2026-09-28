@@ -367,7 +367,9 @@ app.whenReady().then(async () => {
   );
   await attendre(400);
 
-  // --- 9 et 10. Deux sections des Paramètres ---------------------------
+  // --- 9. Les couleurs, dans les Paramètres -----------------------------
+  // (La dixième diapositive, l'impression des cartes, est retirée avec
+  // la fonction elle-même : la base est celle des cartes Arrow Games.)
   await regie.webContents.executeJavaScript(
     `document.getElementById("btn-reglages").click(); true;`
   );
@@ -375,13 +377,6 @@ app.whenReady().then(async () => {
 
   await allerAuReglage(regie, "Couleurs");
   await photographier(regie, "9-couleurs.png", { couleurs: "#reg-ambiance" });
-
-  await allerAuReglage(regie, "Imprimer les cartes");
-  await photographier(regie, "10-impression.png", {
-    // Les quatre coins du bloc de champs : le cadre doit les englober
-    // tous, sinon il ne montre qu'une colonne.
-    hautGauche: "#imp-par-feuille", hautDroite: "#imp-couleur", bas: "#imp-controle"
-  });
 
   writeFileSync(join(SORTIE, "reperes.json"), JSON.stringify(reperes, null, 2));
   console.log(`\nDossier → ${SORTIE}`);

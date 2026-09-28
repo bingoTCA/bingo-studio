@@ -16,7 +16,11 @@
     <span id="pastille-onde" class="pastille pastille-onde">En ondes</span>
     <button id="btn-pause" class="bouton">Couper l'antenne</button>
     <button id="btn-ecrans" class="bouton">Envoyer l'antenne…</button>
-    <button id="btn-cartes" class="bouton">Imprimer les cartes</button>
+    <!-- Impression mise de côté : la base est désormais celle des cartes
+         papier Arrow. Imprimer ces séries, ce serait reproduire les
+         cartes d'un fournisseur — elles se commandent chez lui. Le code
+         reste en place, masqué, pour le jour où une base propre revient. -->
+    <button id="btn-cartes" class="bouton" hidden>Imprimer les cartes</button>
     <button id="btn-reglages" class="bouton">Paramètres</button>
   </div>
 </header>
@@ -363,42 +367,47 @@
         <input id="reg-rebours-volume" type="range" min="0" max="100" step="5">
       </label>
 
-      <h3 id="titre-impression">Imprimer les cartes</h3>
-      <p class="aide">Monte les feuilles à remettre à ton fournisseur licencié. Les numéros
-         sont éparpillés : une feuille ne porte jamais 1-2-3. Seuls les blocs
-         B-I-N-G-O prennent ta couleur ; le reste est noir sur blanc, pour que
-         l'impression reste lisible et bon marché.</p>
-      <p class="aide">Le <strong>numéro de contrôle</strong> s'imprime en rouge
-         au milieu du bandeau, identique sur toutes les cartes du lot. C'est lui
-         qui identifie la série mise en circulation — change-le à chaque
-         nouveau tirage, comme la couleur du papier. Le <strong>numéro de la
-         face</strong>, lui, s'imprime tout seul dans la case du centre et en
-         bas à droite.</p>
-      <div class="reg-impression">
-        <label>Grilles par feuille
-          <select id="imp-par-feuille"></select>
-        </label>
-        <label>Format
-          <select id="imp-format"></select>
-        </label>
-        <label>De la carte
-          <input id="imp-de" type="number" min="1">
-        </label>
-        <label>à la carte
-          <input id="imp-a" type="number" min="1">
-        </label>
-        <label>Couleur des blocs BINGO
-          <input id="imp-couleur" type="color" value="#000000">
-        </label>
-        <label>Numéro de contrôle
-          <input id="imp-controle" type="text" maxlength="12" placeholder="174246"
-                 autocomplete="off">
-        </label>
-      </div>
-      <p id="imp-resume" class="aide"></p>
-      <div class="verif-actions">
-        <button id="btn-imprimer-pdf" class="bouton bouton-primaire">Produire le PDF</button>
-        <button id="btn-imprimer-apercu" class="bouton">Voir un aperçu</button>
+      <!-- Masqué avec le bouton « Imprimer les cartes » : voir l'en-tête. Les
+           champs restent dans la page parce que regie.js les renseigne au
+           démarrage ; les retirer casserait le chargement du catalogue. -->
+      <div id="section-impression" hidden>
+        <h3 id="titre-impression">Imprimer les cartes</h3>
+        <p class="aide">Monte les feuilles à remettre à ton fournisseur licencié. Les numéros
+           sont éparpillés : une feuille ne porte jamais 1-2-3. Seuls les blocs
+           B-I-N-G-O prennent ta couleur ; le reste est noir sur blanc, pour que
+           l'impression reste lisible et bon marché.</p>
+        <p class="aide">Le <strong>numéro de contrôle</strong> s'imprime en rouge
+           au milieu du bandeau, identique sur toutes les cartes du lot. C'est lui
+           qui identifie la série mise en circulation — change-le à chaque
+           nouveau tirage, comme la couleur du papier. Le <strong>numéro de la
+           face</strong>, lui, s'imprime tout seul dans la case du centre et en
+           bas à droite.</p>
+        <div class="reg-impression">
+          <label>Grilles par feuille
+            <select id="imp-par-feuille"></select>
+          </label>
+          <label>Format
+            <select id="imp-format"></select>
+          </label>
+          <label>De la carte
+            <input id="imp-de" type="number" min="1">
+          </label>
+          <label>à la carte
+            <input id="imp-a" type="number" min="1">
+          </label>
+          <label>Couleur des blocs BINGO
+            <input id="imp-couleur" type="color" value="#000000">
+          </label>
+          <label>Numéro de contrôle
+            <input id="imp-controle" type="text" maxlength="12" placeholder="174246"
+                   autocomplete="off">
+          </label>
+        </div>
+        <p id="imp-resume" class="aide"></p>
+        <div class="verif-actions">
+          <button id="btn-imprimer-pdf" class="bouton bouton-primaire">Produire le PDF</button>
+          <button id="btn-imprimer-apercu" class="bouton">Voir un aperçu</button>
+        </div>
       </div>
 
       <h3 id="titre-sauvegarde">Sauvegarder tes réglages</h3>

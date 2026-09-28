@@ -128,31 +128,6 @@ app.whenReady().then(async () => {
   await photographier(antenne, "antenne.png");
   await photographier(regie, "regie.png");
 
-  // Troisième vue : le panneau d'impression des cartes, dans les
-  // Paramètres. C'est la seule fonction qui ne se voit sur aucun des
-  // deux écrans précédents.
-  const impression = new BrowserWindow({
-    width: 1200, height: 428, show: false,
-    webPreferences: { preload: join(RACINE, "preload.js"), contextIsolation: true, offscreen: true }
-  });
-  await impression.loadURL(`http://127.0.0.1:${PORT}/regie`);
-  await attendre(900);
-  await impression.webContents.executeJavaScript(`
-    (() => {
-      document.getElementById("btn-reglages").click();
-      const titre = document.getElementById("titre-impression");
-      // On cherche l'ancêtre qui défile réellement : selon la hauteur de la
-      // fenêtre, ce peut être .param-corps ou le document lui-même.
-      let boite = titre.parentElement;
-      while (boite && boite.scrollHeight <= boite.clientHeight) boite = boite.parentElement;
-      const cible = boite || document.scrollingElement;
-      const ecart = titre.getBoundingClientRect().top - cible.getBoundingClientRect().top;
-      cible.scrollTop += ecart - 18;   // 18 px d'air au-dessus du titre
-      return { conteneur: cible.className || cible.tagName, position: Math.round(cible.scrollTop) };
-    })();
-  `).then((r) => console.log(`  (défilement : ${r.conteneur} → ${r.position} px)`));
-  await attendre(400);
-  await photographier(impression, "impression.png");
 
   console.log(`\nDossier → ${SORTIE}`);
 

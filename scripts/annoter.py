@@ -83,11 +83,6 @@ REPERES = {
         {"zones": ["couleurs"], "texte": "Une couleur, et tout l'habillage suit",
          "centre": (0.535, 0.208), "fleche": True},
     ],
-    "10-impression.png": [
-        {"zones": ["hautGauche", "hautDroite", "bas"],
-         "texte": "Le format, la tranche de cartes, la couleur, le contrôle",
-         "centre": (0.50, 0.625)},
-    ],
 }
 
 

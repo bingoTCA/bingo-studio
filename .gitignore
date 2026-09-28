@@ -7,3 +7,8 @@ data/cartes-nouvelles.*
 data/cartes-precedentes.json
 captures/
 data/echantillon-*
+
+# La base de cartes reprend les séries papier Arrow Games : elle voyage
+# dans les installateurs, pas en fichier brut dans ce dépôt public.
+# Voir README, « Le fichier de la base n'est pas dans ce dépôt ».
+data/cartes.json

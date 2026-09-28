@@ -4,8 +4,9 @@ Régie de bingo télé. Le boulier reste devant la caméra — le logiciel ne ti
 rien. Il fait les deux choses qui font mal en direct : **l'habillage à
 l'antenne** et **la vérification d'une carte au téléphone**.
 
-Catalogue de **50 000 cartes libres de droits**, vérification instantanée contre les
-numéros déjà sortis.
+**Compatible avec les cartes papier Arrow Games** (Capitol™, Bingo Vézina) :
+les séries 1–9 000 et 27 001–34 200 sont déjà dans le logiciel, vérification
+instantanée contre les numéros déjà sortis.
 
 Offert gratuitement aux organismes communautaires. Un projet personnel de
 Marc Bert.
@@ -266,7 +267,7 @@ un peu petits valent mieux que six gros et quatre invisibles.
 
 ## Vérifier une carte
 
-Tape le numéro de carte (1 à 50 000). Verdict immédiat : **gagnante**, ou
+Tape le numéro de série de la carte. Verdict immédiat : **gagnante**, ou
 **il reste N cases**. La grille montre les cases marquées et surligne la figure
 retenue en jaune.
 
@@ -328,167 +329,73 @@ des gagnants à perdre.
 
 ---
 
-## La base de cartes — scellée
+## La base de cartes — les séries papier Arrow Games
 
-`data/cartes.json` porte **50 000 cartes, numérotées de 1 à 50 000**, générées
-avec la graine `bingo-studio 2026`. Elle est **libre de droits pour les
-télévisions communautaires autonomes**.
+Bingo Studio est **compatible avec les cartes papier Arrow Games** (gamme
+Capitol™, distribuées au Québec par Bingo Vézina). La base contient les séries
+numérisées page par page à partir des cartables des télévisions communautaires :
 
-**Cette base ne change jamais, et c'est essentiel.** Les cartes papier vivent
-des années dans les salles ; si la carte n° 4321 portait d'autres numéros après
-une mise à jour, toutes celles déjà vendues deviendraient fausses et la
-vérification en ondes donnerait de mauvais verdicts. Trois garde-fous :
-
-1. **L'empreinte.** `data/cartes.manifeste.json` consigne le SHA-256 du
-   fichier. `npm test` le recalcule à chaque exécution : un seul octet modifié
-   fait échouer les tests, avant la diffusion et non devant public.
-2. **La graine.** À graine égale, le générateur reproduit la base
-   *rigoureusement* à l'identique — vérifié : régénérer avec
-   `bingo-studio 2026` redonne un fichier identique octet pour octet. La base
-   est donc reconstructible même si le fichier était perdu.
-3. **La numérotation.** De 1 à 50 000, sans trou. (Il n'y a pas de carte n° 0 :
-   une série commence à 1.)
-
-### D'où viennent ces numéros
-
-Ils ne sont **repris à personne** : ni à Bingo Vézina, ni à aucun autre
-fournisseur. Ils sortent de `scripts/generer-cartes.mjs`.
-
-La graine (`bingo-studio 2026`) est hachée en FNV-1a pour donner un entier de
-départ, qui alimente un générateur **mulberry32** — un PRNG de 32 bits en
-quelques lignes, déterministe et sans dépendance. Pour chaque carte on y puise
-5 numéros dans 1-15 (colonne B), 5 dans 16-30 (I), 4 dans 31-45 (N, centre
-libre), 5 dans 46-60 (G), 5 dans 61-75 (O). Chaque carte est validée puis
-comparée aux précédentes par signature, pour qu'aucune ne se répète.
-
-Conséquence pratique : **ces numéros de série ne valent que pour ce logiciel**.
-La carte n° 4321 d'ici et celle d'un autre fournisseur portent le même chiffre
-et deux grilles sans rapport. Vérifier une carte achetée ailleurs afficherait
-la mauvaise grille et donnerait un mauvais verdict en ondes.
-
-**Étendre une base ne casse rien.** Vérifié : régénérer de 1 à 50 000 avec la
-même graine redonne les 10 000 premières cartes *à l'identique* — le générateur
-avance séquentiellement, donc une base plus courte est un préfixe exact de la
-plus longue. Une station peut donc passer à une base plus grande sans invalider
-les cartes déjà imprimées.
-
-Tu n'as donc **rien à régénérer**. Après un changement volontaire, resceller :
-
-```bash
-npm run sceller -- --graine="bingo-studio 2026"
-```
-
-## Imprimer les cartes
-
-```bash
-npm run feuilles -- --par-feuille=3 --pdf
-```
-
-Produit `data/feuilles-3-grilles.html` **et le PDF** à envoyer à l'imprimeur.
-
-| Option | Rôle |
+| Série | Dans le logiciel |
 |---|---|
-| `--par-feuille=N` | 1, 2, 3, 4, 6, 9, 12 ou 18 grilles par feuille |
-| `--de=N --a=N` | ne monter qu'une tranche de la base |
-| `--format=NOM` | Letter (défaut), Legal ou A4 |
-| `--couleur=#HEX` | couleur des blocs B-I-N-G-O (défaut noir) — une par série pour les distinguer |
-| `--graine=TEXTE` | graine de répartition, à noter |
-| `--pdf` | produit le PDF (rendu par Electron, aucune bibliothèque en plus) |
+| 1 à 9 000 | intégrée — 9 000 cartes, éprouvées en ondes depuis des années |
+| 27 001 à 36 000 | en cours — 27 001 à 34 200 intégrées |
+| 45 001 à 54 000 | à venir |
 
-**Les numéros de série sont éparpillés.** Une feuille ne porte jamais 1-2-3,
-mais par exemple 24, 27, 6 : la liste complète est brassée avant d'être
-découpée en feuilles. Un acheteur ne peut pas deviner ce qu'il aura, et les
-grilles voisines ne se retrouvent pas dans la même main. À graine égale la
-répartition est identique — un lot perdu se réimprime à l'identique.
+**16 200 cartes** aujourd'hui, **27 000** à terme.
 
-### Ce que porte chaque carte
+### Vérifiée contre le papier
 
-Calqué sur les cartes réellement en circulation au Québec, photographiées et
-comparées :
+- Les cartes lues par OCR ont été confrontées aux pages scannées (lecture
+  triple, corrections à la main consignées).
+- Six cartes d'une vraie feuille Capitol™ 1-9000 — 1509, 1634, 1759, 1884,
+  2009, 2134 — sont gravées dans `tests/papier.test.mjs` : 144 cases sur 144
+  identiques. Une réinstallation qui décalerait une série est attrapée là.
 
-| Élément | Où | Quoi |
-|---|---|---|
-| **Numéro de contrôle** | en rouge, au centre du bandeau B-I-N-G-O | **le même sur tout le tirage** — il identifie le lot mis en circulation, et change à chaque nouvelle série, comme la couleur du papier |
-| **Numéro de la face** | dans la case centrale, sous « GRATUIT », et répété en bas à droite | propre à chaque carte. Deux endroits, parce qu'en fin de partie le centre disparaît sous les jetons |
+### Une carte hors de la base
 
-L'article 72 exige les deux, plus la mention « gratuit » au centre.
+Le logiciel ne devine jamais. La régie affiche « pas dans la base — vérifie au
+cartable », l'antenne « vérification au cartable » : rien qui laisse croire que
+la carte est fausse. Sa série n'est simplement pas encore numérisée.
 
-⚠️ **Qui attribue ces numéros, et selon quelle règle, n'est pas tranché** : une
-demande d'avis est en cours auprès de la Régie. Le logiciel imprime ce que la
-station lui donne ; il ne gère aucun registre d'attribution.
+### Ajouter une série
 
-**Seuls les blocs B-I-N-G-O prennent la couleur.** Le papier reste blanc et les
-carreaux noir sur blanc : c'est ce qui s'imprime le mieux, coûte le moins cher
-en encre et se lit de plus loin. L'encre des lettres bascule toute seule entre
-noir et blanc selon la luminance du fond choisi — un jaune vif ne donnera pas
-des lettres blanches illisibles.
-
-La mention de droits du manifeste est imprimée au bas de chaque feuille.
-
-### Plus de 50 000 numéros de série
-
-Une station qui écoule beaucoup de cartes peut en vouloir davantage. Générer
-une base plus grande ne pose aucun problème de fond : il existe environ
-**5,5 × 10²⁶** cartes de bingo distinctes, donc les collisions sont
-impensables. Mesuré sur cette machine :
-
-| Cartes | Fichier | Temps |
-|---|---|---|
-| 10 000 | 878 Ko | 0,11 s |
-| 50 000 | 4,3 Mo | 0,30 s |
-| 200 000 | 17 Mo | 1,12 s |
-| 500 000 | 44 Mo | 2,85 s |
-
-La limite n'est pas la génération mais la **mémoire du navigateur** : le
-catalogue entier est chargé pour la vérification en ondes. Jusqu'à 50 000, rien
-à signaler. Au-delà de 200 000, il faudrait charger la base par tranches.
-
-> **Format du papier.** Le PDF sort en Letter 8,5 × 11 po par défaut. Je n'ai
-> pas trouvé de source fiable sur les formats de papier de bingo en usage au
-> Québec — les fournisseurs nord-américains vendent du 3-on, 6-on, 9-on
-> jusqu'à 18-on, en séries numérotées 1–9 000, 9–18 000, 18–27 000, mais sans
-> dimension publiée. **À confirmer avec ton imprimeur** avant un gros tirage :
-> `--format` et `--par-feuille` s'ajustent en conséquence.
-
-## Regénérer une base (si un jour tu en veux une autre)
-
-Pour ne plus dépendre du fichier acheté — et posséder tes numéros.
+Une télé scanne son cartable et envoie le PDF ; on le lit (chaîne OCR du
+projet BINGO 1.0 v2, dossier `ocr_arrow/`), puis on installe le CSV complet :
 
 ```bash
-npm run cartes -- --graine="ma graine" --debut=1 --fin=50000
+node scripts/importer-base.mjs --csv=chemin/cartes.csv --verifier   # contrôle seul
+node scripts/importer-base.mjs --csv=chemin/cartes.csv              # installe et scelle
 ```
 
-Ça produit deux fichiers dans `data/` :
+Format : `carte,B1..B5,I1..I5,N1,N2,N4,N5,G1..G5,O1..O5` — la carte lue colonne
+par colonne, N3 (case libre) absente ou présente. L'import refuse tout numéro
+hors de sa colonne, toute case illisible, tout numéro de carte en double, et
+n'installe rien tant qu'il reste un problème. Il écrit `data/cartes.json` et
+`data/cartes.manifeste.json` (tranches, empreinte SHA-256).
 
-| Fichier | Pour qui |
-|---|---|
-| `cartes-nouvelles.json` | le logiciel |
-| `cartes-nouvelles.csv` | **l'imprimeur** — même format que `A09036original.csv` |
+Puis **mettre à jour la section `#cartes` du site** : `tests/site.test.mjs`
+refuse une page qui annonce d'autres chiffres que ceux de la base.
 
-**Note ta graine.** À graine égale, la base produite est rigoureusement
-identique : tu peux la régénérer si le fichier est perdu, et montrer à la
-Régie qu'elle n'a pas été bricolée après coup. Une graine différente donne une
-base entièrement différente.
+### Le fichier de la base n'est pas dans ce dépôt
 
-Le générateur refuse d'écrire quoi que ce soit tant que tout n'est pas
-irréprochable : 24 numéros distincts par carte, case centrale libre, chaque
-colonne dans sa plage (B 1-15, I 16-30, N 31-45, G 46-60, O 61-75), et
-**aucune carte identique à une autre** — deux cartes jumelles, ce sont deux
-gagnants en même temps.
+Les pages des séries portent la mention *« Any reproduction requires the
+approved written consent of Arrow International Inc. »*. `data/cartes.json`
+est donc exclu du dépôt public (`.gitignore`) : il voyage dans les
+installateurs du logiciel, pas en fichier brut téléchargeable par n'importe
+qui. Le manifeste, lui, est publié — on voit ce que contient la base sans la
+diffuser. Pour construire le logiciel, installer d'abord la base avec
+`importer-base.mjs`.
 
-Pour basculer sur une nouvelle base :
+### L'impression des cartes est mise de côté
 
-```bash
-npm run cartes -- --graine="AUTRE GRAINE" --fin=50000 --installer
-npm run sceller -- --graine="AUTRE GRAINE"
-```
-
-L'ancienne base est copiée dans `data/cartes-precedentes.json` avant d'être
-remplacée. ⚠️ À ne faire qu'avec les cartes imprimées depuis le **nouveau**
-CSV : les anciennes cartes papier ne correspondront plus.
-
-Autres options : `--sortie=CHEMIN`, `--sans-csv`, `--aide`.
-
+Bingo Studio a d'abord livré sa propre base de 50 000 cartes générées par
+programme, avec un module d'impression. Ce projet est mis de côté : imprimer
+les séries Arrow Games reviendrait à reproduire les cartes d'un fournisseur,
+et les cartes se commandent chez un fournisseur licencié. Le bouton et la
+section d'impression sont **masqués** dans la régie (`hidden`) —
+`tests/site.test.mjs` vérifie qu'ils le restent. Le code (`src/core/feuilles.js`,
+`scripts/generer-cartes.mjs`, `scripts/feuilles-cartes.mjs`) reste en place, et
+l'ancienne base se régénère à l'identique avec la graine `bingo studio 2026`.
 
 ## Structure
 
@@ -519,9 +426,11 @@ source OBS sans être écrit trois fois.
 npm test
 ```
 
-Vérifie les figures, la case libre, la détection de gagnant, l'intégrité des
-Les 50 000 cartes et les refus de saisie. Une erreur de détection de gagnant est une
-erreur devant public : lance-les avant chaque diffusion.
+Vérifie les figures, la case libre, la détection de gagnant, l'intégrité de
+la base (tranches complètes, empreinte, six cartes contrôlées sur le papier),
+l'accord entre le site et la base, et les refus de saisie. Une erreur de
+détection de gagnant est une erreur devant public : lance-les avant chaque
+diffusion.
 
 ## Empaqueter
 

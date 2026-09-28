@@ -482,8 +482,11 @@ function dessinerVerification(v, actif) {
   // un trou noir au milieu de l'écran.
   if (!v || v.statut === "INTROUVABLE") {
     corps.innerHTML = '<p class="verif-attente">En attente du numéro de carte…</p>';
+    // En ondes, « aucune carte » laisserait croire que la carte est fausse.
+    // Elle est vraie : c'est sa série qui n'est pas encore numérisée, et
+    // l'animateur la vérifie au cartable, comme on l'a toujours fait.
     verdict.textContent = v?.statut === "INTROUVABLE" && v.numero
-      ? `Aucune carte ${v.numero} dans la base`
+      ? `Carte ${v.numero} : vérification au cartable`
       : "";
     verdict.className = "verif-verdict" + (v?.statut === "INTROUVABLE" && v.numero ? " introuvable" : "");
     return;

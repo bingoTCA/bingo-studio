@@ -573,3 +573,7 @@ code {
 .contact-bloc p strong { display: inline; color: #fff; margin: 0; }
 .contact-bloc p + p { margin-top: 8px; }
 .achat-cartes, .appel-cartables { margin-top: 26px; }
+
+/* Les deux captures de BINGO Habillage TV, côte à côte. */
+.habillage-captures { margin: 8px 0 26px; }
+.habillage-captures .apercu { margin-bottom: 0; }

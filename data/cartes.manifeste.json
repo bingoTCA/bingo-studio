@@ -8,14 +8,18 @@
     ],
     [
       27001,
-      34200
+      36000
+    ],
+    [
+      45001,
+      54000
     ]
   ],
   "premier": 1,
-  "dernier": 34200,
-  "nombre": 16200,
+  "dernier": 54000,
+  "nombre": 27000,
   "doublonsConnus": [],
-  "empreinte": "sha256:656278bfc90c91180936508f97457007ebf515f4823b63235407be473057e934",
-  "scelleLe": "2026-09-28",
+  "empreinte": "sha256:4b556842f176f42b9fb0f24e4d2e9dfe909d58ed30155e7f9df9db39b1b77489",
+  "scelleLe": "2026-10-06",
   "note": "Ne pas modifier data/cartes.json à la main : npm test refuse toute base dont l'empreinte ne correspond plus. Pour ajouter une série : relancer scripts/importer-base.mjs sur le CSV complet."
 }

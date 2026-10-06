@@ -41,3 +41,36 @@ for (const [numero, papier] of Object.entries(FEUILLE_CAPITOL)) {
     });
   });
 }
+
+// ---------------------------------------------------------------------
+//  Les classeurs de vérification, page contre base.
+//
+//  Six cartes relevées à l'œil sur les pages scannées des classeurs, là
+//  où une numérisation se trompe le plus volontiers : la page 201 de la
+//  série 45 001–54 000 (fichier « 192-209 », mal nommé et décalé d'une
+//  page — les numéros imprimés ont été suivis), et la DERNIÈRE page de
+//  chaque série, où une page manquante ou doublée décalerait tout.
+//  Relevé le 6 octobre 2026 : 13 cartes, 312 cases sur 312 identiques.
+// ---------------------------------------------------------------------
+
+const PAGES_DE_CLASSEUR = {
+  49801: { B: [2, 4, 7, 14, 12],   I: [23, 30, 27, 25, 21], N: [41, 36, 0, 39, 44], G: [47, 57, 58, 46, 56], O: [67, 70, 66, 64, 61] },
+  49824: { B: [7, 9, 13, 4, 12],   I: [26, 30, 29, 18, 27], N: [40, 45, 0, 33, 42], G: [56, 59, 48, 58, 60], O: [61, 66, 73, 68, 63] },
+  35977: { B: [12, 9, 8, 3, 6],    I: [16, 17, 21, 25, 22], N: [37, 31, 0, 43, 32], G: [49, 54, 47, 50, 53], O: [69, 63, 65, 71, 62] },
+  36000: { B: [13, 11, 10, 7, 5],  I: [16, 17, 21, 30, 27], N: [39, 35, 0, 40, 36], G: [50, 53, 56, 55, 48], O: [61, 71, 72, 73, 69] },
+  53977: { B: [15, 11, 14, 8, 2],  I: [17, 20, 29, 19, 23], N: [35, 43, 0, 42, 44], G: [60, 47, 49, 51, 59], O: [71, 73, 62, 74, 70] },
+  54000: { B: [11, 13, 6, 2, 15],  I: [23, 22, 30, 25, 27], N: [31, 32, 0, 39, 33], G: [51, 60, 50, 48, 56], O: [65, 73, 61, 70, 75] }
+};
+
+for (const [numero, page] of Object.entries(PAGES_DE_CLASSEUR)) {
+  test(`la carte ${numero} du classeur scanné est identique, case pour case, à la base`, () => {
+    const g = catalogue[numero];
+    assert.ok(g, `la carte ${numero} a disparu de la base`);
+    "BINGO".split("").forEach((lettre, col) => {
+      page[lettre].forEach((attendu, ligne) => {
+        assert.equal(g[ligne][col], attendu,
+          `carte ${numero}, case ${lettre}${ligne + 1} : le classeur porte ${attendu}, la base ${g[ligne][col]}`);
+      });
+    });
+  });
+}

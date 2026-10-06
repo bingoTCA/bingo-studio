@@ -5,7 +5,7 @@ rien. Il fait les deux choses qui font mal en direct : **l'habillage à
 l'antenne** et **la vérification d'une carte au téléphone**.
 
 **Compatible avec les cartes papier Arrow Games** (Capitol™, Bingo Vézina) :
-les séries 1–9 000 et 27 001–34 200 sont déjà dans le logiciel, vérification
+les séries 1–9 000, 27 001–36 000 et 45 001–54 000 sont dans le logiciel, vérification
 instantanée contre les numéros déjà sortis.
 
 Offert gratuitement aux organismes communautaires. Un projet personnel de
@@ -340,10 +340,10 @@ gagnantes :
 | Série | Dans le logiciel |
 |---|---|
 | 1 à 9 000 | intégrée — 9 000 cartes, éprouvées en ondes depuis des années |
-| 27 001 à 36 000 | en cours — 27 001 à 34 200 intégrées |
-| 45 001 à 54 000 | à venir |
+| 27 001 à 36 000 | intégrée — 9 000 cartes |
+| 45 001 à 54 000 | intégrée — 9 000 cartes |
 
-**16 200 cartes** aujourd'hui, **27 000** à terme.
+**27 000 cartes**, trois séries complètes (version 1.4.1).
 
 ### Vérifiée contre le papier
 
@@ -352,6 +352,11 @@ gagnantes :
 - Six cartes d'une vraie feuille Capitol™ 1-9000 — 1509, 1634, 1759, 1884,
   2009, 2134 — sont gravées dans `tests/papier.test.mjs` : 144 cases sur 144
   identiques. Une réinstallation qui décalerait une série est attrapée là.
+- Six cartes relevées sur les pages scannées des classeurs y sont aussi : la
+  page 201 de la série 45 001–54 000 (fichier mal nommé, décalé d'une page) et
+  la dernière page de chaque série (36 000, 54 000). Au contrôle de la 1.4.1,
+  13 cartes ont été relevées : 312 cases sur 312 identiques, et les 16 200
+  cartes de la 1.4.0 sont restées identiques.
 
 ### Une carte hors de la base
 
